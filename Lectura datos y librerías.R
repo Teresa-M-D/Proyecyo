@@ -9,3 +9,7 @@ library(plotly)
 library(scatterplot3d)
 library(vcd)
 library(ggplot2)
+
+#corrección nombre variable 
+df["Nationality"]=df["Nacionality"]
+df$Nacionality<-NULL
