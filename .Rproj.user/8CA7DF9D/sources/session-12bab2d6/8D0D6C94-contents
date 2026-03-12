@@ -13,7 +13,3 @@ library(ggplot2)
 #corrección nombre variable 
 df["Nationality"]=df["Nacionality"]
 df$Nacionality<-NULL
-
-#Llamo a GDP PIB
-df["PIB"]=df["GDP"]
-df$GDP<-NULL

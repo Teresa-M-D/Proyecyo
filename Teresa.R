@@ -1,3 +1,6 @@
 #espacio para mí:)
-#hola mundo
-aswdefgth
+head(df)
+descriptive(df)
+
+#ver nombres variables
+names(df)
