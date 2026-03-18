@@ -41,14 +41,27 @@ descriptive(datos)
 
 #Seleccionar moda de Mother.s.occupation y Father.s.occupation:
 
-
+#usamos descriptive y table para ver la moda de Mother.s.occupation
 descriptive(datos$Mother.s.occupation)
-table(datos$Mother.s.occupation)
+table(datos$Mother.s.occupation) 
+
+#para ver cuantos faltantes tenemos
+colSums(is.na(datos))
+
+#imputamos los NA de esta variable con su moda y así con las otras tres variables
+#(Father.s.occupation, Mother.s.qualification, Father.s.qualification)
 datos$Mother.s.occupation[is.na(datos$Mother.s.occupation)] <- "9"
 descriptive(datos$Father.s.occupation)
 datos$Father.s.occupation[is.na(datos$Father.s.occupation)] <- "9"
 
+table(datos$Mother.s.qualification)
+datos$Mother.s.qualification[is.na(datos$Mother.s.qualification)] <- "1"
 
+table(datos$Father.s.qualification)
+datos$Father.s.qualification[is.na(datos$Father.s.qualification)] <- "37"
+
+#vemos que en efecto ya no quedan faltantes
 colSums(is.na(datos))
 sum(is.na(datos))
+
 
