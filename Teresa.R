@@ -1,2 +1,6 @@
 #espacio para mí:)
-#hola mundo
+head(df)
+descriptive(df)
+
+#ver nombres variables
+names(df)
