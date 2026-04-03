@@ -1,4 +1,11 @@
 #Espacio de Yalda
+library(clickR)
+library(rio)
+library(ggplot2)
+library(plotly)
+library(GGally)
+datos <- read.csv("estudiantes.csv", sep = ";", header = TRUE)
+descriptive(datos)
 #Análisis inicial de la variable Target
 
 #Tabla de frecuencias absolutas
