@@ -59,3 +59,30 @@ mean_pib_graduates #0.08183341
 
 #Los estudiantes que abandonaron entraron en años económicamente peores (PIB por debajo de la media).
 #Los que se graduaron entraron en años mejores (PIB por encima de la media).
+
+#Objetivo: comparar la medias de tasa de desempleo entre los estudiantes que abandonan y los que se graduan
+
+mean_desempleo_dropouts <- mean(dropouts$Unemployment.rate)
+mean_desempleo_graduates <- mean(graduates$Unemployment.rate)
+
+mean_desempleo_dropouts #11.6164
+mean_desempleo_graduates #11.63934
+
+#Interpretación: 
+#Vemos que las medias de desempleo son muy parecidas, siendo un poco mayor la de los estudiantes que se graduaron
+#lo que significa que entraron cuando la tasa de desempleo era un poco más alta
+
+
+#Objetivo: comparar la medias de tasa de inflacio entre los estudiantes que abandonan y los que se graduan
+
+
+mean_inflacion_dropouts <- mean(dropouts$Inflation.rate)
+mean_inflacion_graduates <- mean(graduates$Inflation.rate)
+
+mean_inflacion_dropouts #1.283955
+mean_inflacion_graduates #1.197918
+
+#Interpretación:
+#Los estudiantes que abandonaron entraron en años donde la tasa de inflación era más alta
+#Los que se graduaron entraron en años donde la tasa de inflación era un poco más baja 
+
