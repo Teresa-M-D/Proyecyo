@@ -54,6 +54,8 @@ barplot(freq_mother_qualification_imputados)
 
 
 
+
+
 #sin imputar
 freq_mother_qualification <- table(datos_sin_imputar$Mother.s.qualification)
 freq_mother_qualification
@@ -62,29 +64,35 @@ prop.table(freq_mother_qualification)
 barplot(freq_mother_qualification)
 
 
+
+
+######
 prop.table(table(datos_sin_imputar$Mother.s.qualification))
 prop.table(table(datos_imputados$Mother.s.qualification))
-prop.table(table(datos_sin_imputar$Target))
-prop.table(table(datos_imputados$Target))
-prop.table(table(datos_sin_na$Target, datos_sin_imputar$Gender), 1)
-prop.table(table(datos_imputados$Target, datos_imputados$Gender), 1)
 
-abs(
-  prop.table(table(datos_sin_imputar$Mother.s.qualification)) -
-    prop.table(table(datos_imputados$Mother.s.qualification))
-)
 
+
+#Comparar diferencia de proporciones antes y después de la imputación
+niveles_comunes <- sort(unique(c(
+  datos_sin_imputar$Father.s.qualification,
+  datos_imputados$Father.s.qualification
+)))
+
+tabla_sin <- prop.table(table(factor(datos_sin_imputar$Father.s.qualification, levels = niveles_comunes)))
+tabla_imp <- prop.table(table(factor(datos_imputados$Father.s.qualification, levels = niveles_comunes)))
+
+abs(tabla_sin - tabla_imp)
 
 #imputacion por moda condicionada
 library(clickR)
 
-datos_prueba <- read.csv("estudiantes.csv", header = TRUE, sep = ";")
-descriptive(datos_prueba)
+datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
+descriptive(datos_moda_condicionada)
 # Convertimos los códigos de desconocido a NA
-datos_prueba$Mother.s.qualification[datos_prueba$Mother.s.qualification == 34] <- NA
-datos_prueba$Father.s.qualification[datos_prueba$Father.s.qualification == 34] <- NA
-datos_prueba$Mother.s.occupation[datos_prueba$Mother.s.occupation == 99] <- NA
-datos_prueba$Father.s.occupation[datos_prueba$Father.s.occupation == 99] <- NA
+datos_moda_condicionada$Mother.s.qualification[datos_moda_condicionada$Mother.s.qualification == 34] <- NA
+datos_moda_condicionada$Father.s.qualification[datos_moda_condicionada$Father.s.qualification == 34] <- NA
+datos_moda_condicionada$Mother.s.occupation[datos_moda_condicionada$Mother.s.occupation == 99] <- NA
+datos_moda_condicionada$Father.s.occupation[datos_moda_condicionada$Father.s.occupation == 99] <- NA
 
 #funcion para calcular la moda
 moda <- function(x) {
@@ -94,9 +102,9 @@ moda <- function(x) {
 #imputar por target
 
 #mother.s.occupation
-datos_prueba$Mother.s.occupation <- ave(
-  datos_prueba$Mother.s.occupation,
-  datos_prueba$Target,
+datos_moda_condicionada$Mother.s.occupation <- ave(
+  datos_moda_condicionada$Mother.s.occupation,
+  datos_moda_condicionada$Target,
   FUN = function(x) {
     x[is.na(x)] <- moda(x)
     return(x)
@@ -104,9 +112,9 @@ datos_prueba$Mother.s.occupation <- ave(
 )
 
 #father.s.occupation
-datos_prueba$Father.s.occupation <- ave(
-  datos_prueba$Father.s.occupation,
-  datos_prueba$Target,
+datos_moda_condicionada$Father.s.occupation <- ave(
+  datos_moda_condicionada$Father.s.occupation,
+  datos_moda_condicionada$Target,
   FUN = function(x) {
     x[is.na(x)] <- moda(x)
     return(x)
@@ -114,9 +122,9 @@ datos_prueba$Father.s.occupation <- ave(
 )
 
 #mother.s.qualification
-datos_prueba$Mother.s.qualification <- ave(
-  datos_prueba$Mother.s.qualification,
-  datos_prueba$Target,
+datos_moda_condicionada$Mother.s.qualification <- ave(
+  datos_moda_condicionada$Mother.s.qualification,
+  datos_moda_condicionada$Target,
   FUN = function(x) {
     x[is.na(x)] <- moda(x)
     return(x)
@@ -125,20 +133,59 @@ datos_prueba$Mother.s.qualification <- ave(
 
 #father.s.qualification
 
-datos_prueba$Father.s.qualification <- ave(
-  datos_prueba$Father.s.qualification,
-  datos_prueba$Target,
+datos_moda_condicionada$Father.s.qualification <- ave(
+  datos_moda_condicionada$Father.s.qualification,
+  datos_moda_condicionada$Target,
   FUN = function(x) {
     x[is.na(x)] <- moda(x)
     return(x)
   }
 )
-colSums(is.na(datos_prueba))
+colSums(is.na(datos_moda_condicionada))
 
 
-datos_prueba$Mother.s.qualification <- as.numeric(datos_prueba$Mother.s.qualification)
-freq_mother_qualification_prueba <- table(datos_prueba$Mother.s.qualification)
+datos_moda_condicionada$Mother.s.qualification<- as.numeric(datos_moda_condicionada$Mother.s.qualification)
+freq_mother_qualification_prueba <- table(datos_moda_condicionada$Mother.s.qualification)
 freq_mother_qualification_prueba
 
 prop.table(freq_mother_qualification_prueba)
 barplot(freq_mother_qualification_prueba)
+
+
+#mirando a ver si se porque faltan (no hacer caso de momento):
+
+datos_faltantes_motivo <- read.csv("estudiantes.csv", header=TRUE, sep=";")
+
+# Convertimos los códigos de desconocido a NA
+datos_faltantes_motivo$Mother.s.qualification[datos_faltantes_motivo$Mother.s.qualification == 34] <- NA
+datos_faltantes_motivo$Father.s.qualification[datos_faltantes_motivo$Father.s.qualification == 34] <- NA
+datos_faltantes_motivo$Mother.s.occupation[datos_faltantes_motivo$Mother.s.occupation == 99] <- NA
+datos_faltantes_motivo$Father.s.occupation[datos_faltantes_motivo$Father.s.occupation == 99] <- NA
+
+# Creamos indicador de faltante
+datos_faltantes_motivo$NA_mother_occupation <- is.na(datos_faltantes_motivo$Mother.s.occupation)
+
+# Tabla
+table(datos_faltantes_motivo$NA_mother_occupation,
+      datos_faltantes_motivo$Mother.s.qualification)
+
+# Proporciones por columna
+prop.table(
+  table(datos_faltantes_motivo$NA_mother_occupation,
+        datos_faltantes_motivo$Target),
+  2
+)
+#VALORES ATÍPICOS Y TRATAMIENTO:
+
+#Variables numéricas continuas:
+descriptive(datos_moda_condicionada$Admission.grade)
+boxplot(datos_moda_condicionada$Admission.grade)
+
+descriptive(datos_moda_condicionada$Unemployment.rate)
+boxplot(datos_moda_condicionada$Unemployment.rate)
+
+descriptive(datos_moda_condicionada$Inflation.rate)
+boxplot(datos_moda_condicionada$Inflation.rate)
+
+descriptive(datos_moda_condicionada$GDP)
+boxplot(datos_moda_condicionada$GDP)
