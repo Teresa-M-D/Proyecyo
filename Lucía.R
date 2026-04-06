@@ -192,11 +192,8 @@ boxplot(datos_moda_condicionada$GDP)
 
 #Variables numéricas discretas:
 
-table(datos_moda_condicionada$Curricular.units.2nd.sem..credited.)
-table(datos_moda_condicionada$Curricular.units.1st.sem..enrolled.)
-table(datos_moda_condicionada$Curricular.units.2nd.sem..evaluations.)
-table(datos_moda_condicionada$Curricular.units.2nd.sem..approved.)
-table(datos_moda_condicionada$Curricular.units.2nd.sem..without.evaluations.)
+
+descriptive(datos_moda_condicionada$Curricular.units.2nd.sem..grade.)
+boxplot((datos_moda_condicionada$Curricular.units.2nd.sem..grade.))
 
 
-table(datos_moda_condicionada$Curricular.units.2nd.sem..grade.) #creo que es continua
