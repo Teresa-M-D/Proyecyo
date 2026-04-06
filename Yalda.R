@@ -57,8 +57,8 @@ mean_pib_graduates #0.08183341
 
 #Interpretación sencilla:
 
-#Los estudiantes que abandonaron entraron en años económicamente peores (PIB por debajo de la media).
-#Los que se graduaron entraron en años mejores (PIB por encima de la media).
+#Los estudiantes que abandonaron entraron en años económicamente peores
+#Los que se graduaron entraron en años mejores.
 
 #Objetivo: comparar la medias de tasa de desempleo entre los estudiantes que abandonan y los que se graduan
 
