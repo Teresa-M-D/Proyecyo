@@ -213,4 +213,4 @@ boxplot(datos_moda_condicionada$Admission.grade_transformado)
 #necesario realizar una transformación
 
 
-
+#probando
