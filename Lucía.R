@@ -170,6 +170,8 @@ boxplot(datos_moda_condicionada$GDP)
 descriptive(datos_moda_condicionada$Age.at.enrollment)
 boxplot(datos_moda_condicionada$Age.at.enrollment)
 
+descriptive(datos_moda_condicionada$Previous.qualification..grade.)
+boxplot(datos_moda_condicionada$Previous.qualification..grade.)
 #Variables numéricas discretas:
 
 
@@ -499,7 +501,4 @@ datos_recodificados$Daytime.evening.attendance.<-recode(datos_recodificados$Dayt
 
 
 
-descriptive(datos_recodificados)
-colnames(datos_recodificados)
-table(datos_recodificados$Previous.qualification..grade.)
-ncol(datos_recodificados)
+
