@@ -193,7 +193,24 @@ boxplot(datos_moda_condicionada$GDP)
 #Variables numéricas discretas:
 
 
-descriptive(datos_moda_condicionada$Curricular.units.2nd.sem..grade.)
+descriptive(datos_moda_condicionada$Curricular.units.1st.sem..credited.)
 boxplot((datos_moda_condicionada$Curricular.units.2nd.sem..grade.))
+
+descriptive(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
+boxplot(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
+
+#Probando transformaciones:
+library(ggplot2)
+library(clickR)
+
+
+datos_moda_condicionada$Admission.grade_transformado <- sqrt(datos_moda_condicionada$Admission.grade)
+descriptive(datos_moda_condicionada$Admission.grade_transformado)
+boxplot(datos_moda_condicionada$Admission.grade_transformado)
+
+#se supone que esta transformación no la usaremos ya que afecta a la interpretación de la variable
+#además de que, los atípicos de esta variable no distorsionan tanto la distribución como para que sea
+#necesario realizar una transformación
+
 
 
