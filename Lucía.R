@@ -502,3 +502,15 @@ datos_recodificados$Daytime.evening.attendance.<-recode(datos_recodificados$Dayt
 
 
 
+colnames(datos_recodificados)
+#Transformacion lineal notas sobre 200 a sobre 10:
+
+#Previos qualification grade (nota de estudios previos):
+datos_recodificados$Previous.qualification.grade_10 <- (datos_recodificados$Previous.qualification..grade. / 20)
+
+#Admission grade (nota de adimisión):
+datos_recodificados$Admission.grade_10 <- (datos_recodificados$Admission.grade / 20)
+
+#Reagrupaciones:
+
+table(datos_recodificados$Nationality)
