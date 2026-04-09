@@ -18,3 +18,4 @@ datos$Nacionality<-NULL
 #Llamo a GDP PIB
 datos["PIB"]=datos["GDP"]
 datos$GDP<-NULL
+
