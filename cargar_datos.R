@@ -20,7 +20,6 @@ moda <- function(x) {
 }
 #imputar por target
 
-
 #mother.s.occupation
 datos_moda_condicionada$Mother.s.occupation <- ave(
   datos_moda_condicionada$Mother.s.occupation,
