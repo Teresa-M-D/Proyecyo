@@ -1,5 +1,5 @@
-datos<-read.csv("data.csv", sep=";")
-head(df)
+datos<-read.csv("estudiantes.csv", sep=";")
+head(datos)
 install.packages(c("clickR", "DescTools","plotly", "scatterplot3d", "vcd","ggplot2","gridExtra"))
 install.packages("rio", dependencies = TRUE)
 library(gridExtra)
