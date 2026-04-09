@@ -1,7 +1,16 @@
 #imputación de datos faltantes por moda condicionada:
 
-
+#he añadido todas las librerías que creo q hemos usado hasta ahora
+library(gridExtra)
 library(clickR)
+library(DescTools)
+library(plotly)
+library(scatterplot3d)
+library(vcd)
+library(ggplot2)
+library(dplyr)
+library(GGally)
+library(psych)
 
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
 
