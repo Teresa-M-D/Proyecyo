@@ -833,4 +833,4 @@ datos_recodificados$Father_occupation_level <- case_when(
 
 sum(table(datos_recodificados$Father_occupation_level))
 
-
+#probando
