@@ -86,3 +86,4 @@ mean_inflacion_graduates #1.197918
 #Los estudiantes que abandonaron entraron en años donde la tasa de inflación era más alta
 #Los que se graduaron entraron en años donde la tasa de inflación era un poco más baja 
 
+
