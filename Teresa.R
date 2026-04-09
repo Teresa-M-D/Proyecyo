@@ -38,3 +38,29 @@ variables_numéricas<-c("Previous.qualification.grade_10",
                        "PIB") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
 
 describe(datos_recodificados[,variables_numéricas])
+
+
+#Boxplots
+boxplot(datos_recodificados$Previous.qualification.grade_10,
+        yaxt = "n",
+        ylab = "Nota",
+        main = "Nota estudios previos")
+axis(2, at = seq(0, 10, by = 0.5))
+boxplot(datos_recodificados$Age.at.enrollment)
+boxplot(datos_recodificados$Admission.grade_10)
+boxplot(datos_recodificados$Application.order)
+boxplot(datos_recodificados$Curricular.units.1st.sem..credited.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..enrolled.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..evaluations.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..grade.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..credited.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..enrolled.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..evaluations.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..grade.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..without.evaluations.)
+boxplot(datos_recodificados$Unemployment.rate)
+boxplot(datos_recodificados$Inflation.rate)
+boxplot(datos_recodificados$PIB)

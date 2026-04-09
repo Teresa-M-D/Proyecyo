@@ -324,3 +324,4 @@ datos_recodificados$Father_occupation_level <- case_when(
   ) ~ "Formación militar"
   
 )
+
