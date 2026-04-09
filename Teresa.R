@@ -1,9 +1,11 @@
 #espacio para mí:)
-head(df)
-descriptive(df)
-
+#COSAS BÁSICAS
+head(datos)
+descriptive(datos)
 #ver nombres variables
-names(df)
-matriculado=df$Curricular.units.1st.sem..enrolled
+names(datos)
+matriculado=datos$Curricular.units.1st.sem..enrolled
 max(matriculado)
-df$GDP
+boxplot(datos$Target)
+
+

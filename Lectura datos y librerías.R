@@ -1,5 +1,5 @@
-df<-read.csv("data.csv", sep=";")
-head(df)
+datos<-read.csv("estudiantes.csv", sep=";")
+head(datos)
 install.packages(c("clickR", "DescTools","plotly", "scatterplot3d", "vcd","ggplot2","gridExtra"))
 install.packages("rio", dependencies = TRUE)
 library(gridExtra)
@@ -9,11 +9,13 @@ library(plotly)
 library(scatterplot3d)
 library(vcd)
 library(ggplot2)
+library(dplyr)
 
 #corrección nombre variable 
-df["Nationality"]=df["Nacionality"]
-df$Nacionality<-NULL
+datos["Nationality"]=datos["Nacionality"]
+datos$Nacionality<-NULL
 
 #Llamo a GDP PIB
-df["PIB"]=df["GDP"]
-df$GDP<-NULL
+datos["PIB"]=datos["GDP"]
+datos$GDP<-NULL
+
