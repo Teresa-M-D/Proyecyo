@@ -6,6 +6,11 @@ library(clickR)
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
 
 datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
+#Chicas añado el cambio del nombre de variable de Nacionality a Nationality
+datos_moda_condicionada$Nationality<-datos_moda_condicionada$Nacionality
+datos_moda_condicionada$Nacionality<-NULL
+
+
 descriptive(datos_moda_condicionada)
 # Convertimos los códigos de desconocido a NA
 datos_moda_condicionada$Mother.s.qualification[datos_moda_condicionada$Mother.s.qualification == 34] <- NA
@@ -72,7 +77,7 @@ datos_recodificados<-datos_moda_condicionada
 
 #Nacionality:
 
-datos_recodificados$Nationality<-recode(datos_recodificados$Nacionality, 
+datos_recodificados$Nationality<-recode(datos_recodificados$Nationality, 
                                         `1` = "Portugués",
                                         `2` = "Alemán",
                                         `6` = "Español",
@@ -695,3 +700,4 @@ datos_recodificados$Father_occupation_level <- case_when(
   ) ~ "Formación militar"
   
 )
+
