@@ -18,9 +18,19 @@ datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
 #Chicas añado el cambio del nombre de variable de Nacionality a Nationality
 datos_moda_condicionada$Nationality<-datos_moda_condicionada$Nacionality
 datos_moda_condicionada$Nacionality<-NULL
+datos_moda_condicionada["PIB"]=datos_moda_condicionada["GDP"]
+datos_moda_condicionada$GDP<-NULL
+
+
+
+#===============
+#IMPUTACIÓN
+#===============
+ 
 
 
 descriptive(datos_moda_condicionada)
+names(datos_moda_condicionada)
 # Convertimos los códigos de desconocido a NA
 datos_moda_condicionada$Mother.s.qualification[datos_moda_condicionada$Mother.s.qualification == 34] <- NA
 datos_moda_condicionada$Father.s.qualification[datos_moda_condicionada$Father.s.qualification == 34] <- NA
@@ -77,11 +87,10 @@ datos_moda_condicionada$Father.s.qualification <- ave(
 colSums(is.na(datos_moda_condicionada))
 
 
-
+#=============================
 #Recodificación de variables:
+#==============================
 
-install.packages("dplyr")
-library(dplyr)
 datos_recodificados<-datos_moda_condicionada
 
 #Nacionality:
@@ -382,8 +391,9 @@ datos_recodificados$Daytime.evening.attendance.<-recode(datos_recodificados$Dayt
                                                         `0` = "Tarde")
 
 
-
-#Reagrupaciones y transformaciones lineales:
+#===========================================
+#REAGRUPACIONES Y TRANSFORMACIONES LINEALES
+#===========================================
 
 #Transformacion lineal notas sobre 200 a sobre 10:
 
