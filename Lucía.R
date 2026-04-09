@@ -833,4 +833,24 @@ datos_recodificados$Father_occupation_level <- case_when(
 
 sum(table(datos_recodificados$Father_occupation_level))
 
-#probando
+#probando una cosa del pib:
+sort(unique(datos_recodificados$GDP))
+sort(unique(datos_recodificados$Unemployment.rate))
+
+
+unique(datos_recodificados[, c("GDP", "Unemployment.rate")]) |>
+  dplyr::arrange(GDP)
+
+
+library(dplyr)
+
+tabla_años <- data.frame(
+  GDP = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
+  year = c(2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
+)
+
+datos_recodificados <- datos_recodificados %>%
+  left_join(tabla_años, by = "GDP")
+
+sum(table(datos_recodificados$year))
+
