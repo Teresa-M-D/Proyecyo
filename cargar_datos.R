@@ -403,6 +403,10 @@ datos_recodificados$Previous.qualification.grade_10 <- (datos_recodificados$Prev
 #Admission grade (nota de adimisión):
 datos_recodificados$Admission.grade_10 <- (datos_recodificados$Admission.grade / 20)
 
+#Tranformación lineal de nota media de semestres sobre 20 a sobre 10
+datos_recodificados$Curricular.units.1st.sem.grade_10<-(datos_recodificados$Curricular.units.1st.sem..grade./2)
+datos_recodificados$Curricular.units.2nd.sem.grade_10<-(datos_recodificados$Curricular.units.2nd.sem..grade./2)
+
 #Reagrupaciones:
 
 #Reagrupamos Nacionalidades en categorías Portugal, Europa, África y América Latina
