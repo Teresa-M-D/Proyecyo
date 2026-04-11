@@ -1151,6 +1151,8 @@ round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 
 library(vcd)
 install.packages("lsr")
 library(lsr)
+install.packages("rcompanion")
+library(rcompanion)
 #Categórica vs Target
 names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
 
@@ -1219,9 +1221,11 @@ tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
+#Reagrupacion variable MArital_group:
 datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
 datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
 
+#graficos interesantes:
 sum(table(datos_recodificados$Target_bin))
 install.packages("vcd")
 library(vcd)
@@ -1236,5 +1240,36 @@ ggplot(datos_recodificados, aes(x = Marital_group, fill = Target_bin)) +
   labs(y = "Proporción", x = "Estado civil") +
   scale_y_continuous(labels = scales::percent) +
   theme_minimal()
+
+
+#Daytime.evening.attendance:
+sum(table(datos_recodificados$Daytime.evening.attendance.))
+unique(datos_recodificados$Daytime.evening.attendance.)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
+
+#Gráfico mosaico:
+tabla_daytime_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Daytime.evening.attendance.)
+plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Target y Marital Status", ylab="Sexo", xlab="Producto")
+
+#Chi-cuadrado:
+tabla_daytime_target <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
+chisq.test(tabla_daytime_targeta)
+chisq.test(tabla_daytime_targetbla)$expected
+#Fisher:
+fisher.test(tabla_daytime_targetla)
 
 
