@@ -1233,13 +1233,7 @@ mosaic(~ Marital_group + Target_bin, data = datos_recodificados,
        shade = TRUE, legend = TRUE)
 
 
-library(ggplot2)
 
-ggplot(datos_recodificados, aes(x = Marital_group, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Estado civil") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
 
 
 #Daytime.evening.attendance:
@@ -1266,10 +1260,513 @@ tabla_daytime_target <- xtabs(~datos_recodificados$Target_bin + datos_recodifica
 plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Target y Marital Status", ylab="Sexo", xlab="Producto")
 
 #Chi-cuadrado:
-tabla_daytime_target <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
-chisq.test(tabla_daytime_targeta)
-chisq.test(tabla_daytime_targetbla)$expected
+tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
+chisq.test(tabla_daytime_target, correct=FALSE)
+chisq.test(tabla_daytime_target)$expected
 #Fisher:
-fisher.test(tabla_daytime_targetla)
+fisher.test(tabla_daytime_target)
 
 
+mosaic(~ Daytime.evening.attendance. + Target_bin, data = datos_recodificados, 
+       shade = TRUE, legend = TRUE)
+
+
+
+ggplot(datos_recodificados, aes(x = Daytime.evening.attendance., fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Turno") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+tabla_plot <- datos_recodificados %>%
+  count(Daytime.evening.attendance., Target_bin) %>%
+  group_by(Daytime.evening.attendance.) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_plot, aes(x = Daytime.evening.attendance., y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Turno",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Turno y Abandono"
+  ) +
+  theme_minimal()
+
+
+#he elegido esta:
+tabla_plot <- datos_recodificados %>%                  
+  count(Daytime.evening.attendance., Target_bin) %>%
+  group_by(Daytime.evening.attendance.) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_plot, 
+       aes(x = Daytime.evening.attendance., y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Turno",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+#Displaced
+
+sum(table(datos_recodificados$Displaced))
+unique(datos_recodificados$Displaced)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Displaced) 
+
+#Gráfico mosaico:
+tabla_displaced_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Displaced)
+plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Target y Displaced", ylab="Abandono", xlab="Desplazado")
+
+#Chi-cuadrado:
+tabla_displaced_target <- table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
+chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_displaced_target)$expected
+
+mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
+       shade = TRUE, legend = TRUE)
+
+
+
+ggplot(datos_recodificados, aes(x = Displaced, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Desplazado") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+
+tabla_plot <- datos_recodificados %>%
+  count(Displaced, Target_bin) %>%
+  group_by(Displaced) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_plot, aes(x = Displaced, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Desplazado",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Desplazado y Abandono"
+  ) +
+  theme_minimal()
+
+tabla_displaced_plot <- datos_recodificados %>%
+  count(Displaced, Target_bin) %>%
+  group_by(Displaced) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_displaced_plot, 
+       aes(x = Displaced, y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Desplazado",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+#Tuition fees up to date:
+
+sum(table(datos_recodificados$Tuition.fees.up.to.date))
+unique(datos_recodificados$Tuition.fees.up.to.date)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Tuition.fees.up.to.date) 
+
+#Gráfico mosaico:
+tabla_tution_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Tuition.fees.up.to.date)
+plot(tabla_tution_target, col=c("gray", "darkred"), main="Asociación entre Target y Matricula al día", ylab="Tasas pagadas correctamente", xlab="Abandono")
+
+#Chi-cuadrado:
+tabla_tution_target <- table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
+chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_tution_target)$expected
+
+#he elegido este:
+mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+
+ggplot(datos_recodificados, aes(x = Tuition.fees.up.to.date, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Tasas pagadas correctamente") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+
+tabla_tution_plot <- datos_recodificados %>%
+  count(Tuition.fees.up.to.date, Target_bin) %>%
+  group_by(Tuition.fees.up.to.date) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_tution_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Tasas pagadas correctamente",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Matricula al día y Abandono"
+  ) +
+  theme_minimal()
+
+tabla_tution_plot <- datos_recodificados %>%
+  count(Tuition.fees.up.to.date, Target_bin) %>%
+  group_by(Tuition.fees.up.to.date) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_tution_plot, 
+       aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Matricula al día",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+#Debtor:
+
+sum(table(datos_recodificados$Debtor))
+unique(datos_recodificados$Debtor)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Debtor) 
+
+#Gráfico mosaico:
+tabla_debtor_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Debtor)
+plot(tabla_debtor_target, col=c("gray", "darkred"), main="Asociación entre Target y Deudor", ylab="Debe dinero", xlab="Abandono")
+
+#Chi-cuadrado:
+tabla_debtor_target <- table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
+chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_debtor_target)$expected
+
+#he elegido este:
+mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+##este no
+ggplot(datos_recodificados, aes(x = Debtor, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Debe dinero") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+#también he usado este:
+tabla_debtor_target <- datos_recodificados %>%
+  count(Debtor, Target_bin) %>%
+  group_by(Debtor) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_debtor_target, aes(x = Debtor, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Debe dinero",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Deudor y Abandono"
+  ) +
+  theme_minimal()
+
+#este no
+tabla_debtor_plot <- datos_recodificados %>%
+  count(Debtor, Target_bin) %>%
+  group_by(Debtor) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_debtor_plot, 
+       aes(x = Debtor, y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Debe dinero",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+
+#Scholarship_holder:
+
+sum(table(datos_recodificados$Scholarship.holder))
+unique(datos_recodificados$Scholarship.holder)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Scholarship.holder) 
+
+#Gráfico mosaico:
+tabla_beca_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Scholarship.holder)
+plot(tabla_beca_target, col=c("gray", "darkred"), main="Asociación entre Target y Becado", ylab="Becado", xlab="Abandono")
+
+#Chi-cuadrado:
+tabla_beca_target <- table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
+chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_beca_target)$expected
+
+#he elegido este:
+mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+##este no
+ggplot(datos_recodificados, aes(x = Scholarship.holder, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Becado") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+#también he usado este:
+tabla_beca_target <- datos_recodificados %>%
+  count(Scholarship.holder, Target_bin) %>%
+  group_by(Scholarship.holder) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_beca_target, aes(x = Scholarship.holder, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Becado",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Becado y Abandono"
+  ) +
+  theme_minimal()
+
+#este no
+tabla_beca_plot <- datos_recodificados %>%
+  count(Scholarship.holder, Target_bin) %>%
+  group_by(Scholarship.holder) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_beca_plot, 
+       aes(x = Scholarship.holder, y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Becado",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+
+
+
+#Educational_special_needs:
+
+
+
+sum(table(datos_recodificados$Educational.special.needs))
+unique(datos_recodificados$Educational.special.needs)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
+
+
+
+prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
+
+
+#V de Cramer y Tau
+
+cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Educational.special.needs) 
+
+#Gráfico mosaico:
+tabla_necesidades_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Educational.special.needs)
+plot(tabla_necesidades_target, col=c("gray", "darkred"), main="Asociación entre Target y Necesidades educativas especiales", ylab="Necesidad de educación especial", xlab="Abandono")
+
+#Chi-cuadrado:
+tabla_necesidades_target <- table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
+chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_necesidades_target)$expected
+
+#he elegido este:
+mosaic(~ Educational.special.needs + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+##este no
+ggplot(datos_recodificados, aes(x = Educational.special.needs, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Necesidad de educación especial") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
+#también he usado este:
+tabla_necesidades_target <- datos_recodificados %>%
+  count(Educational.special.needs, Target_bin) %>%
+  group_by(Educational.special.needs) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
+
+ggplot(tabla_necesidades_target, aes(x = Educational.special.needs, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = percent) +
+  labs(
+    x = "Necesidad de educaciones especiales",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Necesidades de educaciones especiales y Abandono"
+  ) +
+  theme_minimal()
+
+#este no
+tabla_necesidad_plot <- datos_recodificados %>%
+  count(Educational.special.needs, Target_bin) %>%
+  group_by(Educational.special.needs) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_necesidad_plot, 
+       aes(x = Educational.special.needs, y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Necesidad de eduación especial",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+
+
+
+
+#International:
+
+
+sum(table(datos_recodificados$International))
+unique(datos_recodificados$International)
+
+tabla_internacional_target <- table(datos_recodificados$International,
+                                    datos_recodificados$Target_bin)
+
+tabla_internacional_target
+
+prop.table(tabla_internacional_target, 1)
+prop.table(tabla_internacional_target, 2)
+
+cramersV(tabla_internacional_target)
+GK_assoc(datos_recodificados$International, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$International)
+
+chisq.test(tabla_internacional_target, correct = FALSE)
+chisq.test(tabla_internacional_target)$expected
+
+table(datos_recodificados$International)
+
+tabla_internacional_plot <- datos_recodificados %>%
+  count(International, Target_bin) %>%
+  group_by(International) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Estudiante internacional",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Estudiantes internacionales y Abandono"
+  ) +
+  theme_minimal()
