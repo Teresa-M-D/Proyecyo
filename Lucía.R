@@ -1138,3 +1138,103 @@ datos_recodificados %>%
 round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 1), 3)
 
 
+
+
+
+
+
+
+
+
+
+#ANÁLISIS BIVARIANTE:
+library(vcd)
+install.packages("lsr")
+library(lsr)
+#Categórica vs Target
+names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
+
+#Marital Status:
+sum(table(datos_recodificados$Marital.status))
+unique(datos_recodificados$Marital.status)
+#tabla de frecuencias absolutas:
+table(datos_recodificados$Marital.status, datos_recodificados$Target)
+#Frecuencias relativas sobre el total de cada fila
+prop.table(table(datos_recodificados$Marital.status, datos_recodificados$Target), 1)
+#Nos dice dentro de cada categoría, que % abandona
+
+
+prop.table(table(datos_recodificados$Marital.status, datos_recodificados$Target), 2)
+#de todos los dropout, que % son de cada categoria
+
+#V de Cramer y Tau
+tabla <- xtabs(~datos_recodificados$Target + datos_recodificados$Marital.status)
+assocstats(tabla)$cramer
+cramersV(table(datos_recodificados$Marital.status, datos_recodificados$Target))
+GK_assoc(datos_recodificados$Marital.status, datos_recodificados$Target) #predecir Target con Marital Status
+GK_assoc(datos_recodificados$Target, datos_recodificados$Marital.status) #predecir Marital Status con Target
+
+#Gráfico mosaico:
+plot(tabla, col=c("gray", "darkred"), main="Asociación entre Target y Marital Status", ylab="Sexo", xlab="Producto")
+
+
+#Fisher:
+fisher.test(tabla) #como la tabla es demasiado grande para hacer fisher, nos vemos obligados a hacer una reagrupacion de la variable y aplicar chi cuadrado en esta
+
+#Reagrupación:
+
+datos_recodificados <- datos_recodificados %>%
+  mutate(Marital_group = case_when(
+    Marital.status == "Soltero" ~ "Soltero",
+    Marital.status %in% c("Casado", "Con pareja") ~ "En pareja",
+    Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
+  ))
+sum(table(datos_recodificados$Marital_group))
+
+#Analizamos de nuevo:
+
+table(datos_recodificados$Marital_group, datos_recodificados$Target) #con 3 categorías
+table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) #con 2 categorías
+
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target), 1) #3
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1) #2
+
+
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target), 2) #3
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2) #2
+
+#V de Cramer y Tau
+tabla <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Marital_group)
+assocstats(tabla)$cramer
+cramersV(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin))
+GK_assoc(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Marital_group) 
+
+#Gráfico mosaico:
+plot(tabla, col=c("darkgreen", "black"), main="Asociación entre Target y Marital Status", ylab="Marital Status", xlab="Target")
+#Gráfico asociacion:
+assoc(tabla)
+#Chi-cuadrado con Marital_group:
+tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
+chisq.test(tabla)
+chisq.test(tabla)$expected
+
+datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
+datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+
+sum(table(datos_recodificados$Target_bin))
+install.packages("vcd")
+library(vcd)
+mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
+       shade = TRUE, legend = TRUE)
+
+
+library(ggplot2)
+
+ggplot(datos_recodificados, aes(x = Marital_group, fill = Target_bin)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proporción", x = "Estado civil") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+
+
