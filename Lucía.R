@@ -857,3 +857,284 @@ sum(table(datos_recodificados$year))
 #Tranformación lineal de nota media de semestres sobre 20 a sobre 10
 datos_recodificados$Curricular.units.1st.sem.grade_10<-(datos_recodificados$Curricular.units.1st.sem..grade./2)
 datos_recodificados$Curricular.units.2nd.sem.grade_10<-(datos_recodificados$Curricular.units.2nd.sem..grade./2)
+
+
+
+#Análisis univariante:
+
+#Variables numéricas:
+install.packages("psych")   
+library(psych)             
+
+colnames(datos_recodificados)
+#Para describir todas las variables numéricas:
+variables_numéricas<-c("Previous.qualification.grade_10",
+                       "Age.at.enrollment",
+                       "Admission.grade_10",
+                       "Application.order",
+                       "Curricular.units.1st.sem..credited.",
+                       "Curricular.units.1st.sem..enrolled.",
+                       "Curricular.units.1st.sem..evaluations.",
+                       "Curricular.units.1st.sem..approved.",
+                       "Curricular.units.1st.sem.grade_10",
+                       "Curricular.units.1st.sem..without.evaluations.",
+                       "Curricular.units.2nd.sem..credited.",
+                       "Curricular.units.2nd.sem..enrolled.",
+                       "Curricular.units.2nd.sem..evaluations.",
+                       "Curricular.units.2nd.sem..approved.",
+                       "Curricular.units.2nd.sem.grade_10",
+                       "Curricular.units.2nd.sem..without.evaluations.",
+                       "Unemployment.rate",
+                       "Inflation.rate",
+                       "GDP") 
+
+
+descriptive(datos_recodificados[, variables_numéricas])
+
+
+#Describe y descriptivos de cada una por separado
+datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0]
+comparacion_semestres_y_nota_entrada<-c("Previous.qualification.grade_10",
+                                        "Admission.grade_10",
+                                        "Curricular.units.1st.sem.grade_10",
+                                        "Curricular.units.2nd.sem.grade_10"
+)
+
+
+describe(datos_recodificados[,"Curricular.units.1st.sem.grade_10"])
+describe(datos_recodificados[,"Curricular.units.2nd.sem.grade_10"])
+describe(datos_recodificados[,"Previous.qualification.grade_10"])
+describe(datos_recodificados[,"Admission.grade_10"])
+descriptive(datos_recodificados$Curricular.units.1st.sem.grade_10)
+descriptive(datos_recodificados$Curricular.units.2nd.sem.grade_10)
+
+descriptive(datos_recodificados$Previous.qualification.grade_10)
+descriptive(datos_recodificados[,comparacion_semestres_y_nota_entrada])
+descriptive(datos_recodificados$Admission.grade_10)
+descriptive(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
+descriptive(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+descriptive(datos_recodificados$Age.at.enrollment)
+""
+#Boxplots
+boxplot(datos_recodificados$Previous.qualification.grade_10,
+        yaxt = "n",
+        ylab = "Nota",
+        main = "Nota estudios previos")
+axis(2, at = seq(4, 10, by = 0.5))
+boxplot(datos_recodificados$Age.at.enrollment)
+boxplot(datos_recodificados$Admission.grade_10, yaxt="n", main="Admission grade")
+axis(2, at=seq(4.5,10, by=0.5))
+boxplot(datos_recodificados$Application.order)
+boxplot(datos_recodificados$Curricular.units.1st.sem..credited.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..enrolled., yaxt="n")
+axis(2, at=seq(0,25, by=1))
+boxplot(datos_recodificados$Curricular.units.1st.sem..evaluations., yaxt="n", main="Grades 1st Sem.")
+axis(2, at=seq(0,45, by=3))
+boxplot(datos_recodificados$Curricular.units.1st.sem..approved., yaxt="n")
+axis(2, at=seq(0,25, by=1))
+boxplot(datos_recodificados$Curricular.units.1st.sem.grade_10, yaxt="n")
+axis(2, at=seq(0,10, by=1))
+boxplot(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..credited.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..enrolled.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..evaluations.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem.grade_10)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..without.evaluations.)
+boxplot(datos_recodificados$Unemployment.rate)
+boxplot(datos_recodificados$Inflation.rate)
+boxplot(datos_recodificados$PIB)
+
+#ecdf
+plot(ecdf(datos_recodificados$Admission.grade_10), las=1, yaxt="n")
+axis(2, at=seq(0,1,by=0.1 ))
+grid()
+plot(ecdf(datos_recodificados$Previous.qualification.grade_10), las=1, yaxt="n")
+axis(2, at=seq(0,1,by=0.1 ))
+grid()
+#papel probabiístico normal
+#admission
+qqnorm(
+  datos_recodificados$Admission.grade_10,
+  main = "Papel probabilístico normal Admission Grade",
+)
+qqline(datos_recodificados$Admission.grade_10)
+grid()
+#previous qual grade
+qqnorm(
+  datos_recodificados$Previous.qualification.grade_10,
+  main = "Papel probabilístico normal Previous qualification Grade",
+)
+qqline(datos_recodificados$Previous.qualification.grade_10)
+grid()
+
+#age at enrollment
+
+qqnorm(
+  datos_recodificados$Age.at.enrollment,
+  main = "Papel probabilístico normal Age at enrollment",
+)
+qqline(datos_recodificados$Age.at.enrollment)
+grid()
+#curricular 1st sem grades (con 0)
+qqnorm(
+  datos_recodificados$Curricular.units.1st.sem.grade_10,
+  main = "Papel probabilístico normal 1st Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.1st.sem.grade_10)
+grid()
+#curricular 1st sem grades (sin 0)
+qqnorm(
+  datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0],
+  main = "Papel probabilístico normal 1st Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
+grid()
+#curricular 2nd sem grades (con 0)
+qqnorm(
+  datos_recodificados$Curricular.units.2nd.sem.grade_10,
+  main = "Papel probabilístico normal 2nd Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.2nd.sem.grade_10)
+grid()
+#curricular 2st sem grades (sin 0)
+qqnorm(
+  datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0],
+  main = "Papel probabilístico normal 2nd Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+grid()
+#papel probabiístico exponencial
+x_exp <- datos_recodificados$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
+qqplot(
+  qexp(ppoints(length(x_exp)), rate = 1/mean(x_exp)),
+  sort(x_exp),
+  main = "QQ plot exponencial",
+  xlab = "Cuantiles teóricos",
+  ylab = "Cuantiles observados"
+)
+
+abline(0,1)
+#Estudio de las variables dew notas de 1 y 2 sem
+#1SEM
+#histograma
+hist(datos_recodificados$Curricular.units.1st.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+axis(1, at=seq(0,10, by=0.5))
+hist(datos_recodificados$Previous.qualification.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+axis(1, at=seq(0,10, by=0.5))
+hist(datos_recodificados$Admission.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+axis(1, at=seq(0,10, by=0.5))
+#media de solo los alumnos q se han presentado
+median(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
+mean(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
+
+#2 SEM
+hist(datos_recodificados$Curricular.units.2nd.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+axis(1, at=seq(0,10, by=0.5))
+
+median(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+mean(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+
+
+
+
+
+
+
+
+
+
+
+#Variables categóricas:
+
+#Nacionality_group
+freq_nacionality_group <- table(datos_recodificados$Nationality_group)
+freq_nacionality_group
+bp2 <- barplot(
+  freq_nacionality_group,
+  col = c("lightblue", "lightgreen", "khaki", "gold"),
+  las = 1,
+  main = "Nacionalidad",
+  xlab = "Frecuencias absolutas (n)",
+  ylim = c(0, max(freq_nacionality_group) * 1.3)
+)
+text(bp2, freq_nacionality_group, labels = freq_nacionality_group, pos = 3)
+
+  #tabla de frecuencias
+table(datos_recodificados$Nationality_group, datos_recodificados$Target)
+prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), margin = 1)
+
+library(dplyr)
+
+datos_recodificados %>%
+  group_by(Nationality_group, Target) %>%
+  summarise(n = n()) %>%
+  mutate(prop = n / sum(n))
+
+round(prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), 1), 3)
+
+
+#tuitons fees up to date
+freq_tuition <- table(datos_recodificados$Tuition.fees.up.to.date)
+freq_tuition 
+bp3 <- barplot(
+  freq_tuition,
+  col = c("indianred", "lightgreen"),
+  las = 1,
+  main = "Tasas de mátricula actualizadas",
+  xlab = "Frecuencias absolutas (n)",
+  ylim = c(0, max(freq_tuition) * 1.3)
+)
+text(bp3, freq_tuition, labels = freq_tuition, pos = 3)
+
+#tabla de frecuencias
+table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target)
+prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), margin = 1)
+
+library(dplyr)
+
+datos_recodificados %>%
+  group_by(Tuition.fees.up.to.date, Target) %>%
+  summarise(n = n()) %>%
+  mutate(prop = n / sum(n))
+
+round(prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), 1), 3)
+
+#Course
+
+freq_course <- table(datos_recodificados$Course)
+freq_course
+#como son muchas titulaciones, hacemos un diagrama de barras horizonatal
+library(ggplot2)
+library(dplyr)
+
+datos_recodificados %>%
+  count(Course) %>% 
+  ggplot(aes(x = n, y = Course)) +
+  geom_bar(stat = "identity", fill = "#4C72B0") +
+  labs(
+    title = "Frecuencia de estudiantes por curso",
+    x = "Frecuencia",
+    y = "Curso"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.y = element_text(size = 10),
+    plot.title = element_text(face = "bold")
+  )
+
+
+#tabla de frecuencias
+table(datos_recodificados$Course, datos_recodificados$Target)
+prop.table(table(datos_recodificados$Course, datos_recodificados$Target), margin = 1)
+
+library(dplyr)
+
+datos_recodificados %>%
+  group_by(Course, Target) %>%
+  summarise(n = n()) %>%
+  mutate(prop = n / sum(n))
+
+round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 1), 3)
+
+
