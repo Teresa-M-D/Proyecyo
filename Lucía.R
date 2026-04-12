@@ -1146,53 +1146,26 @@ round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 
 
 
 
+#ANÁLISIS BIVARIANTE
 
-#ANÁLISIS BIVARIANTE:
+#Categóricas vs Target:
 library(clickR)
 library(vcd)
-install.packages("lsr")
 library(lsr)
-install.packages("rcompanion")
 library(rcompanion)
 library(dplyr)
 library(ggplot2)
 library(scales)
-#Categórica vs Target
+
+
 names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
-
-#Marital Status:
-sum(table(datos_recodificados$Marital.status))
-unique(datos_recodificados$Marital.status)
-#tabla de frecuencias absolutas:
-table(datos_recodificados$Marital.status, datos_recodificados$Target)
-#Frecuencias relativas sobre el total de cada fila
-prop.table(table(datos_recodificados$Marital.status, datos_recodificados$Target), 1)
-#Nos dice dentro de cada categoría, que % abandona
-
-
-prop.table(table(datos_recodificados$Marital.status, datos_recodificados$Target), 2)
-#de todos los dropout, que % son de cada categoria
-
-#V de Cramer y Tau
-tabla <- xtabs(~datos_recodificados$Target + datos_recodificados$Marital.status)
-assocstats(tabla)$cramer
-cramersV(table(datos_recodificados$Marital.status, datos_recodificados$Target))
-GK_assoc(datos_recodificados$Marital.status, datos_recodificados$Target) #predecir Target con Marital Status
-GK_assoc(datos_recodificados$Target, datos_recodificados$Marital.status) #predecir Marital Status con Target
-
-#Gráfico mosaico:
-plot(tabla, col=c("gray", "darkred"), main="Asociación entre Target y Marital Status", ylab="Sexo", xlab="Producto")
-
-
-#Fisher:
-fisher.test(tabla) #como la tabla es demasiado grande para hacer fisher, nos vemos obligados a hacer una reagrupacion de la variable y aplicar chi cuadrado en esta
 
 
 #Reagrupacion variable Target:
 datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
 datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
-#Reagrupación:
 
+#Reagrupación de Marital_Status:
 datos_recodificados <- datos_recodificados %>%
   mutate(Marital_group = case_when(
     Marital.status == "Soltero" ~ "Soltero",
@@ -1201,93 +1174,48 @@ datos_recodificados <- datos_recodificados %>%
   ))
 sum(table(datos_recodificados$Marital_group))
 
-#Analizamos de nuevo:
-
-table(datos_recodificados$Marital_group, datos_recodificados$Target) #con 3 categorías
-table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) #con 2 categorías
-
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target), 1) #3
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1) #2
-
-
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target), 2) #3
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2) #2
+#Proporciones:
+table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1)
+prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2)
 
 #V de Cramer y Tau
-tabla <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Marital_group)
-assocstats(tabla)$cramer
 cramersV(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Marital_group) 
 
-#Gráfico mosaico:
-plot(tabla, col=c("darkgreen", "black"), main="Asociación entre Target y Marital Status", ylab="Marital Status", xlab="Target")
-#Gráfico asociacion:
-assoc(tabla)
+
 #Chi-cuadrado con Marital_group:
 tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
-
-
-
-
-
-
+#Gráfico mosaico:
+mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
+       shade = TRUE, legend = TRUE)
 
 
 #Daytime.evening.attendance:
 sum(table(datos_recodificados$Daytime.evening.attendance.))
 unique(datos_recodificados$Daytime.evening.attendance.)
 
+#Proporciones:
 table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
-
 prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
-
 prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
 
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
-
-#Gráfico mosaico:
-tabla_daytime_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Daytime.evening.attendance.)
-plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Target y Marital Status", ylab="Sexo", xlab="Producto")
 
 #Chi-cuadrado:
 tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
 chisq.test(tabla_daytime_target)$expected
 
+#Gráfico:
 
-mosaic(~ Daytime.evening.attendance. + Target_bin, data = datos_recodificados, 
-       shade = TRUE, legend = TRUE)
-
-
-
-tabla_plot <- datos_recodificados %>%
-  count(Daytime.evening.attendance., Target_bin) %>%
-  group_by(Daytime.evening.attendance.) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
-
-ggplot(tabla_plot, aes(x = Daytime.evening.attendance., y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
-  scale_y_continuous(labels = percent) +
-  labs(
-    x = "Turno",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Turno y Abandono"
-  ) +
-  theme_minimal()
-
-
-#he elegido esta:
 tabla_plot <- datos_recodificados %>%                  
   count(Daytime.evening.attendance., Target_bin) %>%
   group_by(Daytime.evening.attendance.) %>%
@@ -1304,85 +1232,57 @@ ggplot(tabla_plot,
   theme_minimal()
 
 
+
+
 #Displaced
 
 sum(table(datos_recodificados$Displaced))
 unique(datos_recodificados$Displaced)
+
+#Proporciones:
 table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
 prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
 prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
 
-
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Displaced) 
-
-#Gráfico mosaico:
-tabla_displaced_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Displaced)
-plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Target y Displaced", ylab="Abandono", xlab="Desplazado")
 
 #Chi-cuadrado:
 tabla_displaced_target <- table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
 chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_displaced_target)$expected
 
+#Gráfico:
 mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
 
-ggplot(tabla_plot, aes(x = Displaced, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
-  scale_y_continuous(labels = percent) +
-  labs(
-    x = "Desplazado",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Desplazado y Abandono"
-  ) +
-  theme_minimal()
 
-tabla_displaced_plot <- datos_recodificados %>%
-  count(Displaced, Target_bin) %>%
-  group_by(Displaced) %>%
-  mutate(prop = n / sum(n))
-
-ggplot(tabla_displaced_plot, 
-       aes(x = Displaced, y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Desplazado",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
 
 
 #Tuition fees up to date:
 
 sum(table(datos_recodificados$Tuition.fees.up.to.date))
 unique(datos_recodificados$Tuition.fees.up.to.date)
+
+#Proporciones:
 table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
 prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
 prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
 
-
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Tuition.fees.up.to.date) 
-
-#Gráfico mosaico:
-tabla_tution_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Tuition.fees.up.to.date)
-plot(tabla_tution_target, col=c("gray", "darkred"), main="Asociación entre Target y Matricula al día", ylab="Tasas pagadas correctamente", xlab="Abandono")
 
 #Chi-cuadrado:
 tabla_tution_target <- table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
 chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_tution_target)$expected
 
-#he elegido este:
+#Gráficos:
 mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
@@ -1404,11 +1304,9 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
     x = "Turno",
     y = "Proporción",
     fill = "Abandono",
-    title = "Relación entre Turno y Abandono"
+    title = "Relación entre Matrícula al día y Abandono"
   ) +
   theme_minimal()
-
-
 
 
 
@@ -1416,31 +1314,35 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
 
 sum(table(datos_recodificados$Debtor))
 unique(datos_recodificados$Debtor)
+#Proporciones:
 table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
 prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
 prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
 
-
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Debtor) 
-
-#Gráfico mosaico:
-tabla_debtor_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Debtor)
-plot(tabla_debtor_target, col=c("gray", "darkred"), main="Asociación entre Target y Deudor", ylab="Debe dinero", xlab="Abandono")
 
 #Chi-cuadrado:
 tabla_debtor_target <- table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
 chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_debtor_target)$expected
 
-#he elegido este:
+#Gráficos:
 mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
-#tambiémn he usado este:
 
-ggplot(tabla_debtor_target, aes(x = Debtor, y = prop, fill = Target_bin)) +
+tabla_debtor_plot <- datos_recodificados %>%
+  count(Debtor, Target_bin) %>%
+  group_by(Debtor) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = percent(prop, accuracy = 0.1)
+  )
+
+ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
   geom_text(aes(label = etiqueta),
             position = position_fill(vjust = 0.5),
@@ -1454,21 +1356,6 @@ ggplot(tabla_debtor_target, aes(x = Debtor, y = prop, fill = Target_bin)) +
   ) +
   theme_minimal()
 
-#este no
-tabla_debtor_plot <- datos_recodificados %>%
-  count(Debtor, Target_bin) %>%
-  group_by(Debtor) %>%
-  mutate(prop = n / sum(n))
-
-ggplot(tabla_debtor_plot, 
-       aes(x = Debtor, y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Debe dinero",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
 
 
 
@@ -1476,141 +1363,56 @@ ggplot(tabla_debtor_plot,
 
 sum(table(datos_recodificados$Scholarship.holder))
 unique(datos_recodificados$Scholarship.holder)
+#Proporciones:
 table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
 prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
 prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
 
-
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Scholarship.holder) 
-
-#Gráfico mosaico:
-tabla_beca_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Scholarship.holder)
-plot(tabla_beca_target, col=c("gray", "darkred"), main="Asociación entre Target y Becado", ylab="Becado", xlab="Abandono")
 
 #Chi-cuadrado:
 tabla_beca_target <- table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
 chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_beca_target)$expected
 
-#he elegido este:
+#Gráficos:
 mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
-
-
-#también he usado este
-
-ggplot(tabla_beca_target, aes(x = Scholarship.holder, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
-  scale_y_continuous(labels = percent) +
-  labs(
-    x = "Becado",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Becado y Abandono"
-  ) +
-  theme_minimal()
-
-#este no
-tabla_beca_plot <- datos_recodificados %>%
-  count(Scholarship.holder, Target_bin) %>%
-  group_by(Scholarship.holder) %>%
-  mutate(prop = n / sum(n))
-
-ggplot(tabla_beca_plot, 
-       aes(x = Scholarship.holder, y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Becado",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
 
 
 
 
 
 #Educational_special_needs:
-
-
-
 sum(table(datos_recodificados$Educational.special.needs))
 unique(datos_recodificados$Educational.special.needs)
+
+#Proporciones:
 table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
 prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
 prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
 
-
+#Cramer y Tau:
 cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Educational.special.needs) 
-
-#Gráfico mosaico:
-tabla_necesidades_target <- xtabs(~datos_recodificados$Target_bin + datos_recodificados$Educational.special.needs)
-plot(tabla_necesidades_target, col=c("gray", "darkred"), main="Asociación entre Target y Necesidades educativas especiales", ylab="Necesidad de educación especial", xlab="Abandono")
 
 #Chi-cuadrado:
 tabla_necesidades_target <- table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
 chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_necesidades_target)$expected
 
-#he elegido este:
-mosaic(~ Educational.special.needs + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
-#también he usado este:
-tabla_necesidades_target <- datos_recodificados %>%
-  count(Educational.special.needs, Target_bin) %>%
-  group_by(Educational.special.needs) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
-
-ggplot(tabla_necesidades_target, aes(x = Educational.special.needs, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
-  scale_y_continuous(labels = percent) +
-  labs(
-    x = "Necesidad de educaciones especiales",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Necesidades de educaciones especiales y Abandono"
-  ) +
-  theme_minimal()
-
-#este no
-tabla_necesidad_plot <- datos_recodificados %>%
-  count(Educational.special.needs, Target_bin) %>%
-  group_by(Educational.special.needs) %>%
-  mutate(prop = n / sum(n))
-
-ggplot(tabla_necesidad_plot, 
-       aes(x = Educational.special.needs, y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Necesidad de eduación especial",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
-
-
-
 
 
 
 #International:
-
-
 sum(table(datos_recodificados$International))
 unique(datos_recodificados$International)
+
+#Proporciones:
 tabla_internacional_target <- table(datos_recodificados$International,
                                     datos_recodificados$Target_bin)
 tabla_internacional_target
@@ -1618,13 +1420,16 @@ tabla_internacional_target
 prop.table(tabla_internacional_target, 1)
 prop.table(tabla_internacional_target, 2)
 
+#Cramer y Tau:
 cramersV(tabla_internacional_target)
 GK_assoc(datos_recodificados$International, datos_recodificados$Target_bin)
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$International)
 
+#Chi-cuadrado:
 chisq.test(tabla_internacional_target, correct = FALSE)
 chisq.test(tabla_internacional_target)$expected
 
+#Gráfico:
 table(datos_recodificados$International)
 
 tabla_internacional_plot <- datos_recodificados %>%
@@ -1646,6 +1451,8 @@ ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_
     title = "Relación entre Estudiantes internacionales y Abandono"
   ) +
   theme_minimal()
+
+
 
 
 
@@ -1702,11 +1509,11 @@ datos_recodificados$Application.mode_group <- case_when(
 
 
 
-table(datos_recodificados$Application.mode_group)
+
 
 unique(datos_recodificados$Application.mode_group)
 tabla_modo_app_target <- table(datos_recodificados$Application.mode_group,
-                                    datos_recodificados$Target_bin)
+                               datos_recodificados$Target_bin)
 tabla_modo_app_target
 
 prop.table(tabla_modo_app_target, 1)
@@ -1721,7 +1528,7 @@ chisq.test(tabla_modo_app_target)$expected
 
 
 
-
+#Gráficos:
 tabla_modo_app_plot <- datos_recodificados %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
@@ -1747,7 +1554,7 @@ ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Tar
 #Género:
 unique(datos_recodificados$Gender)
 tabla_genero_target <- table(datos_recodificados$Gender,
-                               datos_recodificados$Target_bin)
+                             datos_recodificados$Target_bin)
 tabla_genero_target
 
 prop.table(tabla_genero_target, 1)
@@ -1759,8 +1566,13 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Gender)
 
 chisq.test(tabla_genero_target, correct = FALSE)
 chisq.test(tabla_genero_target)$expected
+#Gráfico:
 mosaic(~ Gender + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
+
+
+
+
 
 #Course
 #Vamosa realizar una reagrupacion de las carreras para que el estudio se fiable:
@@ -1827,6 +1639,7 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Course_group)
 chisq.test(tabla_course_target, correct = FALSE)
 chisq.test(tabla_course_target)$expected
 
+#Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
 datos_recodificados$Course_group_short <- dplyr::recode(
   datos_recodificados$Course_group,
   "Ingeniería/Tech" = "Ing./Tech",
@@ -1866,11 +1679,14 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
   ) +
   theme_minimal()
 
+
+
+
 #Previous education level
 table(datos_recodificados$Previous_education_level)
 unique(datos_recodificados$Previous_education_level)
 tabla_prev_edu_target <- table(datos_recodificados$Previous_education_level,
-                             datos_recodificados$Target_bin)
+                               datos_recodificados$Target_bin)
 tabla_prev_edu_target
 
 prop.table(tabla_prev_edu_target, 1)
@@ -1884,7 +1700,7 @@ chisq.test(tabla_prev_edu_target, correct = FALSE)
 chisq.test(tabla_prev_edu_target)$expected
 
 
-
+#Cambiamos a nombres más cortos:
 datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
   datos_recodificados$Previous_education_level,
   "Bajo"= "Bajo",
@@ -1892,9 +1708,9 @@ datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
+#Gráfico:
 mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
-
 
 
 #Mother education level:
@@ -1914,6 +1730,7 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_education_le
 chisq.test(tabla_mum_educ_target, correct = FALSE)
 chisq.test(tabla_mum_educ_target)$expected
 
+#Cambiamos a nombres más cortos:
 datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
   datos_recodificados$Mother_education_level,
   "Bajo"= "Bajo",
@@ -1921,6 +1738,7 @@ datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
+#Gráfico:
 mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
@@ -1941,7 +1759,7 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_education_le
 
 chisq.test(tabla_dad_educ_target, correct = FALSE)
 chisq.test(tabla_dad_educ_target)$expected
-
+#Cambiamos a nombres más cortos:
 datos_recodificados$Father_education_level_group_short <- dplyr::recode(
   datos_recodificados$Father_education_level,
   "Bajo"= "Bajo",
@@ -1949,9 +1767,8 @@ datos_recodificados$Father_education_level_group_short <- dplyr::recode(
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
+#Gráfico:
 mosaic(~ Father_education_level_group_short + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-mosaic(~ Father_education_level + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
 
@@ -1972,6 +1789,7 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_occupation_l
 
 chisq.test(tabla_mum_ocup_target, correct = FALSE)
 chisq.test(tabla_mum_ocup_target)$expected
+#Gráfico:
 mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
@@ -1992,6 +1810,8 @@ GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_occupation_l
 
 chisq.test(tabla_dad_ocup_target, correct = FALSE)
 chisq.test(tabla_dad_ocup_target)$expected
+
+#Gráficos:
 mosaic(~ Father_occupation_level + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
