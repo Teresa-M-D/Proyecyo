@@ -1148,11 +1148,15 @@ round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 
 
 
 #ANÁLISIS BIVARIANTE:
+library(clickR)
 library(vcd)
 install.packages("lsr")
 library(lsr)
 install.packages("rcompanion")
 library(rcompanion)
+library(dplyr)
+library(ggplot2)
+library(scales)
 #Categórica vs Target
 names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
 
@@ -1183,6 +1187,10 @@ plot(tabla, col=c("gray", "darkred"), main="Asociación entre Target y Marital S
 #Fisher:
 fisher.test(tabla) #como la tabla es demasiado grande para hacer fisher, nos vemos obligados a hacer una reagrupacion de la variable y aplicar chi cuadrado en esta
 
+
+#Reagrupacion variable Target:
+datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
+datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
 #Reagrupación:
 
 datos_recodificados <- datos_recodificados %>%
@@ -1221,16 +1229,9 @@ tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
-#Reagrupacion variable MArital_group:
-datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
 
-#graficos interesantes:
-sum(table(datos_recodificados$Target_bin))
-install.packages("vcd")
-library(vcd)
-mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
-       shade = TRUE, legend = TRUE)
+
+
 
 
 
@@ -1239,17 +1240,12 @@ mosaic(~ Marital_group + Target_bin, data = datos_recodificados,
 #Daytime.evening.attendance:
 sum(table(datos_recodificados$Daytime.evening.attendance.))
 unique(datos_recodificados$Daytime.evening.attendance.)
-#tabla de frecuencias absolutas:
+
 table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
+
 prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
 
-
-
 prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
-
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
@@ -1263,25 +1259,12 @@ plot(tabla_daytime_target, col=c("gray", "darkred"), main="Asociación entre Tar
 tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
 chisq.test(tabla_daytime_target)$expected
-#Fisher:
-fisher.test(tabla_daytime_target)
 
 
 mosaic(~ Daytime.evening.attendance. + Target_bin, data = datos_recodificados, 
        shade = TRUE, legend = TRUE)
 
 
-
-ggplot(datos_recodificados, aes(x = Daytime.evening.attendance., fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Turno") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
-
-library(dplyr)
-library(ggplot2)
-library(scales)
 
 tabla_plot <- datos_recodificados %>%
   count(Daytime.evening.attendance., Target_bin) %>%
@@ -1325,17 +1308,10 @@ ggplot(tabla_plot,
 
 sum(table(datos_recodificados$Displaced))
 unique(datos_recodificados$Displaced)
-#tabla de frecuencias absolutas:
 table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
 prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
-
-
-
 prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
 
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
@@ -1353,21 +1329,6 @@ chisq.test(tabla_displaced_target)$expected
 mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
-
-
-ggplot(datos_recodificados, aes(x = Displaced, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Desplazado") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
-
-
-tabla_plot <- datos_recodificados %>%
-  count(Displaced, Target_bin) %>%
-  group_by(Displaced) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
 
 ggplot(tabla_plot, aes(x = Displaced, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
@@ -1403,17 +1364,10 @@ ggplot(tabla_displaced_plot,
 
 sum(table(datos_recodificados$Tuition.fees.up.to.date))
 unique(datos_recodificados$Tuition.fees.up.to.date)
-#tabla de frecuencias absolutas:
 table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
 prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
-
-
-
 prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
 
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
@@ -1434,65 +1388,38 @@ mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,
 
 
 
-ggplot(datos_recodificados, aes(x = Tuition.fees.up.to.date, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Tasas pagadas correctamente") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
-
-
-tabla_tution_plot <- datos_recodificados %>%
+tabla_plot <- datos_recodificados %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
   mutate(prop = n / sum(n),
          etiqueta = percent(prop, accuracy = 0.1))
 
-ggplot(tabla_tution_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
+ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
   geom_text(aes(label = etiqueta),
             position = position_fill(vjust = 0.5),
             size = 4) +
   scale_y_continuous(labels = percent) +
   labs(
-    x = "Tasas pagadas correctamente",
+    x = "Turno",
     y = "Proporción",
     fill = "Abandono",
-    title = "Relación entre Matricula al día y Abandono"
+    title = "Relación entre Turno y Abandono"
   ) +
   theme_minimal()
 
-tabla_tution_plot <- datos_recodificados %>%
-  count(Tuition.fees.up.to.date, Target_bin) %>%
-  group_by(Tuition.fees.up.to.date) %>%
-  mutate(prop = n / sum(n))
 
-ggplot(tabla_tution_plot, 
-       aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Matricula al día",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
+
 
 
 #Debtor:
 
 sum(table(datos_recodificados$Debtor))
 unique(datos_recodificados$Debtor)
-#tabla de frecuencias absolutas:
 table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
 prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
-
-
-
 prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
 
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
@@ -1511,21 +1438,7 @@ chisq.test(tabla_debtor_target)$expected
 mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
-
-##este no
-ggplot(datos_recodificados, aes(x = Debtor, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Debe dinero") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
-
-#también he usado este:
-tabla_debtor_target <- datos_recodificados %>%
-  count(Debtor, Target_bin) %>%
-  group_by(Debtor) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
+#tambiémn he usado este:
 
 ggplot(tabla_debtor_target, aes(x = Debtor, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
@@ -1563,17 +1476,10 @@ ggplot(tabla_debtor_plot,
 
 sum(table(datos_recodificados$Scholarship.holder))
 unique(datos_recodificados$Scholarship.holder)
-#tabla de frecuencias absolutas:
 table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
 prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
-
-
-
 prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
 
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
@@ -1593,20 +1499,7 @@ mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,
        shade = TRUE, legend = TRUE)
 
 
-##este no
-ggplot(datos_recodificados, aes(x = Scholarship.holder, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Becado") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
-
-
-#también he usado este:
-tabla_beca_target <- datos_recodificados %>%
-  count(Scholarship.holder, Target_bin) %>%
-  group_by(Scholarship.holder) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
+#también he usado este
 
 ggplot(tabla_beca_target, aes(x = Scholarship.holder, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
@@ -1648,17 +1541,10 @@ ggplot(tabla_beca_plot,
 
 sum(table(datos_recodificados$Educational.special.needs))
 unique(datos_recodificados$Educational.special.needs)
-#tabla de frecuencias absolutas:
 table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
-#Frecuencias relativas sobre el total de cada fila
 prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
-
-
-
 prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
 
-
-#V de Cramer y Tau
 
 cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
 GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
@@ -1676,14 +1562,6 @@ chisq.test(tabla_necesidades_target)$expected
 #he elegido este:
 mosaic(~ Educational.special.needs + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
-
-
-##este no
-ggplot(datos_recodificados, aes(x = Educational.special.needs, fill = Target_bin)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proporción", x = "Necesidad de educación especial") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal()
 
 
 #también he usado este:
@@ -1733,10 +1611,8 @@ ggplot(tabla_necesidad_plot,
 
 sum(table(datos_recodificados$International))
 unique(datos_recodificados$International)
-
 tabla_internacional_target <- table(datos_recodificados$International,
                                     datos_recodificados$Target_bin)
-
 tabla_internacional_target
 
 prop.table(tabla_internacional_target, 1)
@@ -1768,5 +1644,375 @@ ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_
     y = "Proporción",
     fill = "Abandono",
     title = "Relación entre Estudiantes internacionales y Abandono"
+  ) +
+  theme_minimal()
+
+
+
+#Application_mode:
+
+
+#Reagrupación application_mode:
+
+table(datos_recodificados$Application.mode)
+
+
+datos_recodificados$Application.mode_group <- case_when(
+  
+  # ACCESO NORMAL
+  datos_recodificados$Application.mode %in% c(
+    "1ª fase - cupo general",
+    "2ª fase - cupo general",
+    "3ª fase - cupo general",
+    "1ª fase - cupo especial (Isla de Madeira)",
+    "1ª fase - cupo especial (Islas Azores)"
+  ) ~ "Acceso normal",
+  
+  # MAYORES/ESPECIALES
+  datos_recodificados$Application.mode %in% c(
+    "Mayores de 23 años",
+    "Ordenanza nº 533-A/99, apartado b2 (plan diferente)",
+    "Ordenanza nº 533-A/99, apartado b3 (otra institución)",
+    "Ordenanza nº 612/93",
+    "Ordenanza nº 854-B/99"
+  ) ~ "Acceso mayores/especiales",
+  
+  # CAMBIO/TRASLADO
+  datos_recodificados$Application.mode %in% c(
+    "Cambio de institución/titulación",
+    "Cambio de titulación",
+    "Traslado",
+    "Cambio de institución/titulación (internacional)"
+  ) ~ "Acceso por cambio/traslado",
+  
+  # FORMACIÓN PREVIA
+  datos_recodificados$Application.mode %in% c(
+    "Titulares de diploma de ciclo corto",
+    "Titulares de diploma de especialización tecnológica",
+    "Titulares de otros estudios superiores"
+  ) ~ "Acceso por formación previa",
+  
+  # INTERNACIONAL
+  datos_recodificados$Application.mode %in% c(
+    "Estudiante internacional (grado)"
+    
+  ) ~ "Acceso internacional",
+  
+)
+
+
+
+table(datos_recodificados$Application.mode_group)
+
+unique(datos_recodificados$Application.mode_group)
+tabla_modo_app_target <- table(datos_recodificados$Application.mode_group,
+                                    datos_recodificados$Target_bin)
+tabla_modo_app_target
+
+prop.table(tabla_modo_app_target, 1)
+prop.table(tabla_modo_app_target, 2)
+
+cramersV(tabla_modo_app_target)
+GK_assoc(datos_recodificados$Application.mode_group, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Application.mode_group)
+
+chisq.test(tabla_modo_app_target, correct = FALSE)
+chisq.test(tabla_modo_app_target)$expected
+
+
+
+
+tabla_modo_app_plot <- datos_recodificados %>%
+  count(Application.mode_group, Target_bin) %>%
+  group_by(Application.mode_group) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Tipo de acceso al grado",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Tipo de acceso al grado y Abandono"
+  ) +
+  theme_minimal()
+
+
+
+#Género:
+unique(datos_recodificados$Gender)
+tabla_genero_target <- table(datos_recodificados$Gender,
+                               datos_recodificados$Target_bin)
+tabla_genero_target
+
+prop.table(tabla_genero_target, 1)
+prop.table(tabla_genero_target, 2)
+
+cramersV(tabla_genero_target)
+GK_assoc(datos_recodificados$Gender, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Gender)
+
+chisq.test(tabla_genero_target, correct = FALSE)
+chisq.test(tabla_genero_target)$expected
+mosaic(~ Gender + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+#Course
+#Vamosa realizar una reagrupacion de las carreras para que el estudio se fiable:
+
+datos_recodificados$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_recodificados$Course %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_recodificados$Course %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles",
+    "Diseño de Animación y Multimedia"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_recodificados$Course %in% c(
+    "Gestión",
+    "Gestión (turno de tarde)",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_recodificados$Course %in% c(
+    "Educación Básica",
+    "Trabajo Social",
+    "Trabajo Social (turno de tarde)"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_recodificados$Course %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_recodificados$Course %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
+
+sum(table(datos_recodificados$Course_group))
+unique(datos_recodificados$Course)
+tabla_course_target <- table(datos_recodificados$Course_group,
+                             datos_recodificados$Target_bin)
+tabla_course_target
+
+prop.table(tabla_course_target, 1)
+prop.table(tabla_course_target, 2)
+
+cramersV(tabla_course_target)
+GK_assoc(datos_recodificados$Course_group, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Course_group)
+
+chisq.test(tabla_course_target, correct = FALSE)
+chisq.test(tabla_course_target)$expected
+
+datos_recodificados$Course_group_short <- dplyr::recode(
+  datos_recodificados$Course_group,
+  "Ingeniería/Tech" = "Ing./Tech",
+  "Educación/Social" = "Educ./Soc.",
+  "Comunicación" = "Com.",
+  "Agro/Animal" = "Agro/Anim.",
+  "Empresa" = "Empresa",
+  "Salud" = "Salud"
+)
+
+mosaic(~ Course_group_short + Target_bin, 
+       data = datos_recodificados,
+       shade = TRUE,
+       legend = TRUE,
+       cex.axis = 0.8)  
+
+
+
+
+tabla_course_plot <- datos_recodificados %>%
+  count(Course_group, Target_bin) %>%
+  group_by(Course_group) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Tipo de carrera y Abandono"
+  ) +
+  theme_minimal()
+
+#Previous education level
+table(datos_recodificados$Previous_education_level)
+unique(datos_recodificados$Previous_education_level)
+tabla_prev_edu_target <- table(datos_recodificados$Previous_education_level,
+                             datos_recodificados$Target_bin)
+tabla_prev_edu_target
+
+prop.table(tabla_prev_edu_target, 1)
+prop.table(tabla_prev_edu_target, 2)
+
+cramersV(tabla_prev_edu_target)
+GK_assoc(datos_recodificados$Previous_education_level, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Previous_education_level)
+
+chisq.test(tabla_prev_edu_target, correct = FALSE)
+chisq.test(tabla_prev_edu_target)$expected
+
+
+
+datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
+  datos_recodificados$Previous_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+
+#Mother education level:
+table(datos_recodificados$Mother_education_level)
+unique(datos_recodificados$Mother_education_level)
+tabla_mum_educ_target <- table(datos_recodificados$Mother_education_level,
+                               datos_recodificados$Target_bin)
+tabla_mum_educ_target
+
+prop.table(tabla_mum_educ_target, 1)
+prop.table(tabla_mum_educ_target, 2)
+
+cramersV(tabla_mum_educ_target)
+GK_assoc(datos_recodificados$Mother_education_level, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_education_level)
+
+chisq.test(tabla_mum_educ_target, correct = FALSE)
+chisq.test(tabla_mum_educ_target)$expected
+
+datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
+  datos_recodificados$Mother_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father education level:
+table(datos_recodificados$Father_education_level)
+unique(datos_recodificados$Father_education_level)
+tabla_dad_educ_target <- table(datos_recodificados$Father_education_level,
+                               datos_recodificados$Target_bin)
+tabla_dad_educ_target
+
+prop.table(tabla_dad_educ_target, 1)
+prop.table(tabla_dad_educ_target, 2)
+
+cramersV(tabla_dad_educ_target)
+GK_assoc(datos_recodificados$Father_education_level, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_education_level)
+
+chisq.test(tabla_dad_educ_target, correct = FALSE)
+chisq.test(tabla_dad_educ_target)$expected
+
+datos_recodificados$Father_education_level_group_short <- dplyr::recode(
+  datos_recodificados$Father_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+mosaic(~ Father_education_level_group_short + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+mosaic(~ Father_education_level + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+#Mother occupation level:
+
+table(datos_recodificados$Mother_occupation_level)
+unique(datos_recodificados$Mother_occupation_level)
+tabla_mum_ocup_target <- table(datos_recodificados$Mother_occupation_level,
+                               datos_recodificados$Target_bin)
+tabla_mum_ocup_target
+
+prop.table(tabla_mum_ocup_target, 1)
+prop.table(tabla_mum_ocup_target, 2)
+
+cramersV(tabla_mum_ocup_target)
+GK_assoc(datos_recodificados$Mother_occupation_level, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_occupation_level)
+
+chisq.test(tabla_mum_ocup_target, correct = FALSE)
+chisq.test(tabla_mum_ocup_target)$expected
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father occupation level:
+table(datos_recodificados$Father_occupation_level)
+unique(datos_recodificados$Father_occupation_level)
+tabla_dad_ocup_target <- table(datos_recodificados$Father_occupation_level,
+                               datos_recodificados$Target_bin)
+tabla_dad_ocup_target
+
+prop.table(tabla_dad_ocup_target, 1)
+prop.table(tabla_dad_ocup_target, 2)
+
+cramersV(tabla_dad_ocup_target)
+GK_assoc(datos_recodificados$Father_occupation_level, datos_recodificados$Target_bin)
+GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_occupation_level)
+
+chisq.test(tabla_dad_ocup_target, correct = FALSE)
+chisq.test(tabla_dad_ocup_target)$expected
+mosaic(~ Father_occupation_level + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
+
+
+tabla_course_plot <- datos_recodificados %>%
+  count(Course_group, Target_bin) %>%
+  group_by(Course_group) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Tipo de carrera y Abandono"
   ) +
   theme_minimal()
