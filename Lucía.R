@@ -914,6 +914,8 @@ descriptive(datos_recodificados$Admission.grade_10)
 descriptive(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
 descriptive(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
 descriptive(datos_recodificados$Age.at.enrollment)
+descriptive(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
+
 ""
 #Boxplots
 boxplot(datos_recodificados$Previous.qualification.grade_10,
@@ -1037,7 +1039,7 @@ mean(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$C
 
 
 
-
+sum(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 
 
 
@@ -1836,3 +1838,7 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
     title = "Relación entre Tipo de carrera y Abandono"
   ) +
   theme_minimal()
+
+
+
+table(datos_recodificados$Marital_group)
