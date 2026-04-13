@@ -41,4 +41,4 @@ variables_numéricas<-c("Previous.qualification.grade_10",
 
 describe(datos_recodificados[,variables_numéricas])
 
-
+#Application order
