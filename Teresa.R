@@ -45,6 +45,7 @@ describe(datos_recodificados[,variables_numéricas])
 #***********************
 #Aprobadas
 #***********************
+#1SEM
 #tiene q ver las q apruebas con a cuantas te presentas?
 datos_recodificados$Curricular.units.1st.sem..approved.
 descriptive(datos_recodificados$Curricular.units.1st.sem..approved.)
@@ -62,5 +63,17 @@ labs(x="PIB", y="Unidades curriculares aprobadas", title="Unidades curriculares 
 #Creo nueva variable
 datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
 descriptive(datos_recodificados$Porcentaje_aprobado_sem_1)
-boxplot(datos_recodificados$Porcentaje_aprobado_sem_1~ datos_recodificados$Course)
+boxplot(datos_recodificados$Porcentaje_aprobado_sem_1~ datos_recodificados$Course, las=2, cex.axis=0.6) #hay q bajar tamaño letra
+par(mar=c(13,4,4,2))
+#aproxmamos a normal
+qqnorm(
+  datos_recodificados$Curricular.units.1st.sem..approved.,
+  main = "Papel probabilístico normal Aprobados 1º sem.",
+)
+qqline(datos_recodificados$Curricular.units.1st.sem..approved.)
+grid()
+
+#2SEM
+descriptive(datos_recodificados$Curricular.units.2nd.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..approved.~ datos_recodificados$Course, las=2, cex.axis=0.6)
 
