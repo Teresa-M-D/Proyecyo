@@ -723,4 +723,6 @@ datos_recodificados$Father_occupation_level <- case_when(
   ) ~ "Formación militar"
   
 )
+#NUEVA VARIABLE: (Lo añado ahora)
+datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
 
