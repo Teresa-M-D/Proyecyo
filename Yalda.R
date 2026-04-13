@@ -148,6 +148,75 @@ mean_inflacion_graduates #1.197918
 #Los estudiantes que abandonaron entraron en años donde la tasa de inflación era más alta
 #Los que se graduaron entraron en años donde la tasa de inflación era un poco más baja 
 
+#Objetivo: comparar las medias de la notas del primer cuatrimestre de los estudiantes que abandonaron y los que no lo hicieron
+
+#Primero, hacemos una reagrupación de la variable target
+datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
+datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+
+#Este subconjunto contiene únicamente a los alumnos que abandonaro
+Dropouts <- datos_recodificados[datos_recodificados$Target_bin == "Dropout", ]
+
+
+# Este subconjunto contiene únicamente a los alumnos que se graduaron  
+noDropouts <- datos_recodificados[datos_recodificados$Target_bin == "No Dropout", ]
+
+# Calculamos la media del PIB para los estudiantes que abandonaron
+mean_notas1_dropouts <- mean(Dropouts$Curricular.units.1st.sem.grade_10)
+
+# Calculamos la media de las notas del primer cuatrimestre de los estudiantes que no abandonaron (graduados o siguen matriculados )
+mean_notas1_noDropouts <- mean(noDropouts$Curricular.units.1st.sem.grade_10)
+
+# Mostramos los resultados en pantalla
+
+mean_notas1_dropouts #3.628328 (sobre 10)
+mean_notas1_noDropouts #6.121093 (sobre 10)
+
+#Vamos a hacer una comparación de medianas para comprobar si los resultados de las medias se ven afectadas por la presencia de valores átipicos
+
+median_notas1_dropouts <- median(Dropouts$Curricular.units.1st.sem.grade_10)
+median_notas1_noDropouts <- median(noDropouts$Curricular.units.1st.sem.grade_10)
+
+median_notas1_dropouts #5.464286 (sobre 10)
+median_notas1_noDropouts # 6.357143 (sobre 10)
+
+#Como podemos ver la mediana de las notas del primer cuatrimestre del grupo Dropout es más mayor que la
+#media debido a la presencia de valores extremos bajos que tiran de la media hacia abajo (como vimos en el diagrama de cajas multiple)
+
+
+#Objetvo: comparar las medias de las notas del 2 cuatrimistre entre estudiantes que abandonaron y estudiantes que no
+
+
+mean_notas2_dropouts <- mean(Dropouts$Curricular.units.2nd.sem.grade_10)
+mean_notas2_noDropouts <- mean(noDropouts$Curricular.units.2nd.sem.grade_10)
+
+# Mostramos los resultados en pantalla
+
+mean_notas2_dropouts #2.949669 (sobre 10)
+mean_notas2_noDropouts #6.139772 (sobre 10)
+
+#Vamos a hacer la mediana ahora
+
+median_notas2_dropouts <- median(Dropouts$Curricular.units.2nd.sem.grade_10)
+median_notas2_noDropouts <- median(noDropouts$Curricular.units.2nd.sem.grade_10)
+
+# Mostramos los resultados en pantalla
+
+median_notas2_dropouts #0 (sobre 10)
+median_notas2_noDropouts #6.375 (sobre 10)
+
+#La mediana de las notas del segundo cuatrimestre es más baja que su media, lo que significa que hay valores extremos altos que tiran de la media hacia arriba.
+#La mediana y la media de las notas de los que no abandonaron es muy similar
+
+#T-TEST
+t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados)
+t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados)
+t.test(GDP ~ Target_bin, data=datos_recodificados)
+t.test(Unemployment.rate ~ Target_bin, data=datos_recodificados)
+t.test(Inflation.rate ~ Target_bin, data=datos_recodificados)
+t.test(Admission.grade_10  ~ Target_bin, data=datos_recodificados)
+t.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_recodificados)
+
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
 library(vcd)
@@ -170,8 +239,20 @@ barplot(tabla4, legend=TRUE, col=c("indianred2", "lightblue", "lightgreen"), hor
 
 #BOXPLOTS MÚLTIPLES
 dev.off() # resetea la ventana de gráficos
+
+#Boxplots con la variable target antes de la reagrupación
 boxplot(Admission.grade ~ Target, data=datos_recodificados, las=1)
 boxplot(Admission.grade_10 ~ Target, data=datos_recodificados, las=1)
 boxplot(Previous.qualification.grade_10 ~ Target, data=datos_recodificados, las=1)
 boxplot(Curricular.units.1st.sem.grade_10 ~ Target, data=datos_recodificados, las=1)
 boxplot(Curricular.units.2nd.sem.grade_10 ~ Target, data=datos_recodificados, las=1)
+
+
+#Boxplots de la variable target después de la reagrupación
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(GDP ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Unemployment.rate ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Inflation.rate ~ Target_bin, data=datos_recodificados, las=1)
