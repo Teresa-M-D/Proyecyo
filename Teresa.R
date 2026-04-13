@@ -40,5 +40,28 @@ variables_numéricas<-c("Previous.qualification.grade_10",
                        "PIB") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
 
 describe(datos_recodificados[,variables_numéricas])
+ #***********
+ #Inflation rate
+ #***********
+descriptive(datos_recodificados$Inflation.rate)
+barplot(table(datos_recodificados$Inflation.rate))
+table(datos_recodificados$Inflation.rate)
 
-#Application order
+#***********
+#Inflation rate
+#***********
+descriptive(datos_recodificados$Inflation.rate)
+barplot(table(datos_recodificados$Inflation.rate))
+table(datos_recodificados$Inflation.rate)
+#***********
+#PIB
+#***********
+descriptive(datos_recodificados$PIB)
+barplot(table(datos_recodificados$PIB))
+table(datos_recodificados$PIB)
+#***********
+#Unemployment
+#***********
+descriptive(datos_recodificados$Unemployment.rate)
+barplot(table(datos_recodificados$Unemployment.rate))
+table(datos_recodificados$Unemployment.rate)

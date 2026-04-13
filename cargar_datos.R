@@ -1,5 +1,5 @@
 #imputación de datos faltantes por moda condicionada:
-
+install.packages("lsr")
 #he añadido todas las librerías que creo q hemos usado hasta ahora
 library(gridExtra)
 library(clickR)
@@ -7,6 +7,7 @@ library(DescTools)
 library(plotly)
 library(scatterplot3d)
 library(vcd)
+library(lsr)
 library(ggplot2)
 library(dplyr)
 library(GGally)
