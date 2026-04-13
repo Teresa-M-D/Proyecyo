@@ -1842,3 +1842,16 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
 
 
 table(datos_recodificados$Marital_group)
+
+
+#probando
+install.packages("effsize")
+library(effsize)
+
+cohen.d(Curricular.units.1st.sem.grade_10 ~ Target_bin, 
+        data = datos_recodificados)
+
+cohen.d(Curricular.units.2nd.sem.grade_10 ~ Target_bin, 
+        data = datos_recodificados)
+cohen.d(GDP ~ Target_bin, 
+        data = datos_recodificados)
