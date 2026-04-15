@@ -1322,6 +1322,7 @@ cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodifica
 GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
 
+
 #Chi-cuadrado:
 tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
@@ -1907,6 +1908,10 @@ mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,
        shade = TRUE, legend = TRUE)
 
 
+
+
+
+
 #Father occupation level:
 table(datos_recodificados$Father_occupation_level)
 unique(datos_recodificados$Father_occupation_level)
@@ -1967,3 +1972,22 @@ cohen.d(Curricular.units.2nd.sem.grade_10 ~ Target_bin,
         data = datos_recodificados)
 cohen.d(GDP ~ Target_bin, 
         data = datos_recodificados)
+
+
+
+
+View(datos_recodificados[datos_recodificados$Application.order == 0, ])
+
+sum(datos_recodificados[datos_recodificados$Curricular.units.1st.sem..enrolled. == 0, ])
+table(datos_recodificados$Course)
+
+datos_multimedia <- datos_recodificados[
+  datos_recodificados$Course == "Diseño de Animación y Multimedia", 
+]
+View(datos_multimedia)
+
+datos_multimedia_año <- datos_recodificados[
+  datos_recodificados$Course == "Diseño de Animación y Multimedia" &
+    datos_recodificados$year == 2016,
+]
+View(datos_multimedia_año)
