@@ -1043,7 +1043,101 @@ sum(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 
 
 
+#***********************
+#Aprobadas
+#***********************
+#1SEM
+#tiene q ver las q apruebas con a cuantas te presentas?
+datos_recodificados$Curricular.units.1st.sem..approved.
+descriptive(datos_recodificados$Curricular.units.1st.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..approved.~ datos_recodificados$Course, las=2)
+#otra vez salen los 0 raros de multimedia
 
+
+
+#vamos a ver si dpendn del año (aunq me paree raro q puedan aprobar)
+ggplot(datos_recodificados, 
+       aes(x=factor(PIB), y=Curricular.units.1st.sem..approved.)
+)+
+  geom_boxplot()+
+  facet_wrap(~Course)+
+  labs(x="PIB", y="Unidades curriculares aprobadas", title="Unidades curriculares aprobadas en cada año según la carrera")
+
+
+#Creo nueva variable
+datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
+descriptive(datos_recodificados$Porcentaje_aprobado_sem_1)
+boxplot(datos_recodificados$Porcentaje_aprobado_sem_1~ datos_recodificados$Course, las=2, cex.axis=0.6) #hay q bajar tamaño letra
+par(mar=c(13,4,4,2))
+#aproxmamos a normal
+qqnorm(
+  datos_recodificados$Curricular.units.1st.sem..approved.,
+  main = "Papel probabilístico normal Aprobados 1º sem.",
+)
+qqline(datos_recodificados$Curricular.units.1st.sem..approved.)
+grid()
+
+#2SEM
+descriptive(datos_recodificados$Curricular.units.2nd.sem..approved.)
+boxplot(datos_recodificados$Curricular.units.1st.sem..approved.~ datos_recodificados$Course, las=2, cex.axis=0.6)
+
+#****************************
+#Asignaturas matriculadas
+#****************************
+#1SEM
+datos_recodificados$Curricular.units.1st.sem..enrolled.
+descriptive(datos_recodificados$Curricular.units.1st.sem..enrolled.)
+hist(datos_recodificados$Curricular.units.1st.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
+axis(1, at=seq(0, 26, by=1),las=2)
+axis(2, at=seq(0, 2000, by=100), las=2)
+boxplot(datos_recodificados$Curricular.units.1st.sem..enrolled.~datos_recodificados$Course, las=2, cex.axis=0.7)
+
+#ver si los q no se matriculan a nada en el semestre 1 tampoco lo hacen en el segundo
+datos_recodificados$Curricular.units.2nd.sem..enrolled.[datos_recodificados$Curricular.units.1st.sem..enrolled.==0]
+#probamos ppn x si acaso
+
+table(
+  datos_recodificados$Target[
+    datos_recodificados$Course=="Diseño de Animación y Multimedia" &
+      datos_recodificados$Curricular.units.1st.sem..enrolled. == 0
+  ]
+)
+#2SEM
+descriptive(datos_recodificados$Curricular.units.2nd.sem..enrolled.)
+hist(datos_recodificados$Curricular.units.2nd.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
+axis(1, at=seq(0, 26, by=1),las=2)
+axis(2, at=seq(0, 2000, by=100), las=2)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..enrolled.~datos_recodificados$Course, las=2, cex.axis=0.7)
+
+#**************************
+#Creditadas(convalidadas)
+#**************************
+#1SEM
+descriptive(datos_recodificados$Curricular.units.1st.sem..credited.)
+#ver cual es la frecuencia de 0 
+tabla_cred<-table(datos_recodificados$Curricular.units.1st.sem..credited.)
+tabla_cred
+barplot(tabla_cred)
+#ppexp
+x_exp <- datos_recodificados$Curricular.units.1st.sem..credited.
+qqplot(
+  qexp(ppoints(length(x_exp)), rate = 1/mean(x_exp)),
+  sort(x_exp),
+  main = "QQ plot exponencial",
+  xlab = "Cuantiles teóricos",
+  ylab = "Cuantiles observados"
+)
+abline(0,1)
+grid()
+#BXPLOT Por carreras
+boxplot(datos_recodificados$Curricular.units.1st.sem..credited.~datos_recodificados$Course, las=2)
+
+#2SEM
+descriptive(datos_recodificados$Curricular.units.2nd.sem..credited.)
+boxplot(datos_recodificados$Curricular.units.2nd.sem..credited.~datos_recodificados$Course, las=2)
+tabla_cred2<-table(datos_recodificados$Curricular.units.2nd.sem..credited.)
+tabla_cred2
+barplot(tabla_cred2)
 
 
 
@@ -1140,10 +1234,27 @@ datos_recodificados %>%
 round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 1), 3)
 
 
+#t-test:
+t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados)
+t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados)
+t.test(GDP ~ Target_bin, data=datos_recodificados)
+t.test(Unemployment.rate ~ Target_bin, data=datos_recodificados)
+t.test(Inflation.rate ~ Target_bin, data=datos_recodificados)
+t.test(Admission.grade_10  ~ Target_bin, data=datos_recodificados)
+t.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_recodificados)
 
 
 
 
+
+#Boxplots de la variable target después de la reagrupación
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(GDP ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Unemployment.rate ~ Target_bin, data=datos_recodificados, las=1)
+boxplot(Inflation.rate ~ Target_bin, data=datos_recodificados, las=1)
 
 
 
@@ -1844,6 +1955,7 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
 table(datos_recodificados$Marital_group)
 
 
+#
 #probando
 install.packages("effsize")
 library(effsize)
