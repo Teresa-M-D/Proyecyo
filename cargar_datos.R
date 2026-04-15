@@ -1,6 +1,9 @@
 #imputación de datos faltantes por moda condicionada:
 install.packages("lsr")
+install.packages("corrplot")
+library(corrplot)
 #he añadido todas las librerías que creo q hemos usado hasta ahora
+library(corrplot)
 library(gridExtra)
 library(clickR)
 library(DescTools)
