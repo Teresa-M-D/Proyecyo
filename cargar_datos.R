@@ -740,3 +740,4 @@ datos_recodificados$Carga_academica_real <-
 #mas cosas:
 datos_recodificados$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
                                           datos_recodificados$Course)
+
