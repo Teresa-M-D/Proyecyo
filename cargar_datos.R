@@ -734,3 +734,8 @@ datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricul
 datos_recodificados$Carga_academica_real <- 
   datos_recodificados$Curricular.units.1st.sem..enrolled. - 
   datos_recodificados$Curricular.units.1st.sem..credited.
+
+
+#mas cosas:
+datos_recodificados$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
+                                          datos_recodificados$Course)
