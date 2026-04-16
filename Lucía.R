@@ -1694,32 +1694,30 @@ mosaic(~ Gender + Target_bin, data = datos_recodificados,
 datos_recodificados$Course_group <- dplyr::case_when(
   
   # SALUD
-  datos_recodificados$Course %in% c(
+  datos_recodificados$Course_limpio %in% c(
     "Enfermería",
     "Enfermería Veterinaria",
     "Higiene Bucodental"
   ) ~ "Salud",
   
   # INGENIERÍA / TECNOLOGÍA
-  datos_recodificados$Course %in% c(
+  datos_recodificados$Course_limpio %in% c(
     "Ingeniería Informática",
     "Tecnologías de Producción de Biocombustibles",
     "Diseño de Animación y Multimedia"
   ) ~ "Ingeniería/Tech",
   
   # SOCIALES / EMPRESA
-  datos_recodificados$Course %in% c(
+  datos_recodificados$Course_limpio %in% c(
     "Gestión",
-    "Gestión (turno de tarde)",
     "Gestión de Publicidad y Marketing",
     "Turismo"
   ) ~ "Empresa",
   
   # EDUCACIÓN / SOCIAL
-  datos_recodificados$Course %in% c(
+  datos_recodificados$Course_limpio %in% c(
     "Educación Básica",
-    "Trabajo Social",
-    "Trabajo Social (turno de tarde)"
+    "Trabajo Social"
   ) ~ "Educación/Social",
   
   # COMUNICACIÓN / DISEÑO
@@ -1729,7 +1727,7 @@ datos_recodificados$Course_group <- dplyr::case_when(
   ) ~ "Comunicación",
   
   # AGRO / ANIMAL
-  datos_recodificados$Course %in% c(
+  datos_recodificados$Course_limpio %in% c(
     "Agronomía",
     "Equinocultura"
   ) ~ "Agro/Animal",
@@ -1738,7 +1736,7 @@ datos_recodificados$Course_group <- dplyr::case_when(
 )
 
 sum(table(datos_recodificados$Course_group))
-unique(datos_recodificados$Course)
+unique(datos_recodificados$Course_group)
 tabla_course_target <- table(datos_recodificados$Course_group,
                              datos_recodificados$Target_bin)
 tabla_course_target
@@ -1794,8 +1792,123 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
   theme_minimal()
 
 
+#analizamos sin Diseño Multimedia:
+
+#empezamos creando un dataset sin multimedia:
+datos_sin_multi <- datos_recodificados[
+  datos_recodificados$Course_limpio != "Diseño de Animación y Multimedia",
+]
+sum(table(datos_sin_multi$Course_limpio))
+
+datos_sin_multi$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_sin_multi$Course_limpio %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_sin_multi$Course_limpio %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_sin_multi$Course_limpio %in% c(
+    "Gestión",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_sin_multi$Course_limpio %in% c(
+    "Educación Básica",
+    "Trabajo Social"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_sin_multi$Course_limpio %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_sin_multi$Course_limpio %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
 
 
+
+#seguimos
+sum(table(datos_sin_multi$Course_group))
+table(datos_sin_multi$Course_group)
+colnames(datos_sin_multi)
+tabla_course_sin_multi_target <- table(datos_sin_multi$Course_group,
+                             datos_sin_multi$Target_bin)
+tabla_course_sin_multi_target
+
+
+prop.table(tabla_course_sin_multi_target, 1)
+prop.table(tabla_course_sin_multi_target, 2)
+
+cramersV(tabla_course_sin_multi_target)
+GK_assoc(datos_sin_multi$Course_group, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Course_group)
+
+chisq.test(tabla_course_sin_multi_target, correct = FALSE)
+chisq.test(tabla_course_sin_multi_target)$expected
+
+#Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
+
+datos_sin_multi$Course_group_short <- dplyr::recode(
+  datos_sin_multi$Course_group,
+  "Ingeniería/Tech" = "Ing./Tech",
+  "Educación/Social" = "Educ./Soc.",
+  "Comunicación" = "Com.",
+  "Agro/Animal" = "Agro/Anim.",
+  "Empresa" = "Empresa",
+  "Salud" = "Salud"
+)
+
+# Gráficos:
+
+mosaic(~ Course_group_short + Target_bin, 
+       data = datos_sin_multi,
+       shade = TRUE,
+       legend = TRUE,
+       cex.axis = 0.8)  
+
+tabla_course_plot <- datos_sin_multi %>%
+  count(Course_group_short, Target_bin) %>%
+  group_by(Course_group_short) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group_short, y = prop, fill = Target_bin)) +
+  geom_col() +
+  geom_text(aes(label = etiqueta),
+            position = position_stack(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = c(
+    "Dropout" = "red",
+    "No Dropout" = "lightgreen"
+  )) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre tipo de carrera y abandono"
+  ) +
+  theme_minimal()
+
+unique(datos_recodificados$Course)
 #Previous education level
 table(datos_recodificados$Previous_education_level)
 unique(datos_recodificados$Previous_education_level)
@@ -2078,5 +2191,30 @@ View(datos_recodificados[
   )
 ])
 
-datos_recodificados$Application.mode
+ 
+#vamos a ver que estudiantes tienen carga_academica_real==carga_academia_real_sem2
 
+View(datos_recodificados[
+  datos_recodificados$Carga_academica_real == 0 &
+    datos_recodificados$Carga_academica_real_sem2 == 0,
+  c("Carga_academica_real",
+    "Carga_academica_real_sem2",
+    "Course_limpio",
+    "Target",
+    "Curricular.units.2nd.sem..evaluations.")
+])
+
+#Viendo los alumnos multimedia:
+
+View(datos_recodificados[
+  datos_recodificados$Course=="Diseño de Animación y Multimedia",
+  c("Course",
+    "year",
+    "Target",
+    "Curricular.units.1st.sem..evaluations.",
+    "Curricular.units.1st.sem..enrolled.",
+    "Carga_academica_real",
+    "Carga_academica_real_sem2",
+    "Application.mode_group"
+  )
+])
