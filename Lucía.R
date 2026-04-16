@@ -2044,6 +2044,7 @@ datos_recodificados$Carga_academica_real <-
 
 table(datos_recodificados$Carga_academica_real)
 descriptive(datos_recodificados$Carga_academica_real)
+
 View(datos_recodificados[
   datos_recodificados$Carga_academica_real==0,
   c("Carga_academica_real",
@@ -2052,8 +2053,29 @@ View(datos_recodificados[
     "Curricular.units.1st.sem.grade_10",
     "Curricular.units.1st.sem..evaluations.",
     "Curricular.units.1st.sem..without.evaluations.",
-    "Curricular.units.1st.sem..enrolled."
+    "Curricular.units.1st.sem..enrolled.",
+    "Application.mode_group"
     )
 ])
 
 datos_recodificados$Curricular.units.1st.sem..enrolled.
+
+datos_recodificados$Carga_academica_real_sem2 <- 
+  datos_recodificados$Curricular.units.2nd.sem..enrolled. - 
+  datos_recodificados$Curricular.units.2nd.sem..credited.
+
+View(datos_recodificados[
+  datos_recodificados$Carga_academica_real_sem2==0,
+  c("Carga_academica_real_sem2",
+    "Course_limpio",
+    "Target",
+    "Curricular.units.2nd.sem.grade_10",
+    "Curricular.units.2nd.sem..evaluations.",
+    "Curricular.units.2nd.sem..without.evaluations.",
+    "Curricular.units.2nd.sem..enrolled.",
+    "Application.mode_group"
+  )
+])
+
+datos_recodificados$Application.mode
+
