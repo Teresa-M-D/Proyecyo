@@ -1322,6 +1322,7 @@ cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodifica
 GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
 GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
 
+
 #Chi-cuadrado:
 tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
@@ -1907,6 +1908,10 @@ mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,
        shade = TRUE, legend = TRUE)
 
 
+
+
+
+
 #Father occupation level:
 table(datos_recodificados$Father_occupation_level)
 unique(datos_recodificados$Father_occupation_level)
@@ -1967,3 +1972,88 @@ cohen.d(Curricular.units.2nd.sem.grade_10 ~ Target_bin,
         data = datos_recodificados)
 cohen.d(GDP ~ Target_bin, 
         data = datos_recodificados)
+
+
+
+#no hacer caso
+View(datos_recodificados[datos_recodificados$Application.order == 0, ])
+
+sum(datos_recodificados[datos_recodificados$Curricular.units.1st.sem..enrolled. == 0, ])
+table(datos_recodificados$Course)
+
+datos_multimedia <- datos_recodificados[
+  datos_recodificados$Course == "Diseño de Animación y Multimedia", 
+]
+View(datos_multimedia)
+
+datos_multimedia_año <- datos_recodificados[
+  datos_recodificados$Course == "Diseño de Animación y Multimedia" &
+    datos_recodificados$year == 2016,
+]
+View(datos_multimedia_año)
+
+colnames(datos_recodificados)
+
+library(clickR)
+table(datos_recodificados$Curricular.units.1st.sem..approved.)
+table(datos_recodificados$Curricular.units.1st.sem..credited.)
+table(datos_recodificados$Curricular.units.1st.sem..enrolled.)
+table(datos_recodificados$Curricular.units.1st.sem..evaluations.)
+table(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
+
+
+
+#limpiando variable Course
+table(datos_recodificados$Course_limpio)
+datos_recodificados$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
+                                          datos_recodificados$Course)
+table(datos_recodificados$Course_limpio)
+
+
+aggregate(Curricular.units.1st.sem..evaluations. ~ Course_limpio, 
+          data = datos_recodificados, 
+          mean)
+
+
+aggregate(Curricular.units.1st.sem..evaluations. ~ Course_limpio,
+          data = datos_recodificados,
+          sd)
+
+boxplot(Curricular.units.1st.sem..evaluations. ~ Course_limpio,
+        data = datos_recodificados,
+        las = 2,
+        col = "lightblue",
+        main = "Evaluaciones por carrera",
+        ylab = "Número de evaluaciones")
+
+#Entendiendo las matriculaciones :)
+table(datos_recodificados$Curricular.units.1st.sem..enrolled.)
+
+#Ver si los alumnos con más matriculaciones tienen tambien más convalidadas
+View(datos_recodificados[
+  order(-datos_recodificados$Curricular.units.1st.sem..enrolled.),
+  c("Curricular.units.1st.sem..enrolled.",
+    "Curricular.units.1st.sem..credited.")
+])
+
+#Creo nueva variable con la carga real de los estudiantes, es decir, asignaturas matriculadas-convaldiadas
+
+datos_recodificados$Carga_academica_real <- 
+  datos_recodificados$Curricular.units.1st.sem..enrolled. - 
+  datos_recodificados$Curricular.units.1st.sem..credited.
+
+table(datos_recodificados$Carga_academica_real)
+descriptive(datos_recodificados$Carga_academica_real)
+View(datos_recodificados[
+  datos_recodificados$Carga_academica_real==0,
+  c("Carga_academica_real",
+    "Course_limpio",
+    "Target",
+    "Curricular.units.1st.sem.grade_10",
+    "Curricular.units.1st.sem..evaluations.",
+    "Curricular.units.1st.sem..without.evaluations.",
+    "Curricular.units.1st.sem..enrolled."
+    )
+])
+
+datos_recodificados$Curricular.units.1st.sem..enrolled.

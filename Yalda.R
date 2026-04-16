@@ -217,6 +217,12 @@ t.test(Inflation.rate ~ Target_bin, data=datos_recodificados)
 t.test(Admission.grade_10  ~ Target_bin, data=datos_recodificados)
 t.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_recodificados)
 
+#Yuen's test
+install.packages("WRS2")
+library(WRS2)
+yuen(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_recodificados, tr = 0.2)
+yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_recodificados, tr = 0.2)
+
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
 library(vcd)
