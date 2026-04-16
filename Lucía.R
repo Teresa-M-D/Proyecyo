@@ -2045,6 +2045,7 @@ datos_recodificados$Carga_academica_real <-
 table(datos_recodificados$Carga_academica_real)
 descriptive(datos_recodificados$Carga_academica_real)
 
+
 View(datos_recodificados[
   datos_recodificados$Carga_academica_real==0,
   c("Carga_academica_real",
@@ -2055,7 +2056,7 @@ View(datos_recodificados[
     "Curricular.units.1st.sem..without.evaluations.",
     "Curricular.units.1st.sem..enrolled.",
     "Application.mode_group"
-    )
+  )
 ])
 
 datos_recodificados$Curricular.units.1st.sem..enrolled.
