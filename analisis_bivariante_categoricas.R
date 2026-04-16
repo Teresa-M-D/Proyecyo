@@ -711,6 +711,87 @@ datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
 mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
        shade = TRUE, legend = TRUE)
 
+#Analizamos Mother_education_level sin los datos imputados para ver como cambia respecto a la imputación
+table(datos_recodificados$Mother.s.qualification)
+
+
+datos_sin_imputar$Mother_education_level <- case_when(
+  
+  # BAJO
+  datos_sin_imputar$Mother.s.qualification %in% c(
+    "10º año de escolarización", 
+    "11º año de escolarización - No completado",
+    "12º año de escolarización - No completado",
+    "7º año (sistema antiguo)",
+    "7º año de escolarización",
+    "8º año de escolarización",
+    "9º año de escolarización - No completado",
+    "Educación básica 1er ciclo (4º/5º año) o equivalente",
+    "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
+    "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
+    "Otro - 11º año de escolarización",
+    "Sabe leer sin haber completado 4º año",
+    "No sabe leer ni escribir"
+  ) ~ "Bajo",
+  
+  # MEDIO
+  datos_recodificados$Mother.s.qualification %in% c(
+    "Educación secundaria - 12º año o equivalente",
+    "2º ciclo del bachillerato general"
+  ) ~ "Medio",
+  
+  # TÉCNICO
+  datos_recodificados$Mother.s.qualification %in% c(
+    "Curso de especialización tecnológica",
+    "Curso de estudios superiores especializados",
+    "Curso técnico-profesional",
+    "Curso técnico superior profesional",
+    "Curso general de comercio"
+  ) ~ "Técnico",
+  
+  # SUPERIOR
+  datos_recodificados$Mother.s.qualification %in% c(
+    "Educación superior - Doctorado",
+    "Educación superior - Doctorado (3er ciclo)",
+    "Educación superior - Grado",
+    "Educación superior - Grado (Bachelor)",
+    "Educación superior - Máster",
+    "Educación superior - Máster (2º ciclo)",
+    "Educación superior - Grado (1er ciclo)",
+    "Asistencia a educación superior"
+  ) ~ "Superior"
+)
+
+
+
+table(datos_sin_imputar$Mother_education_level)
+unique(datos_sin_imputar$Mother_education_level)
+tabla_mum_educ_target_sin_imputar <- table(datos_sin_imputar$Mother_education_level,
+                               datos_sin_imputar$Target_bin)
+tabla_mum_educ_target_sin_imputar
+
+prop.table(tabla_mum_educ_target_sin_imputar, 1)
+prop.table(tabla_mum_educ_target_sin_imputar, 2)
+
+cramersV(tabla_mum_educ_target_sin_imputar)
+GK_assoc(datos_sin_imputar$Mother_education_level, datos_sin_imputar$Target_bin)
+GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_education_level)
+
+chisq.test(tabla_mum_educ_target_sin_imputar, correct = FALSE)
+chisq.test(tabla_mum_educ_target_sin_imputar)$expected
+
+#Cambiamos a nombres más cortos:
+datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
+  datos_recodificados$Mother_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
+       shade = TRUE, legend = TRUE)
+
 
 #Father education level:
 table(datos_recodificados$Father_education_level)
