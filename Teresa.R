@@ -37,31 +37,16 @@ variables_numéricas<-c("Previous.qualification.grade_10",
                        "Curricular.units.2nd.sem..without.evaluations.",
                        "Unemployment.rate",
                        "Inflation.rate",
+                       "Porcentaje_aprobado_sem_1",
                        "PIB") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
-
+datos_recodificados$carga
 describe(datos_recodificados[,variables_numéricas])
- #***********
- #Inflation rate
- #***********
-descriptive(datos_recodificados$Inflation.rate)
-barplot(table(datos_recodificados$Inflation.rate))
-table(datos_recodificados$Inflation.rate)
 
-#***********
-#Inflation rate
-#***********
-descriptive(datos_recodificados$Inflation.rate)
-barplot(table(datos_recodificados$Inflation.rate))
-table(datos_recodificados$Inflation.rate)
-#***********
-#PIB
-#***********
-descriptive(datos_recodificados$PIB)
-barplot(table(datos_recodificados$PIB))
-table(datos_recodificados$PIB)
-#***********
-#Unemployment
-#***********
-descriptive(datos_recodificados$Unemployment.rate)
-barplot(table(datos_recodificados$Unemployment.rate))
-table(datos_recodificados$Unemployment.rate)
+
+#hacer matriz de correlaciones
+matriz_corr<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="spearman")
+#para ponerlo gráficamente
+corrplot(matriz_corr, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4)
+#ver relación entre age y application order
+
