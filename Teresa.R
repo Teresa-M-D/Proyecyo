@@ -39,14 +39,14 @@ variables_numéricas<-c("Previous.qualification.grade_10",
                        "Inflation.rate",
                        "Porcentaje_aprobado_sem_1",
                        "PIB") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
-
+datos_recodificados$carga
 describe(datos_recodificados[,variables_numéricas])
 
 
 #hacer matriz de correlaciones
-matriz_corr<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", )
+matriz_corr<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="spearman")
 #para ponerlo gráficamente
 corrplot(matriz_corr, method="color", type = "upper",
-         tl.cex = 0.5)
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4)
 #ver relación entre age y application order
 
