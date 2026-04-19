@@ -712,89 +712,6 @@ mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodific
        shade = TRUE, legend = TRUE)
 
 
-
-#Analizamos Mother_education_level sin los datos imputados para ver como cambia respecto a la imputación
-table(datos_recodificados$Mother.s.qualification)
-
-
-datos_sin_imputar$Mother_education_level <- case_when(
-  
-  # BAJO
-  datos_sin_imputar$Mother.s.qualification %in% c(
-    "10º año de escolarización", 
-    "11º año de escolarización - No completado",
-    "12º año de escolarización - No completado",
-    "7º año (sistema antiguo)",
-    "7º año de escolarización",
-    "8º año de escolarización",
-    "9º año de escolarización - No completado",
-    "Educación básica 1er ciclo (4º/5º año) o equivalente",
-    "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
-    "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
-    "Otro - 11º año de escolarización",
-    "Sabe leer sin haber completado 4º año",
-    "No sabe leer ni escribir"
-  ) ~ "Bajo",
-  
-  # MEDIO
-  datos_recodificados$Mother.s.qualification %in% c(
-    "Educación secundaria - 12º año o equivalente",
-    "2º ciclo del bachillerato general"
-  ) ~ "Medio",
-  
-  # TÉCNICO
-  datos_recodificados$Mother.s.qualification %in% c(
-    "Curso de especialización tecnológica",
-    "Curso de estudios superiores especializados",
-    "Curso técnico-profesional",
-    "Curso técnico superior profesional",
-    "Curso general de comercio"
-  ) ~ "Técnico",
-  
-  # SUPERIOR
-  datos_recodificados$Mother.s.qualification %in% c(
-    "Educación superior - Doctorado",
-    "Educación superior - Doctorado (3er ciclo)",
-    "Educación superior - Grado",
-    "Educación superior - Grado (Bachelor)",
-    "Educación superior - Máster",
-    "Educación superior - Máster (2º ciclo)",
-    "Educación superior - Grado (1er ciclo)",
-    "Asistencia a educación superior"
-  ) ~ "Superior"
-)
-
-
-
-table(datos_sin_imputar$Mother_education_level)
-unique(datos_sin_imputar$Mother_education_level)
-tabla_mum_educ_target_sin_imputar <- table(datos_sin_imputar$Mother_education_level,
-                               datos_sin_imputar$Target_bin)
-tabla_mum_educ_target_sin_imputar
-
-prop.table(tabla_mum_educ_target_sin_imputar, 1)
-prop.table(tabla_mum_educ_target_sin_imputar, 2)
-
-cramersV(tabla_mum_educ_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Mother_education_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_education_level)
-
-chisq.test(tabla_mum_educ_target_sin_imputar, correct = FALSE)
-chisq.test(tabla_mum_educ_target_sin_imputar)$expected
-
-#Cambiamos a nombres más cortos:
-datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Mother_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
 #Father education level:
 table(datos_recodificados$Father_education_level)
 unique(datos_recodificados$Father_education_level)
@@ -1266,52 +1183,52 @@ mosaic(~ Mother_occupation_level + Target_bin, data = datos_sin_imputar,
 
 # Recodificamos primero la variable:
 datos_sin_imputar$Father.s.occupation_recodif<-recode(datos_sin_imputar$Father.s.occupation,
-                                                      `0` = "Estudiante",
-                                                      `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                      `2` = "Especialistas en actividades intelectuales y científicas",
-                                                      `3` = "Técnicos y profesiones de nivel intermedio",
-                                                      `4` = "Personal administrativo",
-                                                      `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                      `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                      `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
-                                                      `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                      `9` = "Trabajadores no cualificados",
-                                                      `10` = "Profesiones de las fuerzas armadas",
-                                                      `90` = "Otra situación",
-                                                      `99` = "(en blanco)",
-                                                      `101` = "Oficiales de las fuerzas armadas",
-                                                      `102` = "Sargentos de las fuerzas armadas",
-                                                      `103` = "Otro personal de las fuerzas armadas",
-                                                      `112` = "Directores de servicios administrativos y comerciales",
-                                                      `114` = "Directores de hostelería, comercio y otros servicios",
-                                                      `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
-                                                      `122` = "Profesionales de la salud",
-                                                      `123` = "Profesores",
-                                                      `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
-                                                      `131` = "Técnicos intermedios en ciencia e ingeniería",
-                                                      `132` = "Técnicos y profesionales intermedios de salud",
-                                                      `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
-                                                      `135` = "Técnicos en tecnologías de la información y la comunicación",
-                                                      `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                      `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
-                                                      `144` = "Otro personal de apoyo administrativo",
-                                                      `151` = "Trabajadores de servicios personales",
-                                                      `152` = "Vendedores",
-                                                      `153` = "Trabajadores de cuidado personal y similares",
-                                                      `154` = "Personal de protección y seguridad",
-                                                      `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
-                                                      `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
-                                                      `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                      `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
-                                                      `174` = "Trabajadores cualificados en electricidad y electrónica",
-                                                      `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
-                                                      `181` = "Operadores de instalaciones y maquinaria fija",
-                                                      `182` = "Trabajadores de montaje",
-                                                      `183` = "Conductores de vehículos y operadores de maquinaria móvil",
-                                                      `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                      `193` = "Trabajadores no cualificados en industria, construcción y transporte",
-                                                      `194` = "Ayudantes de preparación de comidas",
-                                                      `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
+                                                `0` = "Estudiante",
+                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                                `2` = "Especialistas en actividades intelectuales y científicas",
+                                                `3` = "Técnicos y profesiones de nivel intermedio",
+                                                `4` = "Personal administrativo",
+                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
+                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                                `9` = "Trabajadores no cualificados",
+                                                `10` = "Profesiones de las fuerzas armadas",
+                                                `90` = "Otra situación",
+                                                `99` = "(en blanco)",
+                                                `101` = "Oficiales de las fuerzas armadas",
+                                                `102` = "Sargentos de las fuerzas armadas",
+                                                `103` = "Otro personal de las fuerzas armadas",
+                                                `112` = "Directores de servicios administrativos y comerciales",
+                                                `114` = "Directores de hostelería, comercio y otros servicios",
+                                                `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
+                                                `122` = "Profesionales de la salud",
+                                                `123` = "Profesores",
+                                                `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
+                                                `131` = "Técnicos intermedios en ciencia e ingeniería",
+                                                `132` = "Técnicos y profesionales intermedios de salud",
+                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
+                                                `135` = "Técnicos en tecnologías de la información y la comunicación",
+                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                                `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
+                                                `144` = "Otro personal de apoyo administrativo",
+                                                `151` = "Trabajadores de servicios personales",
+                                                `152` = "Vendedores",
+                                                `153` = "Trabajadores de cuidado personal y similares",
+                                                `154` = "Personal de protección y seguridad",
+                                                `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
+                                                `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
+                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                                `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
+                                                `174` = "Trabajadores cualificados en electricidad y electrónica",
+                                                `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
+                                                `181` = "Operadores de instalaciones y maquinaria fija",
+                                                `182` = "Trabajadores de montaje",
+                                                `183` = "Conductores de vehículos y operadores de maquinaria móvil",
+                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                                `193` = "Trabajadores no cualificados en industria, construcción y transporte",
+                                                `194` = "Ayudantes de preparación de comidas",
+                                                `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
 
 sum(table(datos_sin_imputar$Father.s.occupation))
 
