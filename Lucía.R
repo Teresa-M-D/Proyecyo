@@ -2714,3 +2714,38 @@ View(datos_recodificados[
     "Application.mode_group"
   )
 ])
+datos_recodificados$Application.mode_group
+
+#Análisis multivariante:
+install.packages("pscl")
+#Regresión logística binaria:
+# Aseguramos que la variable objetivo esté en formato factor
+datos_recodificados$Target_bin <- relevel(datos_recodificados$Target_bin, ref = "No Dropout")
+datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+
+# Ajustamos el modelo de regresión logística binaria
+modelo_logit <- glm(
+  Target_bin ~ Curricular.units.1st.sem.grade_10 +
+    Tuition.fees.up.to.date +
+    Scholarship.holder +
+    Debtor +
+    Admission.grade_10 +
+    Application.mode_group +
+    Course_group,
+  data = datos_recodificados,
+  family = binomial
+)
+colnames(datos_recodificados)
+
+summary(modelo_logit)
+exp(coef(modelo_logit))
+exp(confint(modelo_logit))
+library(pscl)
+pR2(modelo_logit)
+datos_recodificados$Target_bin <- factor(
+  datos_recodificados$Target_bin,
+  levels = c("No Dropout", "Dropout")
+)
+levels(datos_recodificados$Target_bin)
+rm(modelo_logit)
+#no lo he acabado, no hacer caos
