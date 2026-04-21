@@ -2749,3 +2749,24 @@ datos_recodificados$Target_bin <- factor(
 levels(datos_recodificados$Target_bin)
 rm(modelo_logit)
 #no lo he acabado, no hacer caos
+
+
+#Poner datos para análisis numérico (sin los estudiantes de Multimedia con todo 0 (pero si los que tienen notas)):
+
+datos_recodificados$Curricular.units.1st.sem..evaluations.
+
+library(dplyr)
+
+datos_modelo <- datos_recodificados %>%
+  filter(!(Curricular.units.1st.sem.grade_10 == 0 &
+             Curricular.units.1st.sem..approved. == 0 &
+             Curricular.units.1st.sem..evaluations. == 0 &
+             Curricular.units.1st.sem..credited. ==0 &
+             Curricular.units.1st.sem..enrolled. ==0 
+             ))
+
+nrow(datos_recodificados)
+nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
+colnames(datos_modelo)
+
+table(datos_modelo$Course_limpio)
