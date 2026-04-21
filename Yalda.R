@@ -223,6 +223,10 @@ library(WRS2)
 yuen(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_recodificados, tr = 0.2)
 yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_recodificados, tr = 0.2)
 
+#Test Mann - Whitney
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_recodificados)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_recodificados)
+
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
 library(vcd)
