@@ -45,10 +45,18 @@ describe(datos_recodificados[,variables_numéricas])
 
 
 #hacer matriz de correlaciones
-matriz_corr<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="kendall")
+matriz_corr_kendall<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="kendall") 
+matriz_corr_pearson<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="pearson")
+matriz_corr_spearman<-cor(datos_recodificados[,variables_numéricas], use="complete.obs", method="spearman")
 #para ponerlo gráficamente
-corrplot(matriz_corr, method="color", type = "upper",
+corrplot(matriz_corr_kendall, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
+corrplot(matriz_corr_pearson, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
+corrplot(matriz_corr_spearman, method="color", type = "upper",
          tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
 #ver relación entre age y application order
 
 
+#miramos si en multimedia hay alguno con without evaluationes ==0 en los años q no hay carrera
+boxplot(datos_recodificados$Curricular.units.1st.sem..without.evaluations.[datos_recodificados$Curricular.units.1st.sem..without.evaluations.==0 and ]~datos_recodificados$PIB)
