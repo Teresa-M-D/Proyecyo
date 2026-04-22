@@ -764,3 +764,8 @@ colnames(datos_modelo)
 table(datos_modelo$Course_limpio)
 
 
+#Variable Course_limpio
+table(datos_modelo$Course)
+datos_modelo$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
+                                          datos_modelo$Course)
+table(datos_modelo$Course_limpio)
