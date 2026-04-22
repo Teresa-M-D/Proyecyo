@@ -2770,3 +2770,5 @@ nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
 colnames(datos_modelo)
 
 table(datos_modelo$Course_limpio)
+
+
