@@ -55,6 +55,12 @@ corrplot(matriz_corr_pearson, method="color", type = "upper",
          tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Pearson")
 corrplot(matriz_corr_spearman, method="color", type = "upper",
          tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
-#ver relación entre age y application order
 
+
+#*************************
+#GRÁFICOS DE DISPERSIÓN
+#*************************
+
+
+plot(datos_modelo$Admission.grade_10~datos_modelo$Previous.qualification.grade_10, pch=6)
 
