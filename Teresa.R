@@ -61,6 +61,32 @@ corrplot(matriz_corr_spearman, method="color", type = "upper",
 #GRÁFICOS DE DISPERSIÓN
 #*************************
 
+#admission grade
 
-plot(datos_modelo$Admission.grade_10~datos_modelo$Previous.qualification.grade_10, pch=6)
+plot(datos_modelo$Admission.grade_10~datos_modelo$Previous.qualification.grade_10, cex=1, xaxt="n")
+axis(1, at=seq(0, 10, by=0.1))
+datos_modelo$Previous.qualification.grade_10[datos_modelo$Previous.qualification.grade_10>=9]
+  
+#gráfico 3d
+plot_ly(data=datos_modelo,
+       x=~Admission.grade_10,
+       y=~Previous.qualification.grade_10,
+       z=~Age.at.enrollment,
+       type="scatter3d", 
+       mode="markers",
+       marker=list(size=2))
 
+
+plot_ly(
+  data = datos_modelo,
+  x = ~Admission.grade_10,
+  y = ~carga_academica_real,
+  color = ~Age.at.enrollment,
+  type = "scatter",
+  mode = "markers",
+  marker = list(
+    size = 4,
+    symbol = "circle-open"
+  )
+)
+cor(datos_modelo$Age.at.enrollment, datos_modelo$Application.order, method="spearman")
