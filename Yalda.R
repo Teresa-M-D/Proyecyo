@@ -56,15 +56,15 @@ bp3 <- barplot(
 text(bp3, freq_tuition, labels = freq_tuition, pos = 3)
 
 #Course
-freq_course <- table(datos_recodificados$Course)
+freq_course <- table(datos_modelo$Course_limpio)
 freq_course
 #como son muchas titulaciones, hacemos un diagrama de barras horizonatal
 library(ggplot2)
 library(dplyr)
 
-datos_recodificados %>%
-  count(Course) %>% 
-  ggplot(aes(x = n, y = Course)) +
+datos_modelo %>%
+  count(Course_limpio) %>% 
+  ggplot(aes(x = n, y = Course_limpio)) +
   geom_bar(stat = "identity", fill = "#4C72B0") +
   labs(
     title = "Frecuencia de estudiantes por curso",
@@ -247,10 +247,11 @@ tabla3 <- xtabs(~ datos_recodificados$Target + datos_recodificados$Scholarship.h
 assoc(tabla3, shade = TRUE, col = c("lightblue", "lightcoral"))
 
 #Diagrama de barras bivariante
-tabla4 <- xtabs(~ datos_recodificados$Target + datos_recodificados$Course)
-par(mar = c(5, 18, 4, 2))   
-barplot(tabla4, legend=TRUE, col=c("indianred2", "lightblue", "lightgreen"), horiz=TRUE, las = 1, cex.names = 0.8)
-
+tabla4 <- xtabs(~ datos_modelo$Target + datos_modelo$Course_limpio)
+par(xpd = TRUE, mar = c(5, 18, 4, 8)) 
+barplot(tabla4,  col=c("indianred2", "lightblue", "lightgreen"), horiz=TRUE, las = 1, cex.names = 0.8)
+legend("topright", legend=c("Dropout","Enrolled","Graduate"),
+       fill=c("indianred2","lightblue","lightgreen"), inset=c(-0.2,0))
 
 #BOXPLOTS MÚLTIPLES
 dev.off() # resetea la ventana de gráficos
