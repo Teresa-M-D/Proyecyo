@@ -1271,66 +1271,84 @@ library(ggplot2)
 library(scales)
 
 
-names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
+
+descriptive(datos_modelo)
+datos_modelo <- datos_recodificados %>%
+  filter(!(Curricular.units.1st.sem.grade_10 == 0 &
+             Curricular.units.1st.sem..approved. == 0 &
+             Curricular.units.1st.sem..evaluations. == 0 &
+             Curricular.units.1st.sem..credited. ==0 &
+             Curricular.units.1st.sem..enrolled. ==0 
+  ))
+
+nrow(datos_recodificados)
+nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
+colnames(datos_modelo)
+
+
+
+#ANÁLISIS BIVARIANTE
+
+#CATEGÓRICA VS TARGET
+names(datos_modelo)[sapply(datos_modelo, is.character)] #nombres de las variables categóricas
 
 
 #Reagrupacion variable Target:
-datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+datos_modelo$Target_bin <- ifelse(datos_modelo$Target == "Dropout", "Abandono", "No Abandono")
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
 
 #Reagrupación de Marital_Status:
-datos_recodificados <- datos_recodificados %>%
+datos_modelo <- datos_modelo %>%
   mutate(Marital_group = case_when(
     Marital.status == "Soltero" ~ "Soltero",
-    Marital.status %in% c("Casado", "Con pareja") ~ "En pareja",
+    Marital.status %in% c("Casado", "Con pareja") ~ "Pareja",
     Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
   ))
-sum(table(datos_recodificados$Marital_group))
+sum(table(datos_modelo$Marital_group))
 
 #Proporciones:
-table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 2)
 
 #V de Cramer y Tau
-cramersV(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Marital_group) 
+cramersV(table(datos_modelo$Marital_group, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group) 
 
 
 #Chi-cuadrado con Marital_group:
-tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
+tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
 #Gráfico mosaico:
-mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
-       shade = TRUE, legend = TRUE)
+mosaic(~ Marital_group + Target_bin, data = datos_modelo, 
+       shade = TRUE, legend = TRUE, cex.axis = 0.7)
 
 
 #Daytime.evening.attendance:
-sum(table(datos_recodificados$Daytime.evening.attendance.))
-unique(datos_recodificados$Daytime.evening.attendance.)
+sum(table(datos_modelo$Daytime.evening.attendance.))
+unique(datos_modelo$Daytime.evening.attendance.)
 
 #Proporciones:
-table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
+table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
-
+cramersV(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Daytime.evening.attendance.) 
 
 #Chi-cuadrado:
-tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
+tabla_daytime_target <- table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
 chisq.test(tabla_daytime_target)$expected
 
 #Gráfico:
 
-tabla_plot <- datos_recodificados %>%                  
+tabla_plot <- datos_modelo %>%                  
   count(Daytime.evening.attendance., Target_bin) %>%
   group_by(Daytime.evening.attendance.) %>%
   mutate(prop = n / sum(n))
@@ -1350,26 +1368,26 @@ ggplot(tabla_plot,
 
 #Displaced
 
-sum(table(datos_recodificados$Displaced))
-unique(datos_recodificados$Displaced)
+sum(table(datos_modelo$Displaced))
+unique(datos_modelo$Displaced)
 
 #Proporciones:
-table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Displaced, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Displaced) 
+cramersV(table(datos_modelo$Displaced, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Displaced, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Displaced) 
 
 #Chi-cuadrado:
-tabla_displaced_target <- table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
+tabla_displaced_target <- table(datos_modelo$Displaced, datos_modelo$Target_bin)
 chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_displaced_target)$expected
 
 #Gráfico:
-mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
+mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
 
@@ -1378,31 +1396,31 @@ mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
 
 #Tuition fees up to date:
 
-sum(table(datos_recodificados$Tuition.fees.up.to.date))
-unique(datos_recodificados$Tuition.fees.up.to.date)
+sum(table(datos_modelo$Tuition.fees.up.to.date))
+unique(datos_modelo$Tuition.fees.up.to.date)
 
 #Proporciones:
-table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Tuition.fees.up.to.date) 
+cramersV(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Tuition.fees.up.to.date) 
 
 #Chi-cuadrado:
-tabla_tution_target <- table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
+tabla_tution_target <- table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
 chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_tution_target)$expected
 
 #Gráficos:
-mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,  
+mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 
-tabla_plot <- datos_recodificados %>%
+tabla_plot <- datos_modelo %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
   mutate(prop = n / sum(n),
@@ -1426,29 +1444,29 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
 
 #Debtor:
 
-sum(table(datos_recodificados$Debtor))
-unique(datos_recodificados$Debtor)
+sum(table(datos_modelo$Debtor))
+unique(datos_modelo$Debtor)
 #Proporciones:
-table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Debtor, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Debtor) 
+cramersV(table(datos_modelo$Debtor, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Debtor, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Debtor) 
 
 #Chi-cuadrado:
-tabla_debtor_target <- table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
+tabla_debtor_target <- table(datos_modelo$Debtor, datos_modelo$Target_bin)
 chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_debtor_target)$expected
 
 #Gráficos:
-mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
+mosaic(~ Debtor + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
-tabla_debtor_plot <- datos_recodificados %>%
+tabla_debtor_plot <- datos_modelo %>%
   count(Debtor, Target_bin) %>%
   group_by(Debtor) %>%
   mutate(
@@ -1471,29 +1489,27 @@ ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
   theme_minimal()
 
 
-
-
 #Scholarship_holder:
 
-sum(table(datos_recodificados$Scholarship.holder))
-unique(datos_recodificados$Scholarship.holder)
+sum(table(datos_modelo$Scholarship.holder))
+unique(datos_modelo$Scholarship.holder)
 #Proporciones:
-table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Scholarship.holder) 
+cramersV(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Scholarship.holder, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Scholarship.holder) 
 
 #Chi-cuadrado:
-tabla_beca_target <- table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
+tabla_beca_target <- table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
 chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_beca_target)$expected
 
 #Gráficos:
-mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,  
+mosaic(~ Scholarship.holder + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
@@ -1501,21 +1517,21 @@ mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,
 
 
 #Educational_special_needs:
-sum(table(datos_recodificados$Educational.special.needs))
-unique(datos_recodificados$Educational.special.needs)
+sum(table(datos_modelo$Educational.special.needs))
+unique(datos_modelo$Educational.special.needs)
 
 #Proporciones:
-table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Educational.special.needs) 
+cramersV(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Educational.special.needs, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Educational.special.needs) 
 
 #Chi-cuadrado:
-tabla_necesidades_target <- table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
+tabla_necesidades_target <- table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
 chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_necesidades_target)$expected
 
@@ -1523,12 +1539,12 @@ chisq.test(tabla_necesidades_target)$expected
 
 
 #International:
-sum(table(datos_recodificados$International))
-unique(datos_recodificados$International)
+sum(table(datos_modelo$International))
+unique(datos_modelo$International)
 
 #Proporciones:
-tabla_internacional_target <- table(datos_recodificados$International,
-                                    datos_recodificados$Target_bin)
+tabla_internacional_target <- table(datos_modelo$International,
+                                    datos_modelo$Target_bin)
 tabla_internacional_target
 
 prop.table(tabla_internacional_target, 1)
@@ -1536,17 +1552,17 @@ prop.table(tabla_internacional_target, 2)
 
 #Cramer y Tau:
 cramersV(tabla_internacional_target)
-GK_assoc(datos_recodificados$International, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$International)
+GK_assoc(datos_modelo$International, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$International)
 
 #Chi-cuadrado:
 chisq.test(tabla_internacional_target, correct = FALSE)
 chisq.test(tabla_internacional_target)$expected
 
 #Gráfico:
-table(datos_recodificados$International)
+table(datos_modelo$International)
 
-tabla_internacional_plot <- datos_recodificados %>%
+tabla_internacional_plot <- datos_modelo %>%
   count(International, Target_bin) %>%
   group_by(International) %>%
   mutate(prop = n / sum(n),
@@ -1575,13 +1591,13 @@ ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_
 
 #Reagrupación application_mode:
 
-table(datos_recodificados$Application.mode)
+table(datos_modelo$Application.mode)
 
 
-datos_recodificados$Application.mode_group <- case_when(
+datos_modelo$Application.mode_group <- case_when(
   
   # ACCESO NORMAL
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "1ª fase - cupo general",
     "2ª fase - cupo general",
     "3ª fase - cupo general",
@@ -1590,7 +1606,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso normal",
   
   # MAYORES/ESPECIALES
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Mayores de 23 años",
     "Ordenanza nº 533-A/99, apartado b2 (plan diferente)",
     "Ordenanza nº 533-A/99, apartado b3 (otra institución)",
@@ -1599,7 +1615,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso mayores/especiales",
   
   # CAMBIO/TRASLADO
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Cambio de institución/titulación",
     "Cambio de titulación",
     "Traslado",
@@ -1607,14 +1623,14 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso por cambio/traslado",
   
   # FORMACIÓN PREVIA
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Titulares de diploma de ciclo corto",
     "Titulares de diploma de especialización tecnológica",
     "Titulares de otros estudios superiores"
   ) ~ "Acceso por formación previa",
   
   # INTERNACIONAL
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Estudiante internacional (grado)"
     
   ) ~ "Acceso internacional",
@@ -1625,17 +1641,17 @@ datos_recodificados$Application.mode_group <- case_when(
 
 
 
-unique(datos_recodificados$Application.mode_group)
-tabla_modo_app_target <- table(datos_recodificados$Application.mode_group,
-                               datos_recodificados$Target_bin)
+sum(table(datos_modelo$Application.mode_group))
+tabla_modo_app_target <- table(datos_modelo$Application.mode_group,
+                               datos_modelo$Target_bin)
 tabla_modo_app_target
 
 prop.table(tabla_modo_app_target, 1)
 prop.table(tabla_modo_app_target, 2)
 
 cramersV(tabla_modo_app_target)
-GK_assoc(datos_recodificados$Application.mode_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Application.mode_group)
+GK_assoc(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
 
 chisq.test(tabla_modo_app_target, correct = FALSE)
 chisq.test(tabla_modo_app_target)$expected
@@ -1643,7 +1659,7 @@ chisq.test(tabla_modo_app_target)$expected
 
 
 #Gráficos:
-tabla_modo_app_plot <- datos_recodificados %>%
+tabla_modo_app_plot <- datos_modelo %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
   mutate(prop = n / sum(n),
@@ -1666,94 +1682,93 @@ ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Tar
 
 
 #Género:
-unique(datos_recodificados$Gender)
-tabla_genero_target <- table(datos_recodificados$Gender,
-                             datos_recodificados$Target_bin)
+unique(datos_modelo$Gender)
+tabla_genero_target <- table(datos_modelo$Gender,
+                             datos_modelo$Target_bin)
 tabla_genero_target
 
 prop.table(tabla_genero_target, 1)
 prop.table(tabla_genero_target, 2)
 
 cramersV(tabla_genero_target)
-GK_assoc(datos_recodificados$Gender, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Gender)
+GK_assoc(datos_modelo$Gender, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Gender)
 
 chisq.test(tabla_genero_target, correct = FALSE)
 chisq.test(tabla_genero_target)$expected
 #Gráfico:
-mosaic(~ Gender + Target_bin, data = datos_recodificados,  
+mosaic(~ Gender + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
-
-
 
 
 
 #Course
 #Vamosa realizar una reagrupacion de las carreras para que el estudio se fiable:
 
-datos_recodificados$Course_group <- dplyr::case_when(
+datos_modelo$Course_group <- dplyr::case_when(
   
   # SALUD
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Enfermería",
     "Enfermería Veterinaria",
     "Higiene Bucodental"
   ) ~ "Salud",
   
   # INGENIERÍA / TECNOLOGÍA
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Ingeniería Informática",
     "Tecnologías de Producción de Biocombustibles",
     "Diseño de Animación y Multimedia"
   ) ~ "Ingeniería/Tech",
   
   # SOCIALES / EMPRESA
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Gestión",
     "Gestión de Publicidad y Marketing",
     "Turismo"
   ) ~ "Empresa",
   
   # EDUCACIÓN / SOCIAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Educación Básica",
     "Trabajo Social"
   ) ~ "Educación/Social",
   
   # COMUNICACIÓN / DISEÑO
-  datos_recodificados$Course %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Diseño de Comunicación",
     "Periodismo y Comunicación"
   ) ~ "Comunicación",
   
   # AGRO / ANIMAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Agronomía",
     "Equinocultura"
   ) ~ "Agro/Animal",
   
   TRUE ~ NA_character_
 )
+table(datos_modelo$Course_limpio)
 
-sum(table(datos_recodificados$Course_group))
-unique(datos_recodificados$Course_group)
-tabla_course_target <- table(datos_recodificados$Course_group,
-                             datos_recodificados$Target_bin)
+sum(table(datos_modelo$Course_group))
+unique(datos_modelo$Course_limpio)
+tabla_course_target <- table(datos_modelo$Course_group,
+                             datos_modelo$Target_bin)
 tabla_course_target
 
 prop.table(tabla_course_target, 1)
 prop.table(tabla_course_target, 2)
 
 cramersV(tabla_course_target)
-GK_assoc(datos_recodificados$Course_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Course_group)
+GK_assoc(datos_modelo$Course_group, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Course_group)
 
 chisq.test(tabla_course_target, correct = FALSE)
 chisq.test(tabla_course_target)$expected
 
 #Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
-datos_recodificados$Course_group_short <- dplyr::recode(
-  datos_recodificados$Course_group,
+datos_modelo$Course_group_short <- dplyr::recode(
+  datos_modelo$Course_group,
   "Ingeniería/Tech" = "Ing./Tech",
   "Educación/Social" = "Educ./Soc.",
   "Comunicación" = "Com.",
@@ -1763,7 +1778,7 @@ datos_recodificados$Course_group_short <- dplyr::recode(
 )
 
 mosaic(~ Course_group_short + Target_bin, 
-       data = datos_recodificados,
+       data = datos_modelo,
        shade = TRUE,
        legend = TRUE,
        cex.axis = 0.8)  
@@ -1771,7 +1786,7 @@ mosaic(~ Course_group_short + Target_bin,
 
 
 
-tabla_course_plot <- datos_recodificados %>%
+tabla_course_plot <- datos_modelo %>%
   count(Course_group, Target_bin) %>%
   group_by(Course_group) %>%
   mutate(prop = n / sum(n),
@@ -1793,113 +1808,216 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
 
 
 #Previous education level
-table(datos_recodificados$Previous_education_level)
-unique(datos_recodificados$Previous_education_level)
-tabla_prev_edu_target <- table(datos_recodificados$Previous_education_level,
-                               datos_recodificados$Target_bin)
+table(datos_modelo$Previous_education_level)
+unique(datos_modelo$Previous_education_level)
+tabla_prev_edu_target <- table(datos_modelo$Previous_education_level,
+                               datos_modelo$Target_bin)
 tabla_prev_edu_target
 
 prop.table(tabla_prev_edu_target, 1)
 prop.table(tabla_prev_edu_target, 2)
 
 cramersV(tabla_prev_edu_target)
-GK_assoc(datos_recodificados$Previous_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Previous_education_level)
+GK_assoc(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Previous_education_level)
 
 chisq.test(tabla_prev_edu_target, correct = FALSE)
 chisq.test(tabla_prev_edu_target)$expected
 
 
 #Cambiamos a nombres más cortos:
-datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Previous_education_level,
+datos_modelo$Previous_education_level_group_short <- dplyr::recode(
+  datos_modelo$Previous_education_level,
   "Bajo"= "Bajo",
   "Medio"= "Medio",
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
 #Gráfico:
-mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_recodificados,  
+mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 #Mother education level:
-table(datos_recodificados$Mother_education_level)
-unique(datos_recodificados$Mother_education_level)
-tabla_mum_educ_target <- table(datos_recodificados$Mother_education_level,
-                               datos_recodificados$Target_bin)
+table(datos_modelo$Mother_education_level)
+unique(datos_modelo$Mother_education_level)
+tabla_mum_educ_target <- table(datos_modelo$Mother_education_level,
+                               datos_modelo$Target_bin)
 tabla_mum_educ_target
 
 prop.table(tabla_mum_educ_target, 1)
 prop.table(tabla_mum_educ_target, 2)
 
 cramersV(tabla_mum_educ_target)
-GK_assoc(datos_recodificados$Mother_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_education_level)
+GK_assoc(datos_modelo$Mother_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_education_level)
 
 chisq.test(tabla_mum_educ_target, correct = FALSE)
 chisq.test(tabla_mum_educ_target)$expected
 
 #Cambiamos a nombres más cortos:
-datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Mother_education_level,
+datos_modelo$Mother_education_level_group_short <- dplyr::recode(
+  datos_modelo$Mother_education_level,
   "Bajo"= "Bajo",
   "Medio"= "Medio",
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
 #Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father education level:
+table(datos_modelo$Father_education_level)
+unique(datos_modelo$Father_education_level)
+tabla_dad_educ_target <- table(datos_modelo$Father_education_level,
+                               datos_modelo$Target_bin)
+tabla_dad_educ_target
+
+prop.table(tabla_dad_educ_target, 1)
+prop.table(tabla_dad_educ_target, 2)
+
+cramersV(tabla_dad_educ_target)
+GK_assoc(datos_modelo$Father_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_education_level)
+
+chisq.test(tabla_dad_educ_target, correct = FALSE)
+chisq.test(tabla_dad_educ_target)$expected
+#Cambiamos a nombres más cortos:
+datos_modelo$Father_education_level_group_short <- dplyr::recode(
+  datos_modelo$Father_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Mother occupation level:
+
+sum(table(datos_modelo$Mother_occupation_level))
+unique(datos_modelo$Mother_occupation_level)
+tabla_mum_ocup_target <- table(datos_modelo$Mother_occupation_level,
+                               datos_modelo$Target_bin)
+tabla_mum_ocup_target
+
+prop.table(tabla_mum_ocup_target, 1)
+prop.table(tabla_mum_ocup_target, 2)
+
+cramersV(tabla_mum_ocup_target)
+GK_assoc(datos_modelo$Mother_occupation_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_occupation_level)
+
+chisq.test(tabla_mum_ocup_target, correct = FALSE)
+chisq.test(tabla_mum_ocup_target)$expected
+#Gráfico:
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father occupation level:
+table(datos_modelo$Father_occupation_level)
+unique(datos_modelo$Father_occupation_level)
+tabla_dad_ocup_target <- table(datos_modelo$Father_occupation_level,
+                               datos_modelo$Target_bin)
+tabla_dad_ocup_target
+
+prop.table(tabla_dad_ocup_target, 1)
+prop.table(tabla_dad_ocup_target, 2)
+
+cramersV(tabla_dad_ocup_target)
+GK_assoc(datos_modelo$Father_occupation_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_occupation_level)
+
+chisq.test(tabla_dad_ocup_target, correct = FALSE)
+chisq.test(tabla_dad_ocup_target)$expected
+
+#Gráficos:
+mosaic(~ Father_occupation_level + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 
-#Vamos a ver si encontramos algo interesante de los valores que faltan.
+tabla_course_plot <- datos_modelo %>%
+  count(Course_group, Target_bin) %>%
+  group_by(Course_group) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Tipo de carrera y Abandono"
+  ) +
+  theme_minimal()
 
 
-
+#Pongo aquí el análisis de sensibilidad:
 
 #Analizamos Mother_education_level sin los datos imputados para ver como cambia respecto a la imputación
+datos_sensibilidad <- datos_sin_imputar %>%
+  filter(!(Curricular.units.1st.sem..grade. == 0 &
+             Curricular.units.1st.sem..approved. == 0 &
+             Curricular.units.1st.sem..evaluations. == 0 &
+             Curricular.units.1st.sem..credited. ==0 &
+             Curricular.units.1st.sem..enrolled. ==0 
+  ))
+nrow(datos_sensibilidad)
 
-# Recodificamos primero la variable:
-datos_sin_imputar$Mother.s.qualification_recodif<-recode(datos_sin_imputar$Mother.s.qualification,
-                                                   `1` = "Educación secundaria - 12º año o equivalente",
-                                                   `2` = "Educación superior - Grado (Bachelor)",
-                                                   `3` = "Educación superior - Grado",
-                                                   `4` = "Educación superior - Máster",
-                                                   `5` = "Educación superior - Doctorado",
-                                                   `6` = "Asistencia a educación superior",
-                                                   `9` = "12º año de escolarización - No completado",
-                                                   `10` = "11º año de escolarización - No completado",
-                                                   `11` = "7º año (sistema antiguo)",
-                                                   `12` = "Otro - 11º año de escolarización",
-                                                   `14` = "10º año de escolarización",
-                                                   `18` = "Curso general de comercio",
-                                                   `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
-                                                   `22` = "Curso técnico-profesional",
-                                                   `26` = "7º año de escolarización",
-                                                   `27` = "2º ciclo del bachillerato general",
-                                                   `29` = "9º año de escolarización - No completado",
-                                                   `30` = "8º año de escolarización",
-                                                   `34` = "Desconocido",
-                                                   `35` = "No sabe leer ni escribir",
-                                                   `36` = "Sabe leer sin haber completado 4º año",
-                                                   `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
-                                                   `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
-                                                   `39` = "Curso de especialización tecnológica",
-                                                   `40` = "Educación superior - Grado (1er ciclo)",
-                                                   `41` = "Curso de estudios superiores especializados",
-                                                   `42` = "Curso técnico superior profesional",
-                                                   `43` = "Educación superior - Máster (2º ciclo)",
-                                                   `44` = "Educación superior - Doctorado (3er ciclo)")
 
-sum(table(datos_sin_imputar$Mother.s.qualification))
+# Recodificamos  la variable:
 
-sum(table(datos_sin_imputar$Mother.s.qualification_recodif))
-datos_sin_imputar$Mother_education_level <- case_when(
+
+
+datos_sensibilidad$Mother.s.qualification <- recode(
+  datos_sensibilidad$Mother.s.qualification,
+  `1` = "Educación secundaria - 12º año o equivalente",
+  `2` = "Educación superior - Grado (Bachelor)",
+  `3` = "Educación superior - Grado",
+  `4` = "Educación superior - Máster",
+  `5` = "Educación superior - Doctorado",
+  `6` = "Asistencia a educación superior",
+  `9` = "12º año de escolarización - No completado",
+  `10` = "11º año de escolarización - No completado",
+  `11` = "7º año (sistema antiguo)",
+  `12` = "Otro - 11º año de escolarización",
+  `14` = "10º año de escolarización",
+  `18` = "Curso general de comercio",
+  `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
+  `22` = "Curso técnico-profesional",
+  `26` = "7º año de escolarización",
+  `27` = "2º ciclo del bachillerato general",
+  `29` = "9º año de escolarización - No completado",
+  `30` = "8º año de escolarización",
+  `34` = "Desconocido",
+  `35` = "No sabe leer ni escribir",
+  `36` = "Sabe leer sin haber completado 4º año",
+  `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
+  `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
+  `39` = "Curso de especialización tecnológica",
+  `40` = "Educación superior - Grado (1er ciclo)",
+  `41` = "Curso de estudios superiores especializados",
+  `42` = "Curso técnico superior profesional",
+  `43` = "Educación superior - Máster (2º ciclo)",
+  `44` = "Educación superior - Doctorado (3er ciclo)"
+)
+
+table(datos_sensibilidad$Mother.s.qualification)
+datos_sensibilidad$Mother_education_level <- case_when(
   
   # BAJO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "10º año de escolarización", 
     "11º año de escolarización - No completado",
     "12º año de escolarización - No completado",
@@ -1916,13 +2034,13 @@ datos_sin_imputar$Mother_education_level <- case_when(
   ) ~ "Bajo",
   
   # MEDIO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Educación secundaria - 12º año o equivalente",
     "2º ciclo del bachillerato general"
   ) ~ "Medio",
   
   # TÉCNICO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Curso de especialización tecnológica",
     "Curso de estudios superiores especializados",
     "Curso técnico-profesional",
@@ -1931,7 +2049,7 @@ datos_sin_imputar$Mother_education_level <- case_when(
   ) ~ "Técnico",
   
   # SUPERIOR
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Educación superior - Doctorado",
     "Educación superior - Doctorado (3er ciclo)",
     "Educación superior - Grado",
@@ -1941,121 +2059,123 @@ datos_sin_imputar$Mother_education_level <- case_when(
     "Educación superior - Grado (1er ciclo)",
     "Asistencia a educación superior"
   ) ~ "Superior",
+  
   TRUE ~ NA_character_
 )
 
 
-datos_sin_imputar$Target_bin <- ifelse(datos_sin_imputar$Target == "Dropout", "Abandono", "No Abandono")
-datos_sin_imputar$Target_bin <- as.factor(datos_sin_imputar$Target_bin)
+datos_sensibilidad$Target_bin <- ifelse(
+  datos_sensibilidad$Target == "Dropout",
+  "Abandono",
+  "No Abandono"
+)
+datos_sensibilidad$Target_bin <- as.factor(datos_sensibilidad$Target_bin)
+
+sum(table(datos_sensibilidad$Mother_education_level)) #nos da 4115, debería dar 4414 pero puede que uno de los multimedia eliminados fuera tambien faltante
+#Lo comprobamos
+
+problematicos <- datos_sin_imputar %>%
+  filter(
+    Curricular.units.1st.sem..grade. == 0 &
+      Curricular.units.1st.sem..approved. == 0 &
+      Curricular.units.1st.sem..evaluations. == 0 &
+      Curricular.units.1st.sem..credited. == 0 &
+      Curricular.units.1st.sem..enrolled. == 0
+  )
+
+sum(problematicos$Mother.s.qualification == "34", na.rm = TRUE) #en efecto, uno de los problemáticos (De multimedia), tenia NA
+#aqui lo podemos ver:
+View(
+  datos_sin_imputar %>%
+    filter(
+      Mother.s.qualification == 34 &
+        Course == 171
+    )
+)
+
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Mother_education_level))
+sum(is.na(datos_sensibilidad$Mother_education_level))
 
 
-
-
-
-sum(table(datos_sin_imputar$Mother_education_level)) #coincide con 4424 -130 faltantes
-tabla_mum_educ_target_sin_imputar <- table(datos_sin_imputar$Mother_education_level,
-                                           datos_sin_imputar$Target_bin)
+tabla_mum_educ_target_sin_imputar <- table(
+  datos_sensibilidad$Mother_education_level,
+  datos_sensibilidad$Target_bin
+)
 sum(tabla_mum_educ_target_sin_imputar)
 
 prop.table(tabla_mum_educ_target_sin_imputar, 1)
 prop.table(tabla_mum_educ_target_sin_imputar, 2)
 
 cramersV(tabla_mum_educ_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Mother_education_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_education_level)
+GK_assoc(datos_sensibilidad$Mother_education_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Mother_education_level)
 
 chisq.test(tabla_mum_educ_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_mum_educ_target_sin_imputar)$expected
 
-#Cambiamos a nombres más cortos:
-datos_sin_imputar$Mother_education_level_group_short <- dplyr::recode(
-  datos_sin_imputar$Mother_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sensibilidad$Mother_education_level_group_short <- dplyr::recode(
+  datos_sensibilidad$Mother_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_sin_imputar,  
+
+# Gráfico:
+mosaic(~ Mother_education_level_group_short + Target_bin,
+       data = datos_sensibilidad,
        shade = TRUE, legend = TRUE)
 
 
-#Father education level:
-table(datos_recodificados$Father_education_level)
-unique(datos_recodificados$Father_education_level)
-tabla_dad_educ_target <- table(datos_recodificados$Father_education_level,
-                               datos_recodificados$Target_bin)
-tabla_dad_educ_target
-
-prop.table(tabla_dad_educ_target, 1)
-prop.table(tabla_dad_educ_target, 2)
-
-cramersV(tabla_dad_educ_target)
-GK_assoc(datos_recodificados$Father_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_education_level)
-
-chisq.test(tabla_dad_educ_target, correct = FALSE)
-chisq.test(tabla_dad_educ_target)$expected
-#Cambiamos a nombres más cortos:
-datos_recodificados$Father_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
-
-#Analizamos Father_education_level sin los datos imputados para ver como cambia respecto a la imputación
+# Analizamos Father_education_level sin imputados
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Father.s.qualification_recodif <- recode(datos_sin_imputar$Father.s.qualification,
-                                                     `1` = "Educación secundaria - 12º año o equivalente",
-                                                     `2` = "Educación superior - Grado (Bachelor)",
-                                                     `3` = "Educación superior - Grado",
-                                                     `4` = "Educación superior - Máster",
-                                                     `5` = "Educación superior - Doctorado",
-                                                     `6` = "Asistencia a educación superior",
-                                                     `9` = "12º año de escolarización - No completado",
-                                                     `10` = "11º año de escolarización - No completado",
-                                                     `11` = "7º año (sistema antiguo)",
-                                                     `12` = "Otro - 11º año de escolarización",
-                                                     `13` = "2º año de curso complementario de secundaria",
-                                                     `14` = "10º año de escolarización",
-                                                     `18` = "Curso general de comercio",
-                                                     `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
-                                                     `20` = "Curso complementario de secundaria",
-                                                     `22` = "Curso técnico-profesional",
-                                                     `25` = "Curso complementario de secundaria - no completado",
-                                                     `26` = "7º año de escolarización",
-                                                     `27` = "2º ciclo del bachillerato general",
-                                                     `29` = "9º año de escolarización - No completado",
-                                                     `30` = "8º año de escolarización",
-                                                     `31` = "Curso general de administración y comercio",
-                                                     `33` = "Curso complementario de contabilidad y administración",
-                                                     `34` = "Desconocido",
-                                                     `35` = "No sabe leer ni escribir",
-                                                     `36` = "Sabe leer sin haber completado 4º año",
-                                                     `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
-                                                     `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
-                                                     `39` = "Curso de especialización tecnológica",
-                                                     `40` = "Educación superior - Grado (1er ciclo)",
-                                                     `41` = "Curso de estudios superiores especializados",
-                                                     `42` = "Curso técnico superior profesional",
-                                                     `43` = "Educación superior - Máster (2º ciclo)",
-                                                     `44` = "Educación superior - Doctorado (3er ciclo)")
+datos_sensibilidad$Father.s.qualification<- recode(
+  datos_sensibilidad$Father.s.qualification,
+  `1` = "Educación secundaria - 12º año o equivalente",
+  `2` = "Educación superior - Grado (Bachelor)",
+  `3` = "Educación superior - Grado",
+  `4` = "Educación superior - Máster",
+  `5` = "Educación superior - Doctorado",
+  `6` = "Asistencia a educación superior",
+  `9` = "12º año de escolarización - No completado",
+  `10` = "11º año de escolarización - No completado",
+  `11` = "7º año (sistema antiguo)",
+  `12` = "Otro - 11º año de escolarización",
+  `13` = "2º año de curso complementario de secundaria",
+  `14` = "10º año de escolarización",
+  `18` = "Curso general de comercio",
+  `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
+  `20` = "Curso complementario de secundaria",
+  `22` = "Curso técnico-profesional",
+  `25` = "Curso complementario de secundaria - no completado",
+  `26` = "7º año de escolarización",
+  `27` = "2º ciclo del bachillerato general",
+  `29` = "9º año de escolarización - No completado",
+  `30` = "8º año de escolarización",
+  `31` = "Curso general de administración y comercio",
+  `33` = "Curso complementario de contabilidad y administración",
+  `34` = "Desconocido",
+  `35` = "No sabe leer ni escribir",
+  `36` = "Sabe leer sin haber completado 4º año",
+  `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
+  `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
+  `39` = "Curso de especialización tecnológica",
+  `40` = "Educación superior - Grado (1er ciclo)",
+  `41` = "Curso de estudios superiores especializados",
+  `42` = "Curso técnico superior profesional",
+  `43` = "Educación superior - Máster (2º ciclo)",
+  `44` = "Educación superior - Doctorado (3er ciclo)"
+)
 
-sum(table(datos_sin_imputar$Father.s.qualification))
+sum(table(datos_sensibilidad$Father.s.qualification))
 
-sum(table(datos_sin_imputar$Father.s.qualification_recodif))
-
-datos_sin_imputar$Father_education_level <- case_when(
+datos_sensibilidad$Father_education_level <- case_when(
+  
   # BAJO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "10º año de escolarización", 
     "11º año de escolarización - No completado",
     "12º año de escolarización - No completado",
@@ -2072,13 +2192,13 @@ datos_sin_imputar$Father_education_level <- case_when(
   ) ~ "Bajo",
   
   # MEDIO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification%in% c(
     "Educación secundaria - 12º año o equivalente",
     "2º ciclo del bachillerato general"
   ) ~ "Medio",
   
   # TÉCNICO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "Curso de especialización tecnológica",
     "Curso de estudios superiores especializados",
     "Curso técnico-profesional",
@@ -2092,7 +2212,7 @@ datos_sin_imputar$Father_education_level <- case_when(
   ) ~ "Técnico",
   
   # SUPERIOR
-  datos_sin_imputar$Father.s.qualification_recodif%in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "Educación superior - Doctorado",
     "Educación superior - Doctorado (3er ciclo)",
     "Educación superior - Grado",
@@ -2102,108 +2222,103 @@ datos_sin_imputar$Father_education_level <- case_when(
     "Educación superior - Grado (1er ciclo)",
     "Asistencia a educación superior"
   ) ~ "Superior",
+  
   TRUE ~ NA_character_
 )
 
+sum(table(datos_sensibilidad$Father_education_level)) #deberia dar 4132, puede ser, que de nuevo, uno de los multimedia fuera faltante
 
+#aqui lo podemos ver:
+View(
+  datos_sin_imputar %>%
+    filter(
+      Father.s.qualification == 34 &
+        Course == 171
+    )
+)
 
-sum(table(datos_sin_imputar$Father_education_level)) #coincide con 4424 -112 faltantes
-tabla_dad_educ_target_sin_imputar <- table(datos_sin_imputar$Father_education_level,
-                                           datos_sin_imputar$Target_bin)
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Father_education_level))
+sum(is.na(datos_sensibilidad$Father_education_level))
+
+tabla_dad_educ_target_sin_imputar <- table(
+  datos_sensibilidad$Father_education_level,
+  datos_sensibilidad$Target_bin
+)
 sum(tabla_dad_educ_target_sin_imputar)
 
 prop.table(tabla_dad_educ_target_sin_imputar, 1)
 prop.table(tabla_dad_educ_target_sin_imputar, 2)
 
 cramersV(tabla_dad_educ_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Father_education_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Father_education_level)
+GK_assoc(datos_sensibilidad$Father_education_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Father_education_level)
 
 chisq.test(tabla_dad_educ_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_dad_educ_target_sin_imputar)$expected
 
-#Cambiamos a nombres más cortos:
-datos_sin_imputar$Father_education_level_group_short <- dplyr::recode(
-  datos_sin_imputar$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sensibilidad$Father_education_level_group_short <- dplyr::recode(
+  datos_sensibilidad$Father_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_sin_imputar,  
+
+# Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin,
+       data = datos_sensibilidad,
        shade = TRUE, legend = TRUE)
 
 
-
-#Mother occupation level:
-
-table(datos_recodificados$Mother_occupation_level)
-unique(datos_recodificados$Mother_occupation_level)
-tabla_mum_ocup_target <- table(datos_recodificados$Mother_occupation_level,
-                               datos_recodificados$Target_bin)
-tabla_mum_ocup_target
-
-prop.table(tabla_mum_ocup_target, 1)
-prop.table(tabla_mum_ocup_target, 2)
-
-cramersV(tabla_mum_ocup_target)
-GK_assoc(datos_recodificados$Mother_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_occupation_level)
-
-chisq.test(tabla_mum_ocup_target, correct = FALSE)
-chisq.test(tabla_mum_ocup_target)$expected
-#Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
+#Mother occupation sin imputados:
 
 #Analizamos Mother occupation level sin los datos imputados para ver como cambia respecto a la imputación
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Mother.s.occupation_recodif<-recode(datos_sin_imputar$Mother.s.occupation,
-                                                `0` = "Estudiante",
-                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                `2` = "Especialistas en actividades intelectuales y científicas",
-                                                `3` = "Técnicos y profesiones de nivel intermedio",
-                                                `4` = "Personal administrativo",
-                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanos",
-                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                `9` = "Trabajadores no cualificados",
-                                                `10` = "Profesiones de las fuerzas armadas",
-                                                `90` = "Otra situación",
-                                                `99` = "(en blanco)",
-                                                `122` = "Profesionales de la salud",
-                                                `123` = "Profesores",
-                                                `125` = "Especialistas en tecnologías de la información y la comunicación (TIC)",
-                                                `131` = "Técnicos y profesiones intermedias en ciencia e ingeniería",
-                                                `132` = "Técnicos y profesionales de nivel intermedio en salud",
-                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos, culturales y similares",
-                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                `143` = "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
-                                                `144` = "Otro personal de apoyo administrativo",
-                                                `151` = "Trabajadores de servicios personales",
-                                                `152` = "Vendedores",
-                                                `153` = "Trabajadores de cuidado personal y similares",
-                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                `173` = "Trabajadores cualificados en impresión, instrumentos de precisión, joyería y artesanía",
-                                                `175` = "Trabajadores en procesamiento de alimentos, madera, textil y otras industrias",
-                                                `191` = "Trabajadores de limpieza",
-                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                `193` = "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
-                                                `194` = "Ayudantes de preparación de comidas")
+datos_sensibilidad$Mother.s.occupation<-recode(datos_sensibilidad$Mother.s.occupation,
+                                               `0` = "Estudiante",
+                                               `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                               `2` = "Especialistas en actividades intelectuales y científicas",
+                                               `3` = "Técnicos y profesiones de nivel intermedio",
+                                               `4` = "Personal administrativo",
+                                               `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                               `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                               `7` = "Trabajadores cualificados de la industria, construcción y artesanos",
+                                               `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                               `9` = "Trabajadores no cualificados",
+                                               `10` = "Profesiones de las fuerzas armadas",
+                                               `90` = "Otra situación",
+                                               `99` = "(en blanco)",
+                                               `122` = "Profesionales de la salud",
+                                               `123` = "Profesores",
+                                               `125` = "Especialistas en tecnologías de la información y la comunicación (TIC)",
+                                               `131` = "Técnicos y profesiones intermedias en ciencia e ingeniería",
+                                               `132` = "Técnicos y profesionales de nivel intermedio en salud",
+                                               `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos, culturales y similares",
+                                               `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                               `143` = "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
+                                               `144` = "Otro personal de apoyo administrativo",
+                                               `151` = "Trabajadores de servicios personales",
+                                               `152` = "Vendedores",
+                                               `153` = "Trabajadores de cuidado personal y similares",
+                                               `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                               `173` = "Trabajadores cualificados en impresión, instrumentos de precisión, joyería y artesanía",
+                                               `175` = "Trabajadores en procesamiento de alimentos, madera, textil y otras industrias",
+                                               `191` = "Trabajadores de limpieza",
+                                               `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                               `193` = "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
+                                               `194` = "Ayudantes de preparación de comidas")
 
-sum(table(datos_sin_imputar$Mother.s.occupation))
+sum(table(datos_sensibilidad$Mother.s.occupation))
 
-sum(table(datos_sin_imputar$Mother.s.occupation_recodif))
 
-datos_sin_imputar$Mother_occupation_level <- case_when(
+
+datos_sensibilidad$Mother_occupation_level <- case_when(
   
   # ALTA CUALIFICACIÓN
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Representantes del poder legislativo y ejecutivo, directores y gerentes",
     "Especialistas en actividades intelectuales y científicas",
     "Especialistas en tecnologías de la información y la comunicación (TIC)",
@@ -2212,7 +2327,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Alta cualificación",
   
   # CUALIFICACIÓN MEDIA
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Personal administrativo",
     "Empleados de oficina, secretarios y operadores de datos",
     "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
@@ -2224,7 +2339,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Cualificación media",
   
   # BAJA CUALIFICACIÓN
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Trabajadores de servicios personales, seguridad y vendedores",
     "Trabajadores de servicios personales",
     "Vendedores",
@@ -2239,7 +2354,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Baja cualificación",
   
   # NO CUALIFICADOS
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Trabajadores no cualificados",
     "Trabajadores no cualificados en agricultura, pesca y silvicultura",
     "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
@@ -2247,7 +2362,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "No cualificados",
   
   # OTROS
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Estudiante",
     "Otra situación",
     "Profesiones de las fuerzas armadas"
@@ -2255,113 +2370,92 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   TRUE ~ NA_character_
   
 )
-  
 
 
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Mother_occupation_level))
+sum(is.na(datos_sensibilidad$Mother_occupation_level))
 
 
-sum(table(datos_sin_imputar$Mother_occupation_level)) #coincide con 4424 -17 faltantes
-tabla_mum_ocup_target_sin_imputar <- table(datos_sin_imputar$Mother_occupation_level,
-                                           datos_sin_imputar$Target_bin)
+sum(table(datos_sensibilidad$Mother_occupation_level)) #coincide con 4244-17 faltantes
+tabla_mum_ocup_target_sin_imputar <- table(datos_sensibilidad$Mother_occupation_level,
+                                           datos_sensibilidad$Target_bin)
 sum(tabla_mum_ocup_target_sin_imputar)
 
 prop.table(tabla_mum_ocup_target_sin_imputar, 1)
 prop.table(tabla_mum_ocup_target_sin_imputar, 2)
 
 cramersV(tabla_mum_ocup_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Mother_occupation_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_occupation_level)
+GK_assoc(datos_sensibilidad$Mother_occupation_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Mother_occupation_level)
 
 chisq.test(tabla_mum_ocup_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_mum_ocup_target_sin_imputar)$expected
 
 
 #Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_sin_imputar,  
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_sensibilidad,  
        shade = TRUE, legend = TRUE)
 
-
-
-#Father occupation level:
-table(datos_recodificados$Father_occupation_level)
-unique(datos_recodificados$Father_occupation_level)
-tabla_dad_ocup_target <- table(datos_recodificados$Father_occupation_level,
-                               datos_recodificados$Target_bin)
-tabla_dad_ocup_target
-
-prop.table(tabla_dad_ocup_target, 1)
-prop.table(tabla_dad_ocup_target, 2)
-
-cramersV(tabla_dad_ocup_target)
-GK_assoc(datos_recodificados$Father_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_occupation_level)
-
-chisq.test(tabla_dad_ocup_target, correct = FALSE)
-chisq.test(tabla_dad_ocup_target)$expected
-
-#Gráficos:
-mosaic(~ Father_occupation_level + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
 
 #Analizamos Father occupation level sin los datos imputados para ver como cambia respecto a la imputación
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Father.s.occupation_recodif<-recode(datos_sin_imputar$Father.s.occupation,
-                                                `0` = "Estudiante",
-                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                `2` = "Especialistas en actividades intelectuales y científicas",
-                                                `3` = "Técnicos y profesiones de nivel intermedio",
-                                                `4` = "Personal administrativo",
-                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
-                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                `9` = "Trabajadores no cualificados",
-                                                `10` = "Profesiones de las fuerzas armadas",
-                                                `90` = "Otra situación",
-                                                `99` = "(en blanco)",
-                                                `101` = "Oficiales de las fuerzas armadas",
-                                                `102` = "Sargentos de las fuerzas armadas",
-                                                `103` = "Otro personal de las fuerzas armadas",
-                                                `112` = "Directores de servicios administrativos y comerciales",
-                                                `114` = "Directores de hostelería, comercio y otros servicios",
-                                                `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
-                                                `122` = "Profesionales de la salud",
-                                                `123` = "Profesores",
-                                                `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
-                                                `131` = "Técnicos intermedios en ciencia e ingeniería",
-                                                `132` = "Técnicos y profesionales intermedios de salud",
-                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
-                                                `135` = "Técnicos en tecnologías de la información y la comunicación",
-                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
-                                                `144` = "Otro personal de apoyo administrativo",
-                                                `151` = "Trabajadores de servicios personales",
-                                                `152` = "Vendedores",
-                                                `153` = "Trabajadores de cuidado personal y similares",
-                                                `154` = "Personal de protección y seguridad",
-                                                `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
-                                                `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
-                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
-                                                `174` = "Trabajadores cualificados en electricidad y electrónica",
-                                                `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
-                                                `181` = "Operadores de instalaciones y maquinaria fija",
-                                                `182` = "Trabajadores de montaje",
-                                                `183` = "Conductores de vehículos y operadores de maquinaria móvil",
-                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                `193` = "Trabajadores no cualificados en industria, construcción y transporte",
-                                                `194` = "Ayudantes de preparación de comidas",
-                                                `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
+datos_sensibilidad$Father.s.occupation<-recode(datos_sensibilidad$Father.s.occupation,
+                                               `0` = "Estudiante",
+                                               `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                               `2` = "Especialistas en actividades intelectuales y científicas",
+                                               `3` = "Técnicos y profesiones de nivel intermedio",
+                                               `4` = "Personal administrativo",
+                                               `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                               `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                               `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
+                                               `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                               `9` = "Trabajadores no cualificados",
+                                               `10` = "Profesiones de las fuerzas armadas",
+                                               `90` = "Otra situación",
+                                               `99` = "(en blanco)",
+                                               `101` = "Oficiales de las fuerzas armadas",
+                                               `102` = "Sargentos de las fuerzas armadas",
+                                               `103` = "Otro personal de las fuerzas armadas",
+                                               `112` = "Directores de servicios administrativos y comerciales",
+                                               `114` = "Directores de hostelería, comercio y otros servicios",
+                                               `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
+                                               `122` = "Profesionales de la salud",
+                                               `123` = "Profesores",
+                                               `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
+                                               `131` = "Técnicos intermedios en ciencia e ingeniería",
+                                               `132` = "Técnicos y profesionales intermedios de salud",
+                                               `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
+                                               `135` = "Técnicos en tecnologías de la información y la comunicación",
+                                               `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                               `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
+                                               `144` = "Otro personal de apoyo administrativo",
+                                               `151` = "Trabajadores de servicios personales",
+                                               `152` = "Vendedores",
+                                               `153` = "Trabajadores de cuidado personal y similares",
+                                               `154` = "Personal de protección y seguridad",
+                                               `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
+                                               `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
+                                               `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                               `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
+                                               `174` = "Trabajadores cualificados en electricidad y electrónica",
+                                               `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
+                                               `181` = "Operadores de instalaciones y maquinaria fija",
+                                               `182` = "Trabajadores de montaje",
+                                               `183` = "Conductores de vehículos y operadores de maquinaria móvil",
+                                               `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                               `193` = "Trabajadores no cualificados en industria, construcción y transporte",
+                                               `194` = "Ayudantes de preparación de comidas",
+                                               `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
 
-sum(table(datos_sin_imputar$Father.s.occupation))
+sum(table(datos_sensibilidad$Father.s.occupation))
 
-sum(table(datos_sin_imputar$Father.s.occupation_recodif))
 
-datos_sin_imputar$Father_occupation_level <- case_when(
+datos_sensibilidad$Father_occupation_level <- case_when(
   
   # ALTA CUALIFICACIÓN
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Representantes del poder legislativo y ejecutivo, directores y gerentes",
     "Directores de servicios administrativos y comerciales",
     "Directores de hostelería, comercio y otros servicios",
@@ -2373,7 +2467,7 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Alta cualificación",
   
   # CUALIFICACIÓN MEDIA
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Personal administrativo",
     "Empleados de oficina, secretarios y operadores de datos",
     "Operadores de datos, contabilidad, estadística y servicios financieros",
@@ -2386,7 +2480,7 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Cualificación media",
   
   # BAJA CUALIFICACIÓN
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Trabajadores de servicios personales, seguridad y vendedores",
     "Trabajadores de servicios personales",
     "Vendedores",
@@ -2409,21 +2503,21 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Baja cualificación",
   
   # NO CUALIFICADOS
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Trabajadores no cualificados",
     "Trabajadores no cualificados en agricultura, pesca y silvicultura",
     "Trabajadores no cualificados en industria, construcción y transporte"
   ) ~ "No cualificados",
   
   # OTROS
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Estudiante",
     "Otra situación"
     
   ) ~ "Otros",
   
   # MILITAR
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Profesiones de las fuerzas armadas",
     "Oficiales de las fuerzas armadas",
     "Sargentos de las fuerzas armadas",
@@ -2434,68 +2528,30 @@ datos_sin_imputar$Father_occupation_level <- case_when(
 )
 
 
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Father_occupation_level))
+sum(is.na(datos_sensibilidad$Father_occupation_level))
 
 
-
-sum(table(datos_sin_imputar$Father_occupation_level)) #coincide con 4424 -19 faltantes
-tabla_dad_ocup_target_sin_imputar <- table(datos_sin_imputar$Father_occupation_level,
-                                           datos_sin_imputar$Target_bin)
+sum(table(datos_sensibilidad$Father_occupation_level)) #coincide con 4244-19 faltantes
+tabla_dad_ocup_target_sin_imputar <- table(datos_sensibilidad$Father_occupation_level,
+                                           datos_sensibilidad$Target_bin)
 sum(tabla_dad_ocup_target_sin_imputar)
 
 prop.table(tabla_dad_ocup_target_sin_imputar, 1)
 prop.table(tabla_dad_ocup_target_sin_imputar, 2)
 
 cramersV(tabla_dad_ocup_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Father_occupation_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Father_occupation_level)
+GK_assoc(datos_sensibilidad$Father_occupation_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Father_occupation_level)
 
 chisq.test(tabla_dad_ocup_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_dad_ocup_target_sin_imputar)$expected
 
 
 #Gráfico:
-mosaic(~ Father_occupation_level + Target_bin, data = datos_sin_imputar,  
+mosaic(~ Father_occupation_level + Target_bin, data = datos_sensibilidad,  
        shade = TRUE, legend = TRUE)
-#
-#probando
-install.packages("effsize")
-library(effsize)
-
-cohen.d(Curricular.units.1st.sem.grade_10 ~ Target_bin, 
-        data = datos_recodificados)
-
-cohen.d(Curricular.units.2nd.sem.grade_10 ~ Target_bin, 
-        data = datos_recodificados)
-cohen.d(GDP ~ Target_bin, 
-        data = datos_recodificados)
-
-
-
-#no hacer caso
-View(datos_recodificados[datos_recodificados$Application.order == 0, ])
-
-sum(datos_recodificados[datos_recodificados$Curricular.units.1st.sem..enrolled. == 0, ])
-table(datos_recodificados$Course)
-
-datos_multimedia <- datos_recodificados[
-  datos_recodificados$Course == "Diseño de Animación y Multimedia", 
-]
-View(datos_multimedia)
-
-datos_multimedia_año <- datos_recodificados[
-  datos_recodificados$Course == "Diseño de Animación y Multimedia" &
-    datos_recodificados$year == 2016,
-]
-View(datos_multimedia_año)
-
-colnames(datos_recodificados)
-
-library(clickR)
-table(datos_recodificados$Curricular.units.1st.sem..approved.)
-table(datos_recodificados$Curricular.units.1st.sem..credited.)
-table(datos_recodificados$Curricular.units.1st.sem..enrolled.)
-table(datos_recodificados$Curricular.units.1st.sem..evaluations.)
-table(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 
 
 
