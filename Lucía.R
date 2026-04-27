@@ -153,33 +153,327 @@ barplot(freq_mother_qualification_prueba)
 
 
 #VALORES ATÍPICOS Y TRATAMIENTO:
-
+descriptive(datos_modelo)
 #Variables numéricas continuas:
-descriptive(datos_moda_condicionada$Admission.grade)
-boxplot(datos_moda_condicionada$Admission.grade)
+descriptive(datos_modelo$Admission.grade_10)
+boxplot(datos_modelo$Admission.grade_10)
 
-descriptive(datos_moda_condicionada$Unemployment.rate)
-boxplot(datos_moda_condicionada$Unemployment.rate)
+library(ggplot2)
 
-descriptive(datos_moda_condicionada$Inflation.rate)
-boxplot(datos_moda_condicionada$Inflation.rate)
+ggplot(datos_modelo, aes(y = Admission.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la nota de admisión",
+    subtitle = "Variable: Admission.grade_10",
+    y = "Nota de admisión",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 
-descriptive(datos_moda_condicionada$GDP)
-boxplot(datos_moda_condicionada$GDP)
+descriptive(datos_modelo$Unemployment.rate)
+boxplot(datos_modelo$Unemployment.rate)
 
-descriptive(datos_moda_condicionada$Age.at.enrollment)
-boxplot(datos_moda_condicionada$Age.at.enrollment)
+descriptive(datos_modelo$Inflation.rate)
+boxplot(datos_modelo$Inflation.rate)
 
-descriptive(datos_moda_condicionada$Previous.qualification..grade.)
-boxplot(datos_moda_condicionada$Previous.qualification..grade.)
+descriptive(datos_modelo$GDP)
+boxplot(datos_modelo$GDP)
+
+descriptive(datos_modelo$Age.at.enrollment)
+boxplot(datos_modelo$Age.at.enrollment)
+
+ggplot(datos_modelo, aes(y = Age.at.enrollment)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la edad de matriculación",
+    subtitle = "Variable: Age.at.enrollment",
+    y = "Edad al matricularse",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Previous.qualification.grade_10)
+boxplot(datos_modelo$Previous.qualification.grade_10)
+
+ggplot(datos_modelo, aes(y = Previous.qualification.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la calificación previa",
+    subtitle = "Variable: Previous.qualification.grade_10",
+    y = "Calificación previa",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+descriptive(datos_modelo$year)
+boxplot(datos_modelo$year)
+
+descriptive(datos_modelo$Porcentaje_aprobado_sem_1)
+boxplot((datos_modelo$Porcentaje_aprobado_sem_1))
+
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Porcentaje_aprobado_sem_1 = ifelse(
+      Curricular.units.1st.sem..evaluations. == 0,
+      NA,
+      100 * Curricular.units.1st.sem..approved. / 
+        Curricular.units.1st.sem..evaluations.
+    )
+  )
+
+
+
+ggplot(datos_modelo, aes(y = Porcentaje_aprobado_sem_1)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución del porcentaje de aprobados (1r semestre)",
+    subtitle = "Variable: Porcentaje_aprobados_sem_1",
+    y = "Porcentaje aprobados",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+sum(table(datos_modelo$Porcentaje_aprobado_sem_1)) #da 4075, partimos de 4244 y hay 169 alumnos sin ninguna evaluacion así que: 4244-169=4075
+
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem.grade_10)
+boxplot(datos_modelo$Curricular.units.1st.sem.grade_10)
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  geom_hline(
+    yintercept = 10,
+    linetype = "dashed",
+    color = "#2A9D8F",
+    linewidth = 0.8
+  ) +
+  scale_y_continuous(
+    limits = c(0, 10),
+    breaks = seq(0, 10, by = 2.5)
+  ) +
+  labs(
+    title = "Distribución de las notas del primer semestre",
+    subtitle = "Variable: Curricular.units.1st.sem.grade_10",
+    y = "Nota del primer semestre",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+table(datos_modelo$Curricular.units.1st.sem.grade_10)
+
 #Variables numéricas discretas:
 
 
-descriptive(datos_moda_condicionada$Curricular.units.1st.sem..credited.)
-boxplot((datos_moda_condicionada$Curricular.units.2nd.sem..grade.))
+descriptive(datos_modelo$Curricular.units.1st.sem..credited.)
+table(datos_modelo$Curricular.units.1st.sem..credited.)
 
-descriptive(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
-boxplot(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
+
+descriptive(datos_modelo$Curricular.units.1st.sem..enrolled.)
+boxplot((datos_modelo$Curricular.units.1st.sem..enrolled.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..enrolled.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de las unidades curriculares matriculadas (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..enrolled.",
+    y = "Unidades curriculares matriculadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..evaluations.)
+boxplot((datos_modelo$Curricular.units.1st.sem..evaluations.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..evaluations.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de evaluaciones de las unidades curriculares (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..evaluations",
+    y = "Evaluaciones de las unidades curriculares",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..approved.)
+boxplot((datos_modelo$Curricular.units.1st.sem..approved.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..approved.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, max(datos_modelo$Curricular.units.1st.sem..approved., na.rm = TRUE), by = 5)
+  ) +
+  labs(
+    title = "Distribución de unidades curriculares aprobadas (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..approved.",
+    y = "Unidades curriculares aprobadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..without.evaluations.)
+table(datos_modelo$Curricular.units.1st.sem..without.evaluations.)
+
+
+descriptive(datos_modelo$Carga_academica_real)
+boxplot((datos_modelo$Carga_academica_real))
+ggplot(datos_modelo, aes(y = Carga_academica_real)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  scale_y_continuous(
+    breaks = seq(
+      min(datos_modelo$Carga_academica_real, na.rm = TRUE),
+      max(datos_modelo$Carga_academica_real, na.rm = TRUE),
+      by = 5
+    )
+  ) +
+  labs(
+    title = "Distribución de la carga académica real (1r semestre)",
+    subtitle = "Variable: Carga_academica_real",
+    y = "Nº de unidades curriculares cursadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
 
 #Probando transformaciones:
 library(ggplot2)
@@ -962,12 +1256,28 @@ qqnorm(
 )
 qqline(datos_recodificados$Admission.grade_10)
 grid()
+
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Admission.grade_10,
+  main = "Papel probabilístico normal Admission Grade",
+)
+qqline(datos_modelo$Admission.grade_10)
+grid()
+
 #previous qual grade
 qqnorm(
   datos_recodificados$Previous.qualification.grade_10,
   main = "Papel probabilístico normal Previous qualification Grade",
 )
 qqline(datos_recodificados$Previous.qualification.grade_10)
+grid()
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Previous.qualification.grade_10,
+  main = "Papel probabilístico normal Previous qualification Grade",
+)
+qqline(datos_modelo$Previous.qualification.grade_10)
 grid()
 
 #age at enrollment
@@ -978,6 +1288,15 @@ qqnorm(
 )
 qqline(datos_recodificados$Age.at.enrollment)
 grid()
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Age.at.enrollment,
+  main = "Papel probabilístico normal Age at enrollment",
+)
+qqline(datos_modelo$Age.at.enrollment)
+grid()
+
+
 #curricular 1st sem grades (con 0)
 qqnorm(
   datos_recodificados$Curricular.units.1st.sem.grade_10,
@@ -992,6 +1311,15 @@ qqnorm(
 )
 qqline(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
 grid()
+
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.units.1st.sem.grade_10!=0],
+  main = "Papel probabilístico normal 1st Sem. Grades",
+)
+qqline(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.units.1st.sem.grade_10!=0])
+grid()
+
 #curricular 2nd sem grades (con 0)
 qqnorm(
   datos_recodificados$Curricular.units.2nd.sem.grade_10,
@@ -1006,11 +1334,31 @@ qqnorm(
 )
 qqline(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
 grid()
+
+#Con datos_modelo:
+qqnorm(
+  datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0],
+  main = "Papel probabilístico normal 2nd Sem. Grades",
+)
+qqline(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0])
+grid()
+
 #papel probabiístico exponencial
 x_exp <- datos_recodificados$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
 qqplot(
   qexp(ppoints(length(x_exp)), rate = 1/mean(x_exp)),
   sort(x_exp),
+  main = "QQ plot exponencial",
+  xlab = "Cuantiles teóricos",
+  ylab = "Cuantiles observados"
+)
+
+abline(0,1)
+
+x_exp1 <- datos_modelo$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
+qqplot(
+  qexp(ppoints(length(x_exp1)), rate = 1/mean(x_exp1)),
+  sort(x_exp1),
   main = "QQ plot exponencial",
   xlab = "Cuantiles teóricos",
   ylab = "Cuantiles observados"
@@ -1075,6 +1423,14 @@ qqnorm(
   main = "Papel probabilístico normal Aprobados 1º sem.",
 )
 qqline(datos_recodificados$Curricular.units.1st.sem..approved.)
+grid()
+
+#con datos_modelo
+qqnorm(
+  datos_modelo$Curricular.units.1st.sem..approved.,
+  main = "Papel probabilístico normal Aprobados 1º sem.",
+)
+qqline(datos_modelo$Curricular.units.1st.sem..approved.)
 grid()
 
 #2SEM
