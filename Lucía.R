@@ -3264,6 +3264,186 @@ grafico_or <- ggplot(resultado_graf,
 print(grafico_or)
 
 
+#Modelo nulo:
+modelo_nulo <- glm(
+  Target_bin ~ 1,
+  data = datos_modelo,
+  family = binomial
+)
+anova(modelo_nulo, modelo_combinado, test = "Chisq")
+
+#pseudo R cuadrado
+pseudo_R2 <- 1 - modelo_combinado$deviance / modelo_combinado$null.deviance
+print(pseudo_R2)
+
+#Probabilodades predichas
+datos_modelo$prob_pred <- predict(
+  modelo_combinado,
+  type = "response"
+)
+
+head(datos_modelo[, c("Target_bin", "prob_pred")])
+summary(datos_modelo$prob_pred)
+
+# Clasificación usando umbral 0.5
+datos_modelo$pred_clase <- ifelse(
+  datos_modelo$prob_pred > 0.5,
+  "Abandono",
+  "No Abandono"
+)
+
+# Convertimos la predicción a factor con los mismos niveles que Target_bin
+datos_modelo$pred_clase <- factor(
+  datos_modelo$pred_clase,
+  levels = levels(datos_modelo$Target_bin)
+)
+
+# Matriz de clasificación
+tabla_clasificacion <- table(
+  Real = datos_modelo$Target_bin,
+  Predicho = datos_modelo$pred_clase
+)
+
+tabla_clasificacion
+
+precision_global <- mean(datos_modelo$pred_clase == datos_modelo$Target_bin)
+precision_global
+
+sensibilidad <- tabla_clasificacion["Abandono", "Abandono"] /
+  sum(tabla_clasificacion["Abandono", ])
+
+sensibilidad
+
+
+especificidad <- tabla_clasificacion["No Abandono", "No Abandono"] /
+  sum(tabla_clasificacion["No Abandono", ])
+
+especificidad
+
+tabla_df <- as.data.frame(tabla_clasificacion)
+
+ggplot(tabla_df, aes(x = Real, y = Freq, fill = Predicho)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Clasificación real vs predicha",
+    x = "Situación real",
+    y = "Número de estudiantes",
+    fill = "Clase predicha"
+  ) +
+  theme_minimal()
+
+#con umbral 3:
+datos_modelo$pred_clase_03 <- ifelse(
+  datos_modelo$prob_pred > 0.3,
+  "Abandono",
+  "No Abandono"
+)
+
+datos_modelo$pred_clase_03 <- factor(
+  datos_modelo$pred_clase_03,
+  levels = levels(datos_modelo$Target_bin)
+)
+
+tabla_clasificacion_03 <- table(
+  Real = datos_modelo$Target_bin,
+  Predicho = datos_modelo$pred_clase_03
+)
+
+tabla_df_03 <- as.data.frame(tabla_clasificacion_03)
+
+ggplot(tabla_df_03, aes(x = Real, y = Freq, fill = Predicho)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Clasificación real vs predicha",
+    subtitle = "Umbral de clasificación = 0.3",
+    x = "Situación real",
+    y = "Número de estudiantes",
+    fill = "Clase predicha"
+  ) +
+  theme_minimal()
+
+ggplot(datos_modelo, aes(x = prob_pred, fill = Target_bin)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Distribución de probabilidades predichas",
+    x = "Probabilidad predicha de abandono",
+    y = "Frecuencia",
+    fill = "Situación real"
+  ) +
+  theme_minimal()
+
+
+ggplot(datos_modelo, aes(x = prob_pred, fill = Target_bin)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+  geom_vline(xintercept = 0.3, linetype = "dashed", linewidth = 1) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Distribución de probabilidades predichas",
+    subtitle = "Línea discontinua: umbral de clasificación = 0.3",
+    x = "Probabilidad predicha de abandono",
+    y = "Frecuencia",
+    fill = "Situación real"
+  ) +
+  theme_minimal()
+
+# Clasificación diferentes umbrales:
+umbrales <- c(0.2, 0.3, 0.4, 0.5)
+
+resultados_umbrales <- data.frame()
+
+for (u in umbrales) {
+  
+  pred <- ifelse(datos_modelo$prob_pred > u, "Abandono", "No Abandono")
+  pred <- factor(pred, levels = levels(datos_modelo$Target_bin))
+  
+  tabla <- table(Real = datos_modelo$Target_bin, Predicho = pred)
+  
+  accuracy <- mean(pred == datos_modelo$Target_bin)
+  
+  sensibilidad <- tabla["Abandono", "Abandono"] /
+    sum(tabla["Abandono", ])
+  
+  especificidad <- tabla["No Abandono", "No Abandono"] /
+    sum(tabla["No Abandono", ])
+  
+  resultados_umbrales <- rbind(
+    resultados_umbrales,
+    data.frame(
+      Umbral = u,
+      Accuracy = accuracy,
+      Sensibilidad = sensibilidad,
+      Especificidad = especificidad
+    )
+  )
+}
+
+resultados_umbrales
+
+
+
+install.packages("car")
+library(car)
+
+vif(modelo_combinado)
+
+
 # Instalar si no lo tienes
 # install.packages("DescTools")
 # install.packages("dplyr")
