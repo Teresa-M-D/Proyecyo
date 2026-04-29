@@ -1343,6 +1343,13 @@ qqnorm(
 qqline(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0])
 grid()
 
+#Carga_academica_real con datos_modelo:
+qqnorm(
+  datos_modelo$Carga_academica_real,
+  main = "Papel probabilístico normal Carga_academica_real",
+)
+qqline(datos_modelo$Carga_academica_real)
+grid()
 #papel probabiístico exponencial
 x_exp <- datos_recodificados$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
 qqplot(
@@ -1499,8 +1506,31 @@ barplot(tabla_cred2)
 
 #Variables categóricas:
 
+
+#Tabla de frecuencias absolutas
+freq_target <- table(datos_modelo$Target)
+freq_target
+#Frecuencias relativas
+prop.table(freq_target)
+
+#Porcentajes
+porcentajes = prop.table(freq_target) * 100
+porcentajes 
+#Diagrama de barras
+bp <- barplot(
+  freq_target,
+  col = c("indianred", "peachpuff", "palegreen1"),
+  las = 1,
+  main = "Target",
+  xlab = "Frecuencias absolutas (n)",
+  ylim = c(0, max(freq_target) * 1.1)   
+)
+
+text(bp, freq_target, labels = freq_target, pos = 3)
+
+
 #Nacionality_group
-freq_nacionality_group <- table(datos_recodificados$Nationality_group)
+freq_nacionality_group <- table(datos_modelo$Nationality_group)
 freq_nacionality_group
 bp2 <- barplot(
   freq_nacionality_group,
@@ -1512,22 +1542,8 @@ bp2 <- barplot(
 )
 text(bp2, freq_nacionality_group, labels = freq_nacionality_group, pos = 3)
 
-  #tabla de frecuencias
-table(datos_recodificados$Nationality_group, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), margin = 1)
-
-library(dplyr)
-
-datos_recodificados %>%
-  group_by(Nationality_group, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), 1), 3)
-
-
-#tuitons fees up to date
-freq_tuition <- table(datos_recodificados$Tuition.fees.up.to.date)
+#tuition fees up to date
+freq_tuition <- table(datos_modelo$Tuition.fees.up.to.date)
 freq_tuition 
 bp3 <- barplot(
   freq_tuition,
@@ -1539,30 +1555,16 @@ bp3 <- barplot(
 )
 text(bp3, freq_tuition, labels = freq_tuition, pos = 3)
 
-#tabla de frecuencias
-table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), margin = 1)
-
-library(dplyr)
-
-datos_recodificados %>%
-  group_by(Tuition.fees.up.to.date, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), 1), 3)
-
 #Course
-
-freq_course <- table(datos_recodificados$Course)
+freq_course <- table(datos_modelo$Course_limpio)
 freq_course
 #como son muchas titulaciones, hacemos un diagrama de barras horizonatal
 library(ggplot2)
 library(dplyr)
 
-datos_recodificados %>%
-  count(Course) %>% 
-  ggplot(aes(x = n, y = Course)) +
+datos_modelo %>%
+  count(Course_limpio) %>% 
+  ggplot(aes(x = n, y = Course_limpio)) +
   geom_bar(stat = "identity", fill = "#4C72B0") +
   labs(
     title = "Frecuencia de estudiantes por curso",
@@ -1576,47 +1578,96 @@ datos_recodificados %>%
   )
 
 
-#tabla de frecuencias
-table(datos_recodificados$Course, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Course, datos_recodificados$Target), margin = 1)
+#ANÁLISIS BIVARIANTE
 
-library(dplyr)
+#Numérica vs Target:
 
-datos_recodificados %>%
-  group_by(Course, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 1), 3)
+#Comparación media/medianas manualmente:
+# Calculamos la media del PIB para los estudiantes que abandonaron
 
 
-#t-test:
-t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados)
-t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados)
-t.test(GDP ~ Target_bin, data=datos_recodificados)
-t.test(Unemployment.rate ~ Target_bin, data=datos_recodificados)
-t.test(Inflation.rate ~ Target_bin, data=datos_recodificados)
-t.test(Admission.grade_10  ~ Target_bin, data=datos_recodificados)
-t.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_recodificados)
+# Calculamos la media de las notas del primer cuatrimestre de los estudiantes que no abandonaron (graduados o siguen matriculados )
+
+mean(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+mean(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+mean_notas1_dropouts #3.836201 (sobre 10)
+mean_notas1_noDropouts #6.338498 (sobre 10)
+
+#Vamos a hacer una comparación de medianas para comprobar si los resultados de las medias se ven afectadas por la presencia de valores átipicos
 
 
+median(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+median(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+median_notas1_dropouts #5.5 (sobre 10)
+median_notas1_noDropouts # 6.4 (sobre 10)
+
+#Como podemos ver la mediana de las notas del primer cuatrimestre del grupo Dropout es más mayor que la
+#media debido a la presencia de valores extremos bajos que tiran de la media hacia abajo (como vimos en el diagrama de cajas multiple)
+
+
+#Objetvo: comparar las medias de las notas del 2 cuatrimistre entre estudiantes que abandonaron y estudiantes que no
+
+
+mean(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+mean(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+mean_notas2_dropouts #3.118661 (sobre 10)
+mean_notas2_noDropouts #6.35784 (sobre 10)
+
+#Vamos a hacer la mediana ahora
+
+median(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+median(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+median_notas2_dropouts #5 (sobre 10)
+median_notas2_noDropouts #6.4 (sobre 10)
+
+#La mediana de las notas del segundo cuatrimestre es más baja que su media, lo que significa que hay valores extremos altos que tiran de la media hacia arriba.
+#La mediana y la media de las notas de los que no abandonaron es muy similar
+
+
+#Test Mann - Whitney
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(GDP ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+
+#Diagrama de barras bivariante
+tabla4 <- xtabs(~ datos_modelo$Target + datos_modelo$Course_limpio)
+par(xpd = TRUE, mar = c(5, 18, 4, 8)) 
+barplot(tabla4,  col=c("indianred2", "lightblue", "lightgreen"), horiz=TRUE, las = 1, cex.names = 0.8)
+legend("topright", legend=c("Dropout","Enrolled","Graduate"),
+       fill=c("indianred2","lightblue","lightgreen"), inset=c(-0.2,0))
+
+
+#BOXPLOTS MÚLTIPLES
+dev.off() # resetea la ventana de gráficos
 
 
 
 #Boxplots de la variable target después de la reagrupación
-boxplot(Admission.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(GDP ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Unemployment.rate ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Inflation.rate ~ Target_bin, data=datos_recodificados, las=1)
-
-
-
-
-#ANÁLISIS BIVARIANTE
-
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(GDP ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1)
 #Categóricas vs Target:
 library(clickR)
 library(vcd)
@@ -1643,7 +1694,6 @@ colnames(datos_modelo)
 
 
 
-#ANÁLISIS BIVARIANTE
 
 #CATEGÓRICA VS TARGET
 names(datos_modelo)[sapply(datos_modelo, is.character)] #nombres de las variables categóricas
@@ -3015,42 +3065,91 @@ View(datos_recodificados[
 ])
 datos_recodificados$Application.mode_group
 
-#Análisis multivariante:
-install.packages("pscl")
-#Regresión logística binaria:
-# Aseguramos que la variable objetivo esté en formato factor
-datos_recodificados$Target_bin <- relevel(datos_recodificados$Target_bin, ref = "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
 
-# Ajustamos el modelo de regresión logística binaria
-modelo_logit <- glm(
-  Target_bin ~ Curricular.units.1st.sem.grade_10 +
-    Tuition.fees.up.to.date +
-    Scholarship.holder +
-    Debtor +
-    Admission.grade_10 +
-    Application.mode_group +
-    Course_group,
-  data = datos_recodificados,
-  family = binomial
-)
-colnames(datos_recodificados)
+#Numéricas vs Numéricas
 
-summary(modelo_logit)
-exp(coef(modelo_logit))
-exp(confint(modelo_logit))
-library(pscl)
-pR2(modelo_logit)
-datos_recodificados$Target_bin <- factor(
-  datos_recodificados$Target_bin,
-  levels = c("No Dropout", "Dropout")
-)
-levels(datos_recodificados$Target_bin)
-rm(modelo_logit)
-#no lo he acabado, no hacer caos
+#Creo dos variables numéricas que faltan:
+#Porcentaje_aprobado_sem_2
+#Carga_academica_real_sem_2
+
+datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
+datos_modelo$Carga_academica_real_sem_2 <- 
+  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
+  datos_modelo$Curricular.units.2nd.sem..credited.
 
 
+variables_numéricas<-c("Previous.qualification.grade_10",
+                       "Age.at.enrollment",
+                       "Admission.grade_10",
+                       "Application.order",
+                       "Curricular.units.1st.sem..credited.",
+                       "Curricular.units.1st.sem..enrolled.",
+                       "Curricular.units.1st.sem..evaluations.",
+                       "Curricular.units.1st.sem..approved.",
+                       "Curricular.units.1st.sem.grade_10",
+                       "Curricular.units.1st.sem..without.evaluations.",
+                       "Curricular.units.2nd.sem..credited.",
+                       "Curricular.units.2nd.sem..enrolled.",
+                       "Curricular.units.2nd.sem..evaluations.",
+                       "Curricular.units.2nd.sem..approved.",
+                       "Curricular.units.2nd.sem.grade_10",
+                       "Curricular.units.2nd.sem..without.evaluations.",
+                       "Unemployment.rate",
+                       "Inflation.rate",
+                       "Porcentaje_aprobado_sem_1",
+                       "GDP",
+                       "Carga_academica_real",
+                       "Carga_academica_real_sem_2",
+                       "Porcentaje_aprobado_sem_2",
+                       "year") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
+
+variables_numéricas
+descriptive(datos_modelo)
+library(psych)
+library(corrplot)
+describe(datos_modelo[,variables_numéricas])
+#hacer matriz de correlaciones
+matriz_corr_kendall<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="kendall") 
+matriz_corr_pearson<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="pearson")
+matriz_corr_spearman<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="spearman")
+#para ponerlo gráficamente
+corrplot(matriz_corr_kendall, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Kendall")
+corrplot(matriz_corr_pearson, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Pearson")
+corrplot(matriz_corr_spearman, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
+#ver relación entre age y application order
 #Poner datos para análisis numérico (sin los estudiantes de Multimedia con todo 0 (pero si los que tienen notas)):
+
+
+
+#otra matriz de correlaciones (Ksenia):
+vars_numericas <- datos_modelo[, c("Carga_academica_real",
+                                   "Curricular.units.1st.sem..approved.",
+                                   "Curricular.units.1st.sem.grade_10",
+                                   "Curricular.units.1st.sem..evaluations.")]
+
+matriz_cor <- cor(vars_numericas, use = "complete.obs")
+print(matriz_cor)
+
+# Pasar a formato largo para heatmap
+cor_df <- as.data.frame(as.table(matriz_cor))
+colnames(cor_df) <- c("Var1", "Var2", "Correlacion")
+
+grafico_cor <- ggplot(cor_df, aes(x = Var1, y = Var2, fill = Correlacion)) +
+  geom_tile() +
+  geom_text(aes(label = round(Correlacion, 2)), size = 4) +
+  scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick", midpoint = 0) +
+  labs(title = "5.0 Matriz de correlaciones",
+       x = "",
+       y = "",
+       fill = "Correlación") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(grafico_cor)
+
 
 datos_recodificados$Curricular.units.1st.sem..evaluations.
 
@@ -3069,5 +3168,151 @@ nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
 colnames(datos_modelo)
 
 table(datos_modelo$Course_limpio)
+
+
+#Análisis multivariante:
+colnames(datos_modelo)
+
+table(datos_modelo$Application.mode_group)
+table(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+
+table(datos_modelo$Course_group)
+table(datos_modelo$Course_group, datos_modelo$Target_bin)
+
+table(datos_modelo$Previous_education_level)
+table(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
+#Regresión logística bianria (Lucía):
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
+datos_modelo$Target_bin <- relevel(datos_modelo$Target_bin, ref = "No Abandono")
+
+datos_modelo$Application.mode_group <- relevel(
+  as.factor(datos_modelo$Application.mode_group),
+  ref = "Acceso normal"
+)
+
+datos_modelo$Course_group <- relevel(
+  as.factor(datos_modelo$Course_group),
+  ref = "Empresa"
+)
+
+modelo_combinado <- glm(
+  Target_bin ~ Carga_academica_real +
+    Curricular.units.1st.sem..approved. +
+    Curricular.units.1st.sem.grade_10 +
+    Curricular.units.1st.sem..evaluations. +
+    Tuition.fees.up.to.date +
+    Debtor +
+    Scholarship.holder +
+    Admission.grade_10 +
+    Age.at.enrollment +
+    Gender +
+    Course_group +
+    Application.mode_group,
+  data = datos_modelo,
+  family = binomial
+)
+
+summary(modelo_combinado)
+
+
+# Coeficientes del modelo
+coeficientes <- coef(modelo_combinado)
+
+# Convertimos los coeficientes a Odds Ratios
+OR <- exp(coeficientes)
+
+# Mostramos el resultado
+OR
+
+
+# Intervalos de confianza de los coeficientes
+IC <- confint(modelo_combinado)
+
+# Pasamos los intervalos también a escala Odds Ratio
+IC_OR <- exp(IC)
+
+# Creamos una tabla con OR e intervalos
+resultado_OR <- data.frame(
+  Variable = names(OR),
+  OR = as.numeric(OR),
+  IC_inf = IC_OR[, 1],
+  IC_sup = IC_OR[, 2]
+)
+
+print(resultado_OR)
+
+
+#Representación gráfica:
+library(dplyr)
+library(ggplot2)
+
+resultado_graf <- resultado_OR %>%
+  filter(Variable != "(Intercept)")
+
+grafico_or <- ggplot(resultado_graf,
+                     aes(x = reorder(Variable, OR), y = OR)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = IC_inf, ymax = IC_sup), width = 0.2) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  coord_flip() +
+  labs(title = "Odds Ratios del modelo logístico",
+       subtitle = "Variable respuesta: Abandono",
+       x = "Variable",
+       y = "Odds Ratio") +
+  theme_minimal()
+
+print(grafico_or)
+
+
+# Instalar si no lo tienes
+# install.packages("DescTools")
+# install.packages("dplyr")
+
+library(DescTools)
+library(dplyr)
+
+descriptive(datos_modelo)
+# Variables categóricas que quieres analizar
+variables_categoricas <- c(
+  "Marital_group",
+  "Application.mode_group",
+  "Course_group",
+  "Daytime.evening.attendance.",
+  "Previous_education_level",
+  "Mother_education_level",
+  "Father_education_level",
+  "Mother_occupation_level",
+  "Father_occupation_level",
+  "Displaced",
+  "Educational.special.needs",
+  "Debtor",
+  "Tuition.fees.up.to.date",
+  "Gender",
+  "Scholarship.holder",
+  "International",
+  "Nationality_group"
+)
+
+# Función para calcular V de Cramer frente a Target_bin
+calcular_cramer <- function(var) {
+  
+  tabla <- table(datos_modelo[[var]], datos_modelo$Target_bin)
+  
+  v <- CramerV(tabla)
+  
+  data.frame(
+    Variable = var,
+    Cramer_V = as.numeric(v)
+  )
+}
+
+# Aplicar la función a todas las variables y ordenar
+resultados_cramer <- bind_rows(
+  lapply(variables_categoricas, calcular_cramer)
+) %>%
+  arrange(desc(Cramer_V))
+
+print(resultados_cramer)
+
 
 
