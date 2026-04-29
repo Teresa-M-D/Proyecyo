@@ -6,6 +6,7 @@ library(plotly)
 library(GGally)
 datos <- read.csv("estudiantes.csv", sep = ";", header = TRUE)
 descriptive(datos)
+descriptive(datos_modelo)
 #Análisis inicial de la variable Target
 
 #Tabla de frecuencias absolutas
@@ -91,6 +92,19 @@ boxplot(datos$GDP, main= "PIB")
 datos$NotaAdmisión <- (datos$Previous.qualification..grade. / 200) * 10
 descriptive(datos)
 boxplot(datos$NotaAdmisión, main="Nota de Admisión (del 0 al 10)")
+
+
+#Reagrupacion variable Target:
+datos_modelo$Target_bin <- ifelse(datos_modelo$Target == "Dropout", "Abandono", "No Abandono")
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
+
+#Reagrupación variable Target (incluyendo a los matriculados)
+datos_modelo$Objetivo <- ifelse(
+  datos_modelo$Target == "Dropout", "Abandono",
+  ifelse(datos_modelo$Target == "Enrolled", "Matriculados", "No Abandono")
+)
+
+datos_modelo$Objetivo <- as.factor(datos_modelo$Objetivo)
 
 #ANÁLISIS BIVARIANTE
 
@@ -203,10 +217,10 @@ tabla3 <- xtabs(~ datos_modelo$Target_bin + datos_modelo$Scholarship.holder)
 assoc(tabla3, shade = TRUE, col = c("lightblue", "lightcoral"))
 
 #Diagrama de barras bivariante
-tabla4 <- xtabs(~ datos_modelo$Target + datos_modelo$Course_limpio)
+tabla4 <- xtabs(~ datos_modelo$Objetivo + datos_modelo$Course_limpio)
 par(xpd = TRUE, mar = c(5, 18, 4, 8)) 
 barplot(tabla4,  col=c("indianred2", "lightblue", "lightgreen"), horiz=TRUE, las = 1, cex.names = 0.8)
-legend("topright", legend=c("Dropout","Enrolled","Graduate"),
+legend("topright", legend=c("Abandono","Matriculado","Graduado"),
        fill=c("indianred2","lightblue","lightgreen"), inset=c(-0.2,0))
 
 #BOXPLOTS MÚLTIPLES
@@ -221,11 +235,11 @@ boxplot(Curricular.units.2nd.sem.grade_10 ~ Target, data=datos_modelo, las=1)
 
 
 #Boxplots de la variable target después de la reagrupación
-boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1)
-boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1)
-boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
-boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
-boxplot(PIB ~ Target_bin, data=datos_modelo, las=1)
-boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1)
-boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Nota de admisión y abandono")
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
+boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del primer semestre y abandono")
+boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del segundo semestre y abandono")
+boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
+boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
 
