@@ -162,6 +162,18 @@ median_notas2_noDropouts #6.4 (sobre 10)
 #La mediana de las notas del segundo cuatrimestre es más baja que su media, lo que significa que hay valores extremos altos que tiran de la media hacia arriba.
 #La mediana y la media de las notas de los que no abandonaron es muy similar
 
+median_notaPrevia_dropouts <- median(Dropouts$Previous.qualification.grade_10)
+median_notaPrevia_Nodropouts <- median(noDropouts$Previous.qualification.grade_10)
+
+median_notaPrevia_dropouts
+median_notaPrevia_Nodropouts
+
+median_notaAdmision_dropouts <- median(Dropouts$Admission.grade_10)
+median_notaPrevia_Nodropouts <- median(noDropouts$Admission.grade_10)
+
+median_notaAdmision_dropouts
+median_notaPrevia_Nodropouts 
+
 #T-TEST
 t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo)
 t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo)
@@ -251,4 +263,4 @@ boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "light
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
 boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
 
-hist(datos_modelo$Porcentaje_aprobado_sem_1)
+
