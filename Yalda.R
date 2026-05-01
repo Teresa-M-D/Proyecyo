@@ -106,6 +106,10 @@ datos_modelo$Objetivo <- ifelse(
 
 datos_modelo$Objetivo <- as.factor(datos_modelo$Objetivo)
 
+#NUEVA VARIBLE: aprobados_reales_1sem y aprobados_reales_2sem
+datos_modelo$aprobados_reales_1sem <- pmax(datos_modelo$Curricular.units.1st.sem..approved. - datos_modelo$Curricular.units.1st.sem..credited., 0)
+datos_modelo$aprobados_reales_2sem <- pmax(datos_modelo$Curricular.units.2nd.sem..approved. - datos_modelo$Curricular.units.2nd.sem..credited., 0)
+
 #ANÁLISIS BIVARIANTE
 
 #Objetivo: comparar las medias de la notas del primer cuatrimestre de los estudiantes que abandonaron y los que no lo hicieron
@@ -196,6 +200,8 @@ yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo, tr = 0
 #Test Mann - Whitney
 wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo)
 wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(aprobados_reales_1sem ~ Target_bin, data = datos_modelo)
+wilcox.test(aprobados_reales_2sem ~ Target_bin, data = datos_modelo)
 wilcox.test(PIB ~ Target_bin, data=datos_modelo)
 wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
@@ -239,7 +245,10 @@ boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indi
 boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
 boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del primer semestre y abandono")
 boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del segundo semestre y abandono")
+boxplot(aprobados_reales_1sem ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Unidades curriculares aprobadas en el 1º semestre y abandono")
+boxplot(aprobados_reales_2sem ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Unidades curriculares aprobadas en el 2º semestre  y abandono")
 boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
 boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
 
+hist(datos_modelo$Porcentaje_aprobado_sem_1)
