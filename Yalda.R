@@ -169,10 +169,16 @@ median_notaPrevia_dropouts
 median_notaPrevia_Nodropouts
 
 median_notaAdmision_dropouts <- median(Dropouts$Admission.grade_10)
-median_notaPrevia_Nodropouts <- median(noDropouts$Admission.grade_10)
+median_notaAdmision_Nodropouts <- median(noDropouts$Admission.grade_10)
 
 median_notaAdmision_dropouts
-median_notaPrevia_Nodropouts 
+median_notaAdmision_Nodropouts
+
+mean_notaPrevia_dropouts <- mean(Dropouts$Previous.qualification.grade_10)
+mean_notaPrevia_Nodropouts <- mean(noDropouts$Previous.qualification.grade_10)
+
+mean_notaPrevia_dropouts
+mean_notaPrevia_Nodropouts
 
 #T-TEST
 t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo)
@@ -219,6 +225,20 @@ wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+
+#Tamaño del efecto
+install.packages("rstatix")
+library(rstatix)
+
+wilcox_effsize(data = datos_modelo , Curricular.units.1st.sem.grade_10 ~ Target_bin)
+wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox_effsize(aprobados_reales_1sem ~ Target_bin, data = datos_modelo)
+wilcox_effsize(aprobados_reales_2sem ~ Target_bin, data = datos_modelo)
+wilcox_effsize(PIB ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
 
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
