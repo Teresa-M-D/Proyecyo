@@ -10,7 +10,7 @@ descriptive(datos_modelo)
 #Análisis inicial de la variable Target
 
 #Tabla de frecuencias absolutas
-freq_target <- table(datos_modelo$Target)
+freq_target <- table(datos_modelo$Objetivo)
 freq_target
 #Frecuencias relativas
 prop.table(freq_target)
@@ -50,7 +50,7 @@ bp3 <- barplot(
   freq_tuition,
   col = c("indianred", "lightgreen"),
   las = 1,
-  main = "Tasas de mátricula actualizadas",
+  main = "Tasas de matrícula actualizadas",
   xlab = "Frecuencias absolutas (n)",
   ylim = c(0, max(freq_tuition) * 1.3)
 )
@@ -101,7 +101,7 @@ datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
 #Reagrupación variable Target (incluyendo a los matriculados)
 datos_modelo$Objetivo <- ifelse(
   datos_modelo$Target == "Dropout", "Abandono",
-  ifelse(datos_modelo$Target == "Enrolled", "Matriculados", "No Abandono")
+  ifelse(datos_modelo$Target == "Enrolled", "Matriculados", "Graduados")
 )
 
 datos_modelo$Objetivo <- as.factor(datos_modelo$Objetivo)
