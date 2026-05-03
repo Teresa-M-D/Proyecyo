@@ -1725,7 +1725,7 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group)
 
 #Chi-cuadrado con Marital_group:
 tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
-chisq.test(tabla, correct=FALSE)
+chisq.test(tabla)
 chisq.test(tabla)$expected
 
 #Gráfico mosaico:
@@ -1797,54 +1797,8 @@ mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
 
-#Nationality
-
-sum(table(datos_modelo$Nationality))
-unique(datos_modelo$Nationality)
-
-#Proporciones:
-table(datos_modelo$Nationality_group, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Nationality_group, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Nationality_group, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Nationality_group, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Nationality_group, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Nationality_group) 
-
-#Chi-cuadrado:
-tabla_nationality_target <- table(datos_modelo$Nationality_group, datos_modelo$Target_bin)
-chisq.test(tabla_nationality_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_nationality_target)$expected
-
-#Gráfico:
-mosaic(~ Nationality_group + Target_bin, data = datos_modelo,  #he elegido esta
-       shade = TRUE, legend = TRUE)
 
 
-#International
-
-sum(table(datos_modelo$International))
-unique(datos_modelo$International)
-
-#Proporciones:
-table(datos_modelo$International, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$International, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$International, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$International, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$International, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$International) 
-
-#Chi-cuadrado:
-tabla_international_target <- table(datos_modelo$International, datos_modelo$Target_bin)
-chisq.test(tabla_international_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_international_target)$expected
-
-#Gráfico:
-mosaic(~ International + Target_bin, data = datos_modelo,  #he elegido esta
-       shade = TRUE, legend = TRUE)
 
 #Tuition fees up to date:
 
@@ -1864,40 +1818,31 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Tuition.fees.up.to.date)
 #Chi-cuadrado:
 tabla_tution_target <- table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
 chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_tution_target, correct=FALSE)$expected
+chisq.test(tabla_tution_target)$expected
 
 #Gráficos:
 mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
+
 tabla_plot <- datos_modelo %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
-  mutate(
-    prop = n / sum(n),
-    etiqueta = percent(prop, accuracy = 0.1)
-  )
+  mutate(prop = n / sum(n),
+         etiqueta = percent(prop, accuracy = 0.1))
 
 ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
-  geom_text(
-    aes(label = etiqueta),
-    position = position_fill(vjust = 0.5),
-    size = 4
-  ) +
-  scale_fill_manual(
-    values = c(
-      "Abandono" = "indianred2",
-      "No Abandono" = "lightgreen"
-    )
-  ) +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
   scale_y_continuous(labels = percent) +
   labs(
-    x = "Tasas al día",
+    x = "Turno",
     y = "Proporción",
-    fill = "Target",
-    title = "Relación entre tasas al día y abandono"
+    fill = "Abandono",
+    title = "Relación entre Matrícula al día y Abandono"
   ) +
   theme_minimal()
 
@@ -2117,40 +2062,26 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
 chisq.test(tabla_modo_app_target, correct = FALSE)
 chisq.test(tabla_modo_app_target)$expected
 
-#Gráfico:
-mosaic(~ Application.mode_group + Target_bin, data = datos_modelo,  
-       shade = TRUE, legend = TRUE)
 
 
-
-# Gráficos:
+#Gráficos:
 tabla_modo_app_plot <- datos_modelo %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
-  mutate(
-    prop = n / sum(n),
-    etiqueta = scales::percent(prop, accuracy = 0.1)
-  )
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
 
 ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
-  geom_text(
-    aes(label = etiqueta),
-    position = position_fill(vjust = 0.5),
-    size = 4
-  ) +
-  scale_fill_manual(
-    values = c(
-      "Abandono" = "indianred2",
-      "No Abandono" = "lightgreen"
-    )
-  ) +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
   scale_y_continuous(labels = scales::percent) +
   labs(
     x = "Tipo de acceso al grado",
     y = "Proporción",
-    fill = "Target",
-    title = "Relación entre vía de acceso y abandono"
+    fill = "Abandono",
+    title = "Relación entre Tipo de acceso al grado y Abandono"
   ) +
   theme_minimal()
 
@@ -3094,7 +3025,8 @@ datos_recodificados$Carga_academica_real_sem2 <-
 
 View(datos_recodificados[
   datos_recodificados$Carga_academica_real_sem2==0,
-  c("Course_limpio",
+  c("Carga_academica_real_sem2",
+    "Course_limpio",
     "Target",
     "Curricular.units.2nd.sem.grade_10",
     "Curricular.units.2nd.sem..evaluations.",
@@ -3121,135 +3053,20 @@ View(datos_recodificados[
 
 View(datos_recodificados[
   datos_recodificados$Course=="Diseño de Animación y Multimedia",
-  c("Course_limpio",
-    "Target_bin",
+  c("Course",
+    "year",
+    "Target",
     "Curricular.units.1st.sem..evaluations.",
     "Curricular.units.1st.sem..enrolled.",
-    "Curricular.units.1st.sem..credited.",
-    "Curricular.units.1st.sem..approved.",
-    "Curricular.units.1st.sem.grade_10",
-    "Curricular.units.1st.sem..without.evaluations.",
-    "Curricular.units.2nd.sem..evaluations.",
-    "Curricular.units.2nd.sem..enrolled.",
-    "Curricular.units.2nd.sem..credited.",
-    "Curricular.units.2nd.sem.grade_10",
-    "Curricular.units.2nd.sem..without.evaluations.",
     "Carga_academica_real",
+    "Carga_academica_real_sem2",
     "Application.mode_group"
   )
 ])
-
 datos_recodificados$Application.mode_group
 
 
-# Variables de rendimiento académico del primer semestre
-vars_rendimiento <- c(
-  "Curricular.units.1st.sem..credited.",
-  "Curricular.units.1st.sem..enrolled.",
-  "Curricular.units.1st.sem..evaluations.",
-  "Curricular.units.1st.sem..approved.",
-  "Curricular.units.1st.sem..grade.",
-  "Curricular.units.1st.sem..without.evaluations.",
-  "Curricular.units.2nd.sem..credited.",
-  "Curricular.units.2nd.sem..enrolled.",
-  "Curricular.units.2nd.sem..evaluations.",
-  "Curricular.units.2nd.sem..approved.",
-  "Curricular.units.2nd.sem..grade.",
-  "Curricular.units.2nd.sem..without.evaluations."
-)
-
-# Detectar observaciones problemáticas:
-# estudiantes de Diseño de Animación y Multimedia con 0 en todas esas variables
-multimedia_problematicos <- datos_recodificados[
-  datos_recodificados$Course_limpio == "Diseño de Animación y Multimedia" &
-    rowSums(datos_recodificados[, vars_rendimiento] == 0, na.rm = TRUE) == length(vars_rendimiento),
-]
-
-# Ver cuántas observaciones problemáticas hay
-nrow(multimedia_problematicos)
-
-# Tabla de conteos por Target_bin
-table(multimedia_problematicos$Target_bin)
-
-# Tabla con porcentajes
-prop.table(table(multimedia_problematicos$Target_bin)) * 100
-
-
-
-
-#Vemos si los de multimedia problematicos tenían faltantes:
-# Variables de rendimiento académico
-vars_rendimiento <- c(
-  "Curricular.units.1st.sem..credited.",
-  "Curricular.units.1st.sem..enrolled.",
-  "Curricular.units.1st.sem..evaluations.",
-  "Curricular.units.1st.sem..approved.",
-  "Curricular.units.1st.sem..grade.",
-  "Curricular.units.1st.sem..without.evaluations.",
-  "Curricular.units.2nd.sem..credited.",
-  "Curricular.units.2nd.sem..enrolled.",
-  "Curricular.units.2nd.sem..evaluations.",
-  "Curricular.units.2nd.sem..approved.",
-  "Curricular.units.2nd.sem..grade.",
-  "Curricular.units.2nd.sem..without.evaluations."
-)
-
-
-# Filtrar las 180 observaciones problemáticas en datos sin imputar
-multimedia_problematicos_sin_imputar <- datos_sin_imputar[
-  datos_sin_imputar$Course == "171" &
-    rowSums(datos_sin_imputar[, vars_rendimiento] == 0, na.rm = TRUE) == length(vars_rendimiento),
-  c(
-    "Course",
-    "Target",
-    "Mother.s.qualification",
-    "Father.s.qualification",
-    "Mother.s.occupation",
-    "Father.s.occupation"
-  )
-]
-
-# Conteos concretos de valores problemáticos
-sum(multimedia_problematicos_sin_imputar$Father.s.qualification == 34, na.rm = TRUE)
-sum(multimedia_problematicos_sin_imputar$Mother.s.qualification == 34, na.rm = TRUE)
-sum(multimedia_problematicos_sin_imputar$Father.s.occupation == 99, na.rm = TRUE)
-sum(multimedia_problematicos_sin_imputar$Mother.s.occupation == 99, na.rm = TRUE)
-
-
-resumen_faltantes_multimedia <- data.frame(
-  variable = c(
-    "Father.s.qualification = 34",
-    "Mother.s.qualification = 34",
-    "Father.s.occupation = 99",
-    "Mother.s.occupation = 99"
-  ),
-  n = c(
-    sum(multimedia_problematicos_sin_imputar$Father.s.qualification == 34, na.rm = TRUE),
-    sum(multimedia_problematicos_sin_imputar$Mother.s.qualification == 34, na.rm = TRUE),
-    sum(multimedia_problematicos_sin_imputar$Father.s.occupation == 99, na.rm = TRUE),
-    sum(multimedia_problematicos_sin_imputar$Mother.s.occupation == 99, na.rm = TRUE)
-  )
-)
-
-resumen_faltantes_multimedia
-
-#vemos quien es:
-# Ver qué observaciones tienen alguno de esos valores problemáticos
-casos_familia_faltantes_multimedia <- multimedia_problematicos_sin_imputar[
-  multimedia_problematicos_sin_imputar$Father.s.qualification == 34 |
-    multimedia_problematicos_sin_imputar$Mother.s.qualification == 34 |
-    multimedia_problematicos_sin_imputar$Father.s.occupation == 99 |
-    multimedia_problematicos_sin_imputar$Mother.s.occupation == 99,
-]
-
-View(casos_familia_faltantes_multimedia)
-
-nrow(casos_familia_faltantes_multimedia)
-
-
-
 #Numéricas vs Numéricas
-
 
 #Creo dos variables numéricas que faltan:
 #Porcentaje_aprobado_sem_2
@@ -3681,3 +3498,264 @@ print(resultados_cramer)
 
 
 
+#Gráficos motivación:
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+archivo <- "lfso_24eab01$defaultview_spreadsheet.xlsx"
+
+datos <- read_excel(
+  archivo,
+  sheet = "Data",
+  range = "A1058:D1092",
+  col_names = FALSE
+)
+
+datos_limpios <- datos %>%
+  select(
+    pais = ...1,
+    tasa_abandono = ...4
+  ) %>%
+  filter(!is.na(pais), !is.na(tasa_abandono)) %>%
+  mutate(
+    tasa_abandono = as.numeric(tasa_abandono)
+  )
+
+datos_ue_portugal <- datos_limpios %>%
+  filter(pais %in% c("European Union - 27 countries (from 2020)", "Portugal")) %>%
+  mutate(
+    pais = recode(
+      pais,
+      "European Union - 27 countries (from 2020)" = "Unión Europea"
+    )
+  )
+
+ggplot(datos_ue_portugal, aes(x = pais, y = tasa_abandono, fill = pais)) +
+  geom_col(width = 0.55, show.legend = FALSE) +
+  geom_text(
+    aes(label = paste0(tasa_abandono, "%")),
+    vjust = -0.5,
+    size = 5,
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Tasa de abandono de educación o formación formal",
+    subtitle = "Personas de 15 a 34 años, 2024",
+    x = "",
+    y = "Porcentaje (%)",
+    caption = "Fuente: Eurostat, lfso_24eab01"
+  ) +
+  ylim(0, 20) +
+  theme_minimal()
+
+install.packages("sf")
+install.packages("rnaturalearth")
+install.packages("rnaturalearthdata")
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+
+
+# Instalar paquetes si no los tienes
+# install.packages(c("readxl", "dplyr", "plotly"))
+
+library(readxl)
+library(dplyr)
+library(plotly)
+
+# -------------------------------
+# 1. Leer el archivo de Eurostat
+# -------------------------------
+archivo <- "lfso_24eab01$defaultview_spreadsheet.xlsx"
+
+datos <- read_excel(
+  archivo,
+  sheet = "Data",
+  range = "A1058:D1092",
+  col_names = FALSE
+)
+
+# -------------------------------
+# 2. Limpiar datos
+# -------------------------------
+datos_limpios <- datos %>%
+  select(
+    pais = ...1,
+    tasa_abandono = ...4
+  ) %>%
+  filter(!is.na(pais), !is.na(tasa_abandono)) %>%
+  mutate(
+    tasa_abandono = suppressWarnings(as.numeric(tasa_abandono))
+  ) %>%
+  filter(!is.na(tasa_abandono)) %>%
+  filter(!grepl("Euro area", pais))
+
+# -------------------------------
+# 3. Tabla de equivalencias a ISO-3
+#    (necesario para plotly)
+# -------------------------------
+equivalencias_iso <- data.frame(
+  pais = c(
+    "European Union - 27 countries (from 2020)",
+    "Belgium", "Bulgaria", "Czechia", "Denmark", "Germany",
+    "Estonia", "Ireland", "Greece", "Spain", "France",
+    "Croatia", "Italy", "Cyprus", "Latvia", "Lithuania",
+    "Luxembourg", "Hungary", "Malta", "Netherlands",
+    "Austria", "Poland", "Portugal", "Romania", "Slovenia",
+    "Slovakia", "Finland", "Sweden", "Norway", "North Macedonia"
+  ),
+  pais_es = c(
+    "Unión Europea",
+    "Bélgica", "Bulgaria", "Chequia", "Dinamarca", "Alemania",
+    "Estonia", "Irlanda", "Grecia", "España", "Francia",
+    "Croacia", "Italia", "Chipre", "Letonia", "Lituania",
+    "Luxemburgo", "Hungría", "Malta", "Países Bajos",
+    "Austria", "Polonia", "Portugal", "Rumanía", "Eslovenia",
+    "Eslovaquia", "Finlandia", "Suecia", "Noruega", "Macedonia del Norte"
+  ),
+  iso3 = c(
+    "EUU",
+    "BEL", "BGR", "CZE", "DNK", "DEU",
+    "EST", "IRL", "GRC", "ESP", "FRA",
+    "HRV", "ITA", "CYP", "LVA", "LTU",
+    "LUX", "HUN", "MLT", "NLD",
+    "AUT", "POL", "PRT", "ROU", "SVN",
+    "SVK", "FIN", "SWE", "NOR", "MKD"
+  )
+)
+
+# -------------------------------
+# 4. Unir datos con ISO
+# -------------------------------
+datos_mapa <- datos_limpios %>%
+  left_join(equivalencias_iso, by = "pais") %>%
+  filter(!is.na(iso3)) %>%
+  filter(iso3 != "EUU") %>%
+  mutate(
+    texto = paste0(
+      "<b>", pais_es, "</b>",
+      "<br>Tasa de abandono: ", tasa_abandono, "%"
+    )
+  )
+# -------------------------------
+# 5. Crear texto para tooltip
+# -------------------------------
+datos_mapa <- datos_mapa %>%
+  mutate(
+    texto = paste0(
+      "<b>", pais, "</b>",
+      "<br>Tasa de abandono: ", tasa_abandono, "%"
+    )
+  )
+
+# -------------------------------
+# 6. Crear mapa interactivo
+# -------------------------------
+fig <- plotly::plot_ly(
+  data = datos_mapa,
+  type = "choropleth",
+  locations = ~iso3,
+  z = ~tasa_abandono,
+  text = ~texto,
+  hovertemplate = "%{text}<extra></extra>",
+  colorscale = list(
+    c(0.0, "#fee5d9"),
+    c(0.2, "#fcbba1"),
+    c(0.4, "#fc9272"),
+    c(0.6, "#fb6a4a"),
+    c(0.8, "#de2d26"),
+    c(1.0, "#a50f15")
+  ),
+  marker = list(
+    line = list(color = "white", width = 0.5)
+  ),
+  colorbar = list(
+    title = "Tasa (%)"
+  )
+)
+
+
+fig <- fig %>%
+  layout(
+    title = list(
+      text = "Tasa de abandono de educación o formación formal en Europa<br><sup>Personas de 15 a 34 años, 2024</sup>"
+    ),
+    geo = list(
+      scope = "europe",
+      projection = list(type = "mercator"),
+      showland = TRUE,
+      landcolor = "rgb(245,245,245)",
+      showcountries = TRUE,
+      countrycolor = "white",
+      showcoastlines = FALSE,
+      showframe = FALSE,
+      lataxis = list(range = c(34, 72)),
+      lonaxis = list(range = c(-12, 35))
+    )
+  )
+
+fig
+
+
+
+#guardar el mapa como HTML
+install.packages("htmlwidgets")
+library(htmlwidgets)
+
+saveWidget(fig, "mapa_abandono_europa.html", selfcontained = TRUE)
+
+getwd()
+
+#grafico Portugal OCDE
+library(ggplot2)
+library(dplyr)
+
+datos_ocde <- data.frame(
+  Zona = c("Portugal", "Media OCDE"),
+  Tasa = c(8, 13)
+)
+
+ggplot(datos_ocde, aes(x = Zona, y = Tasa, fill = Zona)) +
+  geom_col(width = 0.55, show.legend = FALSE) +
+  geom_text(
+    aes(label = paste0(Tasa, "%")),
+    vjust = -0.5,
+    size = 5,
+    fontface = "bold"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Portugal" = "#de2d26",
+      "Media OCDE" = "#fcae91"
+    )
+  ) +
+  labs(
+    title = "Abandono tras el primer año en programas de grado",
+    subtitle = "Estudiantes que acceden por primera vez a estudios de grado",
+    x = "",
+    y = "Porcentaje (%)",
+    caption = "Fuente: OECD, Education at a Glance"
+  ) +
+  ylim(0, 16) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 11),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+#target
+#Tabla de frecuencias absolutas
+freq_target <- table(datos_modelo$Target_bin)
+freq_target
+#Frecuencias relativas
+prop.table(freq_target)
