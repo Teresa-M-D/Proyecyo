@@ -153,33 +153,327 @@ barplot(freq_mother_qualification_prueba)
 
 
 #VALORES ATÍPICOS Y TRATAMIENTO:
-
+descriptive(datos_modelo)
 #Variables numéricas continuas:
-descriptive(datos_moda_condicionada$Admission.grade)
-boxplot(datos_moda_condicionada$Admission.grade)
+descriptive(datos_modelo$Admission.grade_10)
+boxplot(datos_modelo$Admission.grade_10)
 
-descriptive(datos_moda_condicionada$Unemployment.rate)
-boxplot(datos_moda_condicionada$Unemployment.rate)
+library(ggplot2)
 
-descriptive(datos_moda_condicionada$Inflation.rate)
-boxplot(datos_moda_condicionada$Inflation.rate)
+ggplot(datos_modelo, aes(y = Admission.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la nota de admisión",
+    subtitle = "Variable: Admission.grade_10",
+    y = "Nota de admisión",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
 
-descriptive(datos_moda_condicionada$GDP)
-boxplot(datos_moda_condicionada$GDP)
+descriptive(datos_modelo$Unemployment.rate)
+boxplot(datos_modelo$Unemployment.rate)
 
-descriptive(datos_moda_condicionada$Age.at.enrollment)
-boxplot(datos_moda_condicionada$Age.at.enrollment)
+descriptive(datos_modelo$Inflation.rate)
+boxplot(datos_modelo$Inflation.rate)
 
-descriptive(datos_moda_condicionada$Previous.qualification..grade.)
-boxplot(datos_moda_condicionada$Previous.qualification..grade.)
+descriptive(datos_modelo$GDP)
+boxplot(datos_modelo$GDP)
+
+descriptive(datos_modelo$Age.at.enrollment)
+boxplot(datos_modelo$Age.at.enrollment)
+
+ggplot(datos_modelo, aes(y = Age.at.enrollment)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la edad de matriculación",
+    subtitle = "Variable: Age.at.enrollment",
+    y = "Edad al matricularse",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Previous.qualification.grade_10)
+boxplot(datos_modelo$Previous.qualification.grade_10)
+
+ggplot(datos_modelo, aes(y = Previous.qualification.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de la calificación previa",
+    subtitle = "Variable: Previous.qualification.grade_10",
+    y = "Calificación previa",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+descriptive(datos_modelo$year)
+boxplot(datos_modelo$year)
+
+descriptive(datos_modelo$Porcentaje_aprobado_sem_1)
+boxplot((datos_modelo$Porcentaje_aprobado_sem_1))
+
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Porcentaje_aprobado_sem_1 = ifelse(
+      Curricular.units.1st.sem..evaluations. == 0,
+      NA,
+      100 * Curricular.units.1st.sem..approved. / 
+        Curricular.units.1st.sem..evaluations.
+    )
+  )
+
+
+
+ggplot(datos_modelo, aes(y = Porcentaje_aprobado_sem_1)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución del porcentaje de aprobados (1r semestre)",
+    subtitle = "Variable: Porcentaje_aprobados_sem_1",
+    y = "Porcentaje aprobados",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+sum(table(datos_modelo$Porcentaje_aprobado_sem_1)) #da 4075, partimos de 4244 y hay 169 alumnos sin ninguna evaluacion así que: 4244-169=4075
+
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem.grade_10)
+boxplot(datos_modelo$Curricular.units.1st.sem.grade_10)
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem.grade_10)) +
+  geom_boxplot(
+    fill = "#F4A261",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  geom_hline(
+    yintercept = 10,
+    linetype = "dashed",
+    color = "#2A9D8F",
+    linewidth = 0.8
+  ) +
+  scale_y_continuous(
+    limits = c(0, 10),
+    breaks = seq(0, 10, by = 2.5)
+  ) +
+  labs(
+    title = "Distribución de las notas del primer semestre",
+    subtitle = "Variable: Curricular.units.1st.sem.grade_10",
+    y = "Nota del primer semestre",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+table(datos_modelo$Curricular.units.1st.sem.grade_10)
+
 #Variables numéricas discretas:
 
 
-descriptive(datos_moda_condicionada$Curricular.units.1st.sem..credited.)
-boxplot((datos_moda_condicionada$Curricular.units.2nd.sem..grade.))
+descriptive(datos_modelo$Curricular.units.1st.sem..credited.)
+table(datos_modelo$Curricular.units.1st.sem..credited.)
 
-descriptive(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
-boxplot(datos_moda_condicionada$Curricular.units.1st.sem..grade.)
+
+descriptive(datos_modelo$Curricular.units.1st.sem..enrolled.)
+boxplot((datos_modelo$Curricular.units.1st.sem..enrolled.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..enrolled.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de las unidades curriculares matriculadas (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..enrolled.",
+    y = "Unidades curriculares matriculadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..evaluations.)
+boxplot((datos_modelo$Curricular.units.1st.sem..evaluations.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..evaluations.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  labs(
+    title = "Distribución de evaluaciones de las unidades curriculares (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..evaluations",
+    y = "Evaluaciones de las unidades curriculares",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..approved.)
+boxplot((datos_modelo$Curricular.units.1st.sem..approved.))
+ggplot(datos_modelo, aes(y = Curricular.units.1st.sem..approved.)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  scale_y_continuous(
+    breaks = seq(0, max(datos_modelo$Curricular.units.1st.sem..approved., na.rm = TRUE), by = 5)
+  ) +
+  labs(
+    title = "Distribución de unidades curriculares aprobadas (1r semestre)",
+    subtitle = "Variable: Curricular.units.1st.sem..approved.",
+    y = "Unidades curriculares aprobadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+descriptive(datos_modelo$Curricular.units.1st.sem..without.evaluations.)
+table(datos_modelo$Curricular.units.1st.sem..without.evaluations.)
+
+
+descriptive(datos_modelo$Carga_academica_real)
+boxplot((datos_modelo$Carga_academica_real))
+ggplot(datos_modelo, aes(y = Carga_academica_real)) +
+  geom_boxplot(
+    fill = "lightblue",
+    color = "#264653",
+    outlier.color = "#E63946",
+    outlier.size = 2,
+    outlier.alpha = 0.8,
+    width = 0.35
+  ) +
+  scale_y_continuous(
+    breaks = seq(
+      min(datos_modelo$Carga_academica_real, na.rm = TRUE),
+      max(datos_modelo$Carga_academica_real, na.rm = TRUE),
+      by = 5
+    )
+  ) +
+  labs(
+    title = "Distribución de la carga académica real (1r semestre)",
+    subtitle = "Variable: Carga_academica_real",
+    y = "Nº de unidades curriculares cursadas",
+    x = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
 
 #Probando transformaciones:
 library(ggplot2)
@@ -962,12 +1256,28 @@ qqnorm(
 )
 qqline(datos_recodificados$Admission.grade_10)
 grid()
+
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Admission.grade_10,
+  main = "Papel probabilístico normal Admission Grade",
+)
+qqline(datos_modelo$Admission.grade_10)
+grid()
+
 #previous qual grade
 qqnorm(
   datos_recodificados$Previous.qualification.grade_10,
   main = "Papel probabilístico normal Previous qualification Grade",
 )
 qqline(datos_recodificados$Previous.qualification.grade_10)
+grid()
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Previous.qualification.grade_10,
+  main = "Papel probabilístico normal Previous qualification Grade",
+)
+qqline(datos_modelo$Previous.qualification.grade_10)
 grid()
 
 #age at enrollment
@@ -978,6 +1288,15 @@ qqnorm(
 )
 qqline(datos_recodificados$Age.at.enrollment)
 grid()
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Age.at.enrollment,
+  main = "Papel probabilístico normal Age at enrollment",
+)
+qqline(datos_modelo$Age.at.enrollment)
+grid()
+
+
 #curricular 1st sem grades (con 0)
 qqnorm(
   datos_recodificados$Curricular.units.1st.sem.grade_10,
@@ -992,6 +1311,15 @@ qqnorm(
 )
 qqline(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
 grid()
+
+#con datos_modelo:
+qqnorm(
+  datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.units.1st.sem.grade_10!=0],
+  main = "Papel probabilístico normal 1st Sem. Grades",
+)
+qqline(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.units.1st.sem.grade_10!=0])
+grid()
+
 #curricular 2nd sem grades (con 0)
 qqnorm(
   datos_recodificados$Curricular.units.2nd.sem.grade_10,
@@ -1006,11 +1334,38 @@ qqnorm(
 )
 qqline(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
 grid()
+
+#Con datos_modelo:
+qqnorm(
+  datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0],
+  main = "Papel probabilístico normal 2nd Sem. Grades",
+)
+qqline(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0])
+grid()
+
+#Carga_academica_real con datos_modelo:
+qqnorm(
+  datos_modelo$Carga_academica_real,
+  main = "Papel probabilístico normal Carga_academica_real",
+)
+qqline(datos_modelo$Carga_academica_real)
+grid()
 #papel probabiístico exponencial
 x_exp <- datos_recodificados$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
 qqplot(
   qexp(ppoints(length(x_exp)), rate = 1/mean(x_exp)),
   sort(x_exp),
+  main = "QQ plot exponencial",
+  xlab = "Cuantiles teóricos",
+  ylab = "Cuantiles observados"
+)
+
+abline(0,1)
+
+x_exp1 <- datos_modelo$Admission.grade_10 - 4.75 #le restamos 4.75 para q el mínimo sea 0
+qqplot(
+  qexp(ppoints(length(x_exp1)), rate = 1/mean(x_exp1)),
+  sort(x_exp1),
   main = "QQ plot exponencial",
   xlab = "Cuantiles teóricos",
   ylab = "Cuantiles observados"
@@ -1075,6 +1430,14 @@ qqnorm(
   main = "Papel probabilístico normal Aprobados 1º sem.",
 )
 qqline(datos_recodificados$Curricular.units.1st.sem..approved.)
+grid()
+
+#con datos_modelo
+qqnorm(
+  datos_modelo$Curricular.units.1st.sem..approved.,
+  main = "Papel probabilístico normal Aprobados 1º sem.",
+)
+qqline(datos_modelo$Curricular.units.1st.sem..approved.)
 grid()
 
 #2SEM
@@ -1143,8 +1506,31 @@ barplot(tabla_cred2)
 
 #Variables categóricas:
 
+
+#Tabla de frecuencias absolutas
+freq_target <- table(datos_modelo$Target)
+freq_target
+#Frecuencias relativas
+prop.table(freq_target)
+
+#Porcentajes
+porcentajes = prop.table(freq_target) * 100
+porcentajes 
+#Diagrama de barras
+bp <- barplot(
+  freq_target,
+  col = c("indianred", "peachpuff", "palegreen1"),
+  las = 1,
+  main = "Target",
+  xlab = "Frecuencias absolutas (n)",
+  ylim = c(0, max(freq_target) * 1.1)   
+)
+
+text(bp, freq_target, labels = freq_target, pos = 3)
+
+
 #Nacionality_group
-freq_nacionality_group <- table(datos_recodificados$Nationality_group)
+freq_nacionality_group <- table(datos_modelo$Nationality_group)
 freq_nacionality_group
 bp2 <- barplot(
   freq_nacionality_group,
@@ -1156,22 +1542,8 @@ bp2 <- barplot(
 )
 text(bp2, freq_nacionality_group, labels = freq_nacionality_group, pos = 3)
 
-  #tabla de frecuencias
-table(datos_recodificados$Nationality_group, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), margin = 1)
-
-library(dplyr)
-
-datos_recodificados %>%
-  group_by(Nationality_group, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Nationality_group, datos_recodificados$Target), 1), 3)
-
-
-#tuitons fees up to date
-freq_tuition <- table(datos_recodificados$Tuition.fees.up.to.date)
+#tuition fees up to date
+freq_tuition <- table(datos_modelo$Tuition.fees.up.to.date)
 freq_tuition 
 bp3 <- barplot(
   freq_tuition,
@@ -1183,30 +1555,16 @@ bp3 <- barplot(
 )
 text(bp3, freq_tuition, labels = freq_tuition, pos = 3)
 
-#tabla de frecuencias
-table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), margin = 1)
-
-library(dplyr)
-
-datos_recodificados %>%
-  group_by(Tuition.fees.up.to.date, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target), 1), 3)
-
 #Course
-
-freq_course <- table(datos_recodificados$Course)
+freq_course <- table(datos_modelo$Course_limpio)
 freq_course
 #como son muchas titulaciones, hacemos un diagrama de barras horizonatal
 library(ggplot2)
 library(dplyr)
 
-datos_recodificados %>%
-  count(Course) %>% 
-  ggplot(aes(x = n, y = Course)) +
+datos_modelo %>%
+  count(Course_limpio) %>% 
+  ggplot(aes(x = n, y = Course_limpio)) +
   geom_bar(stat = "identity", fill = "#4C72B0") +
   labs(
     title = "Frecuencia de estudiantes por curso",
@@ -1220,47 +1578,96 @@ datos_recodificados %>%
   )
 
 
-#tabla de frecuencias
-table(datos_recodificados$Course, datos_recodificados$Target)
-prop.table(table(datos_recodificados$Course, datos_recodificados$Target), margin = 1)
+#ANÁLISIS BIVARIANTE
 
-library(dplyr)
+#Numérica vs Target:
 
-datos_recodificados %>%
-  group_by(Course, Target) %>%
-  summarise(n = n()) %>%
-  mutate(prop = n / sum(n))
-
-round(prop.table(table(datos_recodificados$Course, datos_recodificados$Target), 1), 3)
+#Comparación media/medianas manualmente:
+# Calculamos la media del PIB para los estudiantes que abandonaron
 
 
-#t-test:
-t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados)
-t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados)
-t.test(GDP ~ Target_bin, data=datos_recodificados)
-t.test(Unemployment.rate ~ Target_bin, data=datos_recodificados)
-t.test(Inflation.rate ~ Target_bin, data=datos_recodificados)
-t.test(Admission.grade_10  ~ Target_bin, data=datos_recodificados)
-t.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_recodificados)
+# Calculamos la media de las notas del primer cuatrimestre de los estudiantes que no abandonaron (graduados o siguen matriculados )
+
+mean(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+mean(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+mean_notas1_dropouts #3.836201 (sobre 10)
+mean_notas1_noDropouts #6.338498 (sobre 10)
+
+#Vamos a hacer una comparación de medianas para comprobar si los resultados de las medias se ven afectadas por la presencia de valores átipicos
 
 
+median(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+median(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+median_notas1_dropouts #5.5 (sobre 10)
+median_notas1_noDropouts # 6.4 (sobre 10)
+
+#Como podemos ver la mediana de las notas del primer cuatrimestre del grupo Dropout es más mayor que la
+#media debido a la presencia de valores extremos bajos que tiran de la media hacia abajo (como vimos en el diagrama de cajas multiple)
+
+
+#Objetvo: comparar las medias de las notas del 2 cuatrimistre entre estudiantes que abandonaron y estudiantes que no
+
+
+mean(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+mean(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+mean_notas2_dropouts #3.118661 (sobre 10)
+mean_notas2_noDropouts #6.35784 (sobre 10)
+
+#Vamos a hacer la mediana ahora
+
+median(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="No Abandono"])
+
+median(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Target_bin=="Abandono"])
+
+# Mostramos los resultados en pantalla
+
+median_notas2_dropouts #5 (sobre 10)
+median_notas2_noDropouts #6.4 (sobre 10)
+
+#La mediana de las notas del segundo cuatrimestre es más baja que su media, lo que significa que hay valores extremos altos que tiran de la media hacia arriba.
+#La mediana y la media de las notas de los que no abandonaron es muy similar
+
+
+#Test Mann - Whitney
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(GDP ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+
+#Diagrama de barras bivariante
+tabla4 <- xtabs(~ datos_modelo$Target + datos_modelo$Course_limpio)
+par(xpd = TRUE, mar = c(5, 18, 4, 8)) 
+barplot(tabla4,  col=c("indianred2", "lightblue", "lightgreen"), horiz=TRUE, las = 1, cex.names = 0.8)
+legend("topright", legend=c("Dropout","Enrolled","Graduate"),
+       fill=c("indianred2","lightblue","lightgreen"), inset=c(-0.2,0))
+
+
+#BOXPLOTS MÚLTIPLES
+dev.off() # resetea la ventana de gráficos
 
 
 
 #Boxplots de la variable target después de la reagrupación
-boxplot(Admission.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(GDP ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Unemployment.rate ~ Target_bin, data=datos_recodificados, las=1)
-boxplot(Inflation.rate ~ Target_bin, data=datos_recodificados, las=1)
-
-
-
-
-#ANÁLISIS BIVARIANTE
-
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1)
+boxplot(GDP ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1)
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1)
 #Categóricas vs Target:
 library(clickR)
 library(vcd)
@@ -1271,66 +1678,83 @@ library(ggplot2)
 library(scales)
 
 
-names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
+
+descriptive(datos_modelo)
+datos_modelo <- datos_recodificados %>%
+  filter(!(Curricular.units.1st.sem.grade_10 == 0 &
+             Curricular.units.1st.sem..approved. == 0 &
+             Curricular.units.1st.sem..evaluations. == 0 &
+             Curricular.units.1st.sem..credited. ==0 &
+             Curricular.units.1st.sem..enrolled. ==0 
+  ))
+
+nrow(datos_recodificados)
+nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
+colnames(datos_modelo)
+
+
+
+
+#CATEGÓRICA VS TARGET
+names(datos_modelo)[sapply(datos_modelo, is.character)] #nombres de las variables categóricas
 
 
 #Reagrupacion variable Target:
-datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+datos_modelo$Target_bin <- ifelse(datos_modelo$Target == "Dropout", "Abandono", "No Abandono")
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
 
 #Reagrupación de Marital_Status:
-datos_recodificados <- datos_recodificados %>%
+datos_modelo <- datos_modelo %>%
   mutate(Marital_group = case_when(
     Marital.status == "Soltero" ~ "Soltero",
-    Marital.status %in% c("Casado", "Con pareja") ~ "En pareja",
+    Marital.status %in% c("Casado", "Con pareja") ~ "Pareja",
     Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
   ))
-sum(table(datos_recodificados$Marital_group))
+sum(table(datos_modelo$Marital_group))
 
 #Proporciones:
-table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 2)
 
 #V de Cramer y Tau
-cramersV(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Marital_group) 
+cramersV(table(datos_modelo$Marital_group, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group) 
 
 
 #Chi-cuadrado con Marital_group:
-tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
+tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
 #Gráfico mosaico:
-mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
-       shade = TRUE, legend = TRUE)
+mosaic(~ Marital_group + Target_bin, data = datos_modelo, 
+       shade = TRUE, legend = TRUE, cex.axis = 0.7)
 
 
 #Daytime.evening.attendance:
-sum(table(datos_recodificados$Daytime.evening.attendance.))
-unique(datos_recodificados$Daytime.evening.attendance.)
+sum(table(datos_modelo$Daytime.evening.attendance.))
+unique(datos_modelo$Daytime.evening.attendance.)
 
 #Proporciones:
-table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
+table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
-
+cramersV(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Daytime.evening.attendance.) 
 
 #Chi-cuadrado:
-tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
+tabla_daytime_target <- table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
 chisq.test(tabla_daytime_target)$expected
 
 #Gráfico:
 
-tabla_plot <- datos_recodificados %>%                  
+tabla_plot <- datos_modelo %>%                  
   count(Daytime.evening.attendance., Target_bin) %>%
   group_by(Daytime.evening.attendance.) %>%
   mutate(prop = n / sum(n))
@@ -1350,26 +1774,26 @@ ggplot(tabla_plot,
 
 #Displaced
 
-sum(table(datos_recodificados$Displaced))
-unique(datos_recodificados$Displaced)
+sum(table(datos_modelo$Displaced))
+unique(datos_modelo$Displaced)
 
 #Proporciones:
-table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Displaced, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Displaced) 
+cramersV(table(datos_modelo$Displaced, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Displaced, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Displaced) 
 
 #Chi-cuadrado:
-tabla_displaced_target <- table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
+tabla_displaced_target <- table(datos_modelo$Displaced, datos_modelo$Target_bin)
 chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_displaced_target)$expected
 
 #Gráfico:
-mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
+mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
 
@@ -1378,31 +1802,31 @@ mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
 
 #Tuition fees up to date:
 
-sum(table(datos_recodificados$Tuition.fees.up.to.date))
-unique(datos_recodificados$Tuition.fees.up.to.date)
+sum(table(datos_modelo$Tuition.fees.up.to.date))
+unique(datos_modelo$Tuition.fees.up.to.date)
 
 #Proporciones:
-table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Tuition.fees.up.to.date) 
+cramersV(table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Tuition.fees.up.to.date) 
 
 #Chi-cuadrado:
-tabla_tution_target <- table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
+tabla_tution_target <- table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
 chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_tution_target)$expected
 
 #Gráficos:
-mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,  
+mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 
-tabla_plot <- datos_recodificados %>%
+tabla_plot <- datos_modelo %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
   mutate(prop = n / sum(n),
@@ -1426,29 +1850,29 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
 
 #Debtor:
 
-sum(table(datos_recodificados$Debtor))
-unique(datos_recodificados$Debtor)
+sum(table(datos_modelo$Debtor))
+unique(datos_modelo$Debtor)
 #Proporciones:
-table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Debtor, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Debtor) 
+cramersV(table(datos_modelo$Debtor, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Debtor, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Debtor) 
 
 #Chi-cuadrado:
-tabla_debtor_target <- table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
+tabla_debtor_target <- table(datos_modelo$Debtor, datos_modelo$Target_bin)
 chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_debtor_target)$expected
 
 #Gráficos:
-mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
+mosaic(~ Debtor + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
-tabla_debtor_plot <- datos_recodificados %>%
+tabla_debtor_plot <- datos_modelo %>%
   count(Debtor, Target_bin) %>%
   group_by(Debtor) %>%
   mutate(
@@ -1471,29 +1895,27 @@ ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
   theme_minimal()
 
 
-
-
 #Scholarship_holder:
 
-sum(table(datos_recodificados$Scholarship.holder))
-unique(datos_recodificados$Scholarship.holder)
+sum(table(datos_modelo$Scholarship.holder))
+unique(datos_modelo$Scholarship.holder)
 #Proporciones:
-table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Scholarship.holder) 
+cramersV(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Scholarship.holder, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Scholarship.holder) 
 
 #Chi-cuadrado:
-tabla_beca_target <- table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
+tabla_beca_target <- table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
 chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_beca_target)$expected
 
 #Gráficos:
-mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,  
+mosaic(~ Scholarship.holder + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
@@ -1501,21 +1923,21 @@ mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,
 
 
 #Educational_special_needs:
-sum(table(datos_recodificados$Educational.special.needs))
-unique(datos_recodificados$Educational.special.needs)
+sum(table(datos_modelo$Educational.special.needs))
+unique(datos_modelo$Educational.special.needs)
 
 #Proporciones:
-table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
+table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Educational.special.needs) 
+cramersV(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Educational.special.needs, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Educational.special.needs) 
 
 #Chi-cuadrado:
-tabla_necesidades_target <- table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
+tabla_necesidades_target <- table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
 chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
 chisq.test(tabla_necesidades_target)$expected
 
@@ -1523,12 +1945,12 @@ chisq.test(tabla_necesidades_target)$expected
 
 
 #International:
-sum(table(datos_recodificados$International))
-unique(datos_recodificados$International)
+sum(table(datos_modelo$International))
+unique(datos_modelo$International)
 
 #Proporciones:
-tabla_internacional_target <- table(datos_recodificados$International,
-                                    datos_recodificados$Target_bin)
+tabla_internacional_target <- table(datos_modelo$International,
+                                    datos_modelo$Target_bin)
 tabla_internacional_target
 
 prop.table(tabla_internacional_target, 1)
@@ -1536,17 +1958,17 @@ prop.table(tabla_internacional_target, 2)
 
 #Cramer y Tau:
 cramersV(tabla_internacional_target)
-GK_assoc(datos_recodificados$International, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$International)
+GK_assoc(datos_modelo$International, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$International)
 
 #Chi-cuadrado:
 chisq.test(tabla_internacional_target, correct = FALSE)
 chisq.test(tabla_internacional_target)$expected
 
 #Gráfico:
-table(datos_recodificados$International)
+table(datos_modelo$International)
 
-tabla_internacional_plot <- datos_recodificados %>%
+tabla_internacional_plot <- datos_modelo %>%
   count(International, Target_bin) %>%
   group_by(International) %>%
   mutate(prop = n / sum(n),
@@ -1575,13 +1997,13 @@ ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_
 
 #Reagrupación application_mode:
 
-table(datos_recodificados$Application.mode)
+table(datos_modelo$Application.mode)
 
 
-datos_recodificados$Application.mode_group <- case_when(
+datos_modelo$Application.mode_group <- case_when(
   
   # ACCESO NORMAL
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "1ª fase - cupo general",
     "2ª fase - cupo general",
     "3ª fase - cupo general",
@@ -1590,7 +2012,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso normal",
   
   # MAYORES/ESPECIALES
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Mayores de 23 años",
     "Ordenanza nº 533-A/99, apartado b2 (plan diferente)",
     "Ordenanza nº 533-A/99, apartado b3 (otra institución)",
@@ -1599,7 +2021,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso mayores/especiales",
   
   # CAMBIO/TRASLADO
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Cambio de institución/titulación",
     "Cambio de titulación",
     "Traslado",
@@ -1607,14 +2029,14 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso por cambio/traslado",
   
   # FORMACIÓN PREVIA
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Titulares de diploma de ciclo corto",
     "Titulares de diploma de especialización tecnológica",
     "Titulares de otros estudios superiores"
   ) ~ "Acceso por formación previa",
   
   # INTERNACIONAL
-  datos_recodificados$Application.mode %in% c(
+  datos_modelo$Application.mode %in% c(
     "Estudiante internacional (grado)"
     
   ) ~ "Acceso internacional",
@@ -1625,17 +2047,17 @@ datos_recodificados$Application.mode_group <- case_when(
 
 
 
-unique(datos_recodificados$Application.mode_group)
-tabla_modo_app_target <- table(datos_recodificados$Application.mode_group,
-                               datos_recodificados$Target_bin)
+sum(table(datos_modelo$Application.mode_group))
+tabla_modo_app_target <- table(datos_modelo$Application.mode_group,
+                               datos_modelo$Target_bin)
 tabla_modo_app_target
 
 prop.table(tabla_modo_app_target, 1)
 prop.table(tabla_modo_app_target, 2)
 
 cramersV(tabla_modo_app_target)
-GK_assoc(datos_recodificados$Application.mode_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Application.mode_group)
+GK_assoc(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
 
 chisq.test(tabla_modo_app_target, correct = FALSE)
 chisq.test(tabla_modo_app_target)$expected
@@ -1643,7 +2065,7 @@ chisq.test(tabla_modo_app_target)$expected
 
 
 #Gráficos:
-tabla_modo_app_plot <- datos_recodificados %>%
+tabla_modo_app_plot <- datos_modelo %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
   mutate(prop = n / sum(n),
@@ -1666,94 +2088,93 @@ ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Tar
 
 
 #Género:
-unique(datos_recodificados$Gender)
-tabla_genero_target <- table(datos_recodificados$Gender,
-                             datos_recodificados$Target_bin)
+unique(datos_modelo$Gender)
+tabla_genero_target <- table(datos_modelo$Gender,
+                             datos_modelo$Target_bin)
 tabla_genero_target
 
 prop.table(tabla_genero_target, 1)
 prop.table(tabla_genero_target, 2)
 
 cramersV(tabla_genero_target)
-GK_assoc(datos_recodificados$Gender, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Gender)
+GK_assoc(datos_modelo$Gender, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Gender)
 
 chisq.test(tabla_genero_target, correct = FALSE)
 chisq.test(tabla_genero_target)$expected
 #Gráfico:
-mosaic(~ Gender + Target_bin, data = datos_recodificados,  
+mosaic(~ Gender + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
-
-
 
 
 
 #Course
 #Vamosa realizar una reagrupacion de las carreras para que el estudio se fiable:
 
-datos_recodificados$Course_group <- dplyr::case_when(
+datos_modelo$Course_group <- dplyr::case_when(
   
   # SALUD
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Enfermería",
     "Enfermería Veterinaria",
     "Higiene Bucodental"
   ) ~ "Salud",
   
   # INGENIERÍA / TECNOLOGÍA
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Ingeniería Informática",
     "Tecnologías de Producción de Biocombustibles",
     "Diseño de Animación y Multimedia"
   ) ~ "Ingeniería/Tech",
   
   # SOCIALES / EMPRESA
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Gestión",
     "Gestión de Publicidad y Marketing",
     "Turismo"
   ) ~ "Empresa",
   
   # EDUCACIÓN / SOCIAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Educación Básica",
     "Trabajo Social"
   ) ~ "Educación/Social",
   
   # COMUNICACIÓN / DISEÑO
-  datos_recodificados$Course %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Diseño de Comunicación",
     "Periodismo y Comunicación"
   ) ~ "Comunicación",
   
   # AGRO / ANIMAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_modelo$Course_limpio %in% c(
     "Agronomía",
     "Equinocultura"
   ) ~ "Agro/Animal",
   
   TRUE ~ NA_character_
 )
+table(datos_modelo$Course_limpio)
 
-sum(table(datos_recodificados$Course_group))
-unique(datos_recodificados$Course_group)
-tabla_course_target <- table(datos_recodificados$Course_group,
-                             datos_recodificados$Target_bin)
+sum(table(datos_modelo$Course_group))
+unique(datos_modelo$Course_limpio)
+tabla_course_target <- table(datos_modelo$Course_group,
+                             datos_modelo$Target_bin)
 tabla_course_target
 
 prop.table(tabla_course_target, 1)
 prop.table(tabla_course_target, 2)
 
 cramersV(tabla_course_target)
-GK_assoc(datos_recodificados$Course_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Course_group)
+GK_assoc(datos_modelo$Course_group, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Course_group)
 
 chisq.test(tabla_course_target, correct = FALSE)
 chisq.test(tabla_course_target)$expected
 
 #Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
-datos_recodificados$Course_group_short <- dplyr::recode(
-  datos_recodificados$Course_group,
+datos_modelo$Course_group_short <- dplyr::recode(
+  datos_modelo$Course_group,
   "Ingeniería/Tech" = "Ing./Tech",
   "Educación/Social" = "Educ./Soc.",
   "Comunicación" = "Com.",
@@ -1763,7 +2184,7 @@ datos_recodificados$Course_group_short <- dplyr::recode(
 )
 
 mosaic(~ Course_group_short + Target_bin, 
-       data = datos_recodificados,
+       data = datos_modelo,
        shade = TRUE,
        legend = TRUE,
        cex.axis = 0.8)  
@@ -1771,7 +2192,7 @@ mosaic(~ Course_group_short + Target_bin,
 
 
 
-tabla_course_plot <- datos_recodificados %>%
+tabla_course_plot <- datos_modelo %>%
   count(Course_group, Target_bin) %>%
   group_by(Course_group) %>%
   mutate(prop = n / sum(n),
@@ -1792,227 +2213,217 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
   theme_minimal()
 
 
-#analizamos sin Diseño Multimedia:
-
-#empezamos creando un dataset sin multimedia:
-datos_sin_multi <- datos_recodificados[
-  datos_recodificados$Course_limpio != "Diseño de Animación y Multimedia",
-]
-sum(table(datos_sin_multi$Course_limpio))
-
-datos_sin_multi$Course_group <- dplyr::case_when(
-  
-  # SALUD
-  datos_sin_multi$Course_limpio %in% c(
-    "Enfermería",
-    "Enfermería Veterinaria",
-    "Higiene Bucodental"
-  ) ~ "Salud",
-  
-  # INGENIERÍA / TECNOLOGÍA
-  datos_sin_multi$Course_limpio %in% c(
-    "Ingeniería Informática",
-    "Tecnologías de Producción de Biocombustibles"
-  ) ~ "Ingeniería/Tech",
-  
-  # SOCIALES / EMPRESA
-  datos_sin_multi$Course_limpio %in% c(
-    "Gestión",
-    "Gestión de Publicidad y Marketing",
-    "Turismo"
-  ) ~ "Empresa",
-  
-  # EDUCACIÓN / SOCIAL
-  datos_sin_multi$Course_limpio %in% c(
-    "Educación Básica",
-    "Trabajo Social"
-  ) ~ "Educación/Social",
-  
-  # COMUNICACIÓN / DISEÑO
-  datos_sin_multi$Course_limpio %in% c(
-    "Diseño de Comunicación",
-    "Periodismo y Comunicación"
-  ) ~ "Comunicación",
-  
-  # AGRO / ANIMAL
-  datos_sin_multi$Course_limpio %in% c(
-    "Agronomía",
-    "Equinocultura"
-  ) ~ "Agro/Animal",
-  
-  TRUE ~ NA_character_
-)
-
-
-
-#seguimos
-sum(table(datos_sin_multi$Course_group))
-table(datos_sin_multi$Course_group)
-colnames(datos_sin_multi)
-tabla_course_sin_multi_target <- table(datos_sin_multi$Course_group,
-                             datos_sin_multi$Target_bin)
-tabla_course_sin_multi_target
-
-
-prop.table(tabla_course_sin_multi_target, 1)
-prop.table(tabla_course_sin_multi_target, 2)
-
-cramersV(tabla_course_sin_multi_target)
-GK_assoc(datos_sin_multi$Course_group, datos_sin_multi$Target_bin)
-GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Course_group)
-
-chisq.test(tabla_course_sin_multi_target, correct = FALSE)
-chisq.test(tabla_course_sin_multi_target)$expected
-
-#Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
-
-datos_sin_multi$Course_group_short <- dplyr::recode(
-  datos_sin_multi$Course_group,
-  "Ingeniería/Tech" = "Ing./Tech",
-  "Educación/Social" = "Educ./Soc.",
-  "Comunicación" = "Com.",
-  "Agro/Animal" = "Agro/Anim.",
-  "Empresa" = "Empresa",
-  "Salud" = "Salud"
-)
-
-# Gráficos:
-
-mosaic(~ Course_group_short + Target_bin, 
-       data = datos_sin_multi,
-       shade = TRUE,
-       legend = TRUE,
-       cex.axis = 0.8)  
-
-tabla_course_plot <- datos_sin_multi %>%
-  count(Course_group_short, Target_bin) %>%
-  group_by(Course_group_short) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = scales::percent(prop, accuracy = 0.1))
-
-ggplot(tabla_course_plot, aes(x = Course_group_short, y = prop, fill = Target_bin)) +
-  geom_col() +
-  geom_text(aes(label = etiqueta),
-            position = position_stack(vjust = 0.5),
-            size = 4) +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(values = c(
-    "Dropout" = "red",
-    "No Dropout" = "lightgreen"
-  )) +
-  labs(
-    x = "Tipo de carrera",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre tipo de carrera y abandono"
-  ) +
-  theme_minimal()
-
-unique(datos_recodificados$Course)
 #Previous education level
-table(datos_recodificados$Previous_education_level)
-unique(datos_recodificados$Previous_education_level)
-tabla_prev_edu_target <- table(datos_recodificados$Previous_education_level,
-                               datos_recodificados$Target_bin)
+table(datos_modelo$Previous_education_level)
+unique(datos_modelo$Previous_education_level)
+tabla_prev_edu_target <- table(datos_modelo$Previous_education_level,
+                               datos_modelo$Target_bin)
 tabla_prev_edu_target
 
 prop.table(tabla_prev_edu_target, 1)
 prop.table(tabla_prev_edu_target, 2)
 
 cramersV(tabla_prev_edu_target)
-GK_assoc(datos_recodificados$Previous_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Previous_education_level)
+GK_assoc(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Previous_education_level)
 
 chisq.test(tabla_prev_edu_target, correct = FALSE)
 chisq.test(tabla_prev_edu_target)$expected
 
 
 #Cambiamos a nombres más cortos:
-datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Previous_education_level,
+datos_modelo$Previous_education_level_group_short <- dplyr::recode(
+  datos_modelo$Previous_education_level,
   "Bajo"= "Bajo",
   "Medio"= "Medio",
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
 #Gráfico:
-mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_recodificados,  
+mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 #Mother education level:
-table(datos_recodificados$Mother_education_level)
-unique(datos_recodificados$Mother_education_level)
-tabla_mum_educ_target <- table(datos_recodificados$Mother_education_level,
-                               datos_recodificados$Target_bin)
+table(datos_modelo$Mother_education_level)
+unique(datos_modelo$Mother_education_level)
+tabla_mum_educ_target <- table(datos_modelo$Mother_education_level,
+                               datos_modelo$Target_bin)
 tabla_mum_educ_target
 
 prop.table(tabla_mum_educ_target, 1)
 prop.table(tabla_mum_educ_target, 2)
 
 cramersV(tabla_mum_educ_target)
-GK_assoc(datos_recodificados$Mother_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_education_level)
+GK_assoc(datos_modelo$Mother_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_education_level)
 
 chisq.test(tabla_mum_educ_target, correct = FALSE)
 chisq.test(tabla_mum_educ_target)$expected
 
 #Cambiamos a nombres más cortos:
-datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Mother_education_level,
+datos_modelo$Mother_education_level_group_short <- dplyr::recode(
+  datos_modelo$Mother_education_level,
   "Bajo"= "Bajo",
   "Medio"= "Medio",
   "Superior"= "Sup.",
   "Técnico"= "Técn."
 )
 #Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father education level:
+table(datos_modelo$Father_education_level)
+unique(datos_modelo$Father_education_level)
+tabla_dad_educ_target <- table(datos_modelo$Father_education_level,
+                               datos_modelo$Target_bin)
+tabla_dad_educ_target
+
+prop.table(tabla_dad_educ_target, 1)
+prop.table(tabla_dad_educ_target, 2)
+
+cramersV(tabla_dad_educ_target)
+GK_assoc(datos_modelo$Father_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_education_level)
+
+chisq.test(tabla_dad_educ_target, correct = FALSE)
+chisq.test(tabla_dad_educ_target)$expected
+#Cambiamos a nombres más cortos:
+datos_modelo$Father_education_level_group_short <- dplyr::recode(
+  datos_modelo$Father_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Mother occupation level:
+
+sum(table(datos_modelo$Mother_occupation_level))
+unique(datos_modelo$Mother_occupation_level)
+tabla_mum_ocup_target <- table(datos_modelo$Mother_occupation_level,
+                               datos_modelo$Target_bin)
+tabla_mum_ocup_target
+
+prop.table(tabla_mum_ocup_target, 1)
+prop.table(tabla_mum_ocup_target, 2)
+
+cramersV(tabla_mum_ocup_target)
+GK_assoc(datos_modelo$Mother_occupation_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_occupation_level)
+
+chisq.test(tabla_mum_ocup_target, correct = FALSE)
+chisq.test(tabla_mum_ocup_target)$expected
+#Gráfico:
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#Father occupation level:
+table(datos_modelo$Father_occupation_level)
+unique(datos_modelo$Father_occupation_level)
+tabla_dad_ocup_target <- table(datos_modelo$Father_occupation_level,
+                               datos_modelo$Target_bin)
+tabla_dad_ocup_target
+
+prop.table(tabla_dad_ocup_target, 1)
+prop.table(tabla_dad_ocup_target, 2)
+
+cramersV(tabla_dad_ocup_target)
+GK_assoc(datos_modelo$Father_occupation_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_occupation_level)
+
+chisq.test(tabla_dad_ocup_target, correct = FALSE)
+chisq.test(tabla_dad_ocup_target)$expected
+
+#Gráficos:
+mosaic(~ Father_occupation_level + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
 
+tabla_course_plot <- datos_modelo %>%
+  count(Course_group, Target_bin) %>%
+  group_by(Course_group) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = etiqueta),
+            position = position_fill(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre Tipo de carrera y Abandono"
+  ) +
+  theme_minimal()
+
+
+#Pongo aquí el análisis de sensibilidad:
 
 #Analizamos Mother_education_level sin los datos imputados para ver como cambia respecto a la imputación
+datos_sensibilidad <- datos_sin_imputar %>%
+  filter(!(Curricular.units.1st.sem..grade. == 0 &
+             Curricular.units.1st.sem..approved. == 0 &
+             Curricular.units.1st.sem..evaluations. == 0 &
+             Curricular.units.1st.sem..credited. ==0 &
+             Curricular.units.1st.sem..enrolled. ==0 
+  ))
+nrow(datos_sensibilidad)
 
-# Recodificamos primero la variable:
-datos_sin_imputar$Mother.s.qualification_recodif<-recode(datos_sin_imputar$Mother.s.qualification,
-                                                   `1` = "Educación secundaria - 12º año o equivalente",
-                                                   `2` = "Educación superior - Grado (Bachelor)",
-                                                   `3` = "Educación superior - Grado",
-                                                   `4` = "Educación superior - Máster",
-                                                   `5` = "Educación superior - Doctorado",
-                                                   `6` = "Asistencia a educación superior",
-                                                   `9` = "12º año de escolarización - No completado",
-                                                   `10` = "11º año de escolarización - No completado",
-                                                   `11` = "7º año (sistema antiguo)",
-                                                   `12` = "Otro - 11º año de escolarización",
-                                                   `14` = "10º año de escolarización",
-                                                   `18` = "Curso general de comercio",
-                                                   `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
-                                                   `22` = "Curso técnico-profesional",
-                                                   `26` = "7º año de escolarización",
-                                                   `27` = "2º ciclo del bachillerato general",
-                                                   `29` = "9º año de escolarización - No completado",
-                                                   `30` = "8º año de escolarización",
-                                                   `34` = "Desconocido",
-                                                   `35` = "No sabe leer ni escribir",
-                                                   `36` = "Sabe leer sin haber completado 4º año",
-                                                   `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
-                                                   `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
-                                                   `39` = "Curso de especialización tecnológica",
-                                                   `40` = "Educación superior - Grado (1er ciclo)",
-                                                   `41` = "Curso de estudios superiores especializados",
-                                                   `42` = "Curso técnico superior profesional",
-                                                   `43` = "Educación superior - Máster (2º ciclo)",
-                                                   `44` = "Educación superior - Doctorado (3er ciclo)")
 
-sum(table(datos_sin_imputar$Mother.s.qualification))
+# Recodificamos  la variable:
 
-sum(table(datos_sin_imputar$Mother.s.qualification_recodif))
-datos_sin_imputar$Mother_education_level <- case_when(
+
+
+datos_sensibilidad$Mother.s.qualification <- recode(
+  datos_sensibilidad$Mother.s.qualification,
+  `1` = "Educación secundaria - 12º año o equivalente",
+  `2` = "Educación superior - Grado (Bachelor)",
+  `3` = "Educación superior - Grado",
+  `4` = "Educación superior - Máster",
+  `5` = "Educación superior - Doctorado",
+  `6` = "Asistencia a educación superior",
+  `9` = "12º año de escolarización - No completado",
+  `10` = "11º año de escolarización - No completado",
+  `11` = "7º año (sistema antiguo)",
+  `12` = "Otro - 11º año de escolarización",
+  `14` = "10º año de escolarización",
+  `18` = "Curso general de comercio",
+  `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
+  `22` = "Curso técnico-profesional",
+  `26` = "7º año de escolarización",
+  `27` = "2º ciclo del bachillerato general",
+  `29` = "9º año de escolarización - No completado",
+  `30` = "8º año de escolarización",
+  `34` = "Desconocido",
+  `35` = "No sabe leer ni escribir",
+  `36` = "Sabe leer sin haber completado 4º año",
+  `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
+  `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
+  `39` = "Curso de especialización tecnológica",
+  `40` = "Educación superior - Grado (1er ciclo)",
+  `41` = "Curso de estudios superiores especializados",
+  `42` = "Curso técnico superior profesional",
+  `43` = "Educación superior - Máster (2º ciclo)",
+  `44` = "Educación superior - Doctorado (3er ciclo)"
+)
+
+table(datos_sensibilidad$Mother.s.qualification)
+datos_sensibilidad$Mother_education_level <- case_when(
   
   # BAJO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "10º año de escolarización", 
     "11º año de escolarización - No completado",
     "12º año de escolarización - No completado",
@@ -2029,13 +2440,13 @@ datos_sin_imputar$Mother_education_level <- case_when(
   ) ~ "Bajo",
   
   # MEDIO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Educación secundaria - 12º año o equivalente",
     "2º ciclo del bachillerato general"
   ) ~ "Medio",
   
   # TÉCNICO
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Curso de especialización tecnológica",
     "Curso de estudios superiores especializados",
     "Curso técnico-profesional",
@@ -2044,7 +2455,7 @@ datos_sin_imputar$Mother_education_level <- case_when(
   ) ~ "Técnico",
   
   # SUPERIOR
-  datos_sin_imputar$Mother.s.qualification_recodif %in% c(
+  datos_sensibilidad$Mother.s.qualification %in% c(
     "Educación superior - Doctorado",
     "Educación superior - Doctorado (3er ciclo)",
     "Educación superior - Grado",
@@ -2054,121 +2465,123 @@ datos_sin_imputar$Mother_education_level <- case_when(
     "Educación superior - Grado (1er ciclo)",
     "Asistencia a educación superior"
   ) ~ "Superior",
+  
   TRUE ~ NA_character_
 )
 
 
-datos_sin_imputar$Target_bin <- ifelse(datos_sin_imputar$Target == "Dropout", "Abandono", "No Abandono")
-datos_sin_imputar$Target_bin <- as.factor(datos_sin_imputar$Target_bin)
+datos_sensibilidad$Target_bin <- ifelse(
+  datos_sensibilidad$Target == "Dropout",
+  "Abandono",
+  "No Abandono"
+)
+datos_sensibilidad$Target_bin <- as.factor(datos_sensibilidad$Target_bin)
+
+sum(table(datos_sensibilidad$Mother_education_level)) #nos da 4115, debería dar 4414 pero puede que uno de los multimedia eliminados fuera tambien faltante
+#Lo comprobamos
+
+problematicos <- datos_sin_imputar %>%
+  filter(
+    Curricular.units.1st.sem..grade. == 0 &
+      Curricular.units.1st.sem..approved. == 0 &
+      Curricular.units.1st.sem..evaluations. == 0 &
+      Curricular.units.1st.sem..credited. == 0 &
+      Curricular.units.1st.sem..enrolled. == 0
+  )
+
+sum(problematicos$Mother.s.qualification == "34", na.rm = TRUE) #en efecto, uno de los problemáticos (De multimedia), tenia NA
+#aqui lo podemos ver:
+View(
+  datos_sin_imputar %>%
+    filter(
+      Mother.s.qualification == 34 &
+        Course == 171
+    )
+)
+
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Mother_education_level))
+sum(is.na(datos_sensibilidad$Mother_education_level))
 
 
-
-
-
-sum(table(datos_sin_imputar$Mother_education_level)) #coincide con 4424 -130 faltantes
-tabla_mum_educ_target_sin_imputar <- table(datos_sin_imputar$Mother_education_level,
-                                           datos_sin_imputar$Target_bin)
+tabla_mum_educ_target_sin_imputar <- table(
+  datos_sensibilidad$Mother_education_level,
+  datos_sensibilidad$Target_bin
+)
 sum(tabla_mum_educ_target_sin_imputar)
 
 prop.table(tabla_mum_educ_target_sin_imputar, 1)
 prop.table(tabla_mum_educ_target_sin_imputar, 2)
 
 cramersV(tabla_mum_educ_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Mother_education_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_education_level)
+GK_assoc(datos_sensibilidad$Mother_education_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Mother_education_level)
 
 chisq.test(tabla_mum_educ_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_mum_educ_target_sin_imputar)$expected
 
-#Cambiamos a nombres más cortos:
-datos_sin_imputar$Mother_education_level_group_short <- dplyr::recode(
-  datos_sin_imputar$Mother_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sensibilidad$Mother_education_level_group_short <- dplyr::recode(
+  datos_sensibilidad$Mother_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_sin_imputar,  
+
+# Gráfico:
+mosaic(~ Mother_education_level_group_short + Target_bin,
+       data = datos_sensibilidad,
        shade = TRUE, legend = TRUE)
 
 
-#Father education level:
-table(datos_recodificados$Father_education_level)
-unique(datos_recodificados$Father_education_level)
-tabla_dad_educ_target <- table(datos_recodificados$Father_education_level,
-                               datos_recodificados$Target_bin)
-tabla_dad_educ_target
-
-prop.table(tabla_dad_educ_target, 1)
-prop.table(tabla_dad_educ_target, 2)
-
-cramersV(tabla_dad_educ_target)
-GK_assoc(datos_recodificados$Father_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_education_level)
-
-chisq.test(tabla_dad_educ_target, correct = FALSE)
-chisq.test(tabla_dad_educ_target)$expected
-#Cambiamos a nombres más cortos:
-datos_recodificados$Father_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
-
-#Analizamos Father_education_level sin los datos imputados para ver como cambia respecto a la imputación
+# Analizamos Father_education_level sin imputados
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Father.s.qualification_recodif <- recode(datos_sin_imputar$Father.s.qualification,
-                                                     `1` = "Educación secundaria - 12º año o equivalente",
-                                                     `2` = "Educación superior - Grado (Bachelor)",
-                                                     `3` = "Educación superior - Grado",
-                                                     `4` = "Educación superior - Máster",
-                                                     `5` = "Educación superior - Doctorado",
-                                                     `6` = "Asistencia a educación superior",
-                                                     `9` = "12º año de escolarización - No completado",
-                                                     `10` = "11º año de escolarización - No completado",
-                                                     `11` = "7º año (sistema antiguo)",
-                                                     `12` = "Otro - 11º año de escolarización",
-                                                     `13` = "2º año de curso complementario de secundaria",
-                                                     `14` = "10º año de escolarización",
-                                                     `18` = "Curso general de comercio",
-                                                     `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
-                                                     `20` = "Curso complementario de secundaria",
-                                                     `22` = "Curso técnico-profesional",
-                                                     `25` = "Curso complementario de secundaria - no completado",
-                                                     `26` = "7º año de escolarización",
-                                                     `27` = "2º ciclo del bachillerato general",
-                                                     `29` = "9º año de escolarización - No completado",
-                                                     `30` = "8º año de escolarización",
-                                                     `31` = "Curso general de administración y comercio",
-                                                     `33` = "Curso complementario de contabilidad y administración",
-                                                     `34` = "Desconocido",
-                                                     `35` = "No sabe leer ni escribir",
-                                                     `36` = "Sabe leer sin haber completado 4º año",
-                                                     `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
-                                                     `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
-                                                     `39` = "Curso de especialización tecnológica",
-                                                     `40` = "Educación superior - Grado (1er ciclo)",
-                                                     `41` = "Curso de estudios superiores especializados",
-                                                     `42` = "Curso técnico superior profesional",
-                                                     `43` = "Educación superior - Máster (2º ciclo)",
-                                                     `44` = "Educación superior - Doctorado (3er ciclo)")
+datos_sensibilidad$Father.s.qualification<- recode(
+  datos_sensibilidad$Father.s.qualification,
+  `1` = "Educación secundaria - 12º año o equivalente",
+  `2` = "Educación superior - Grado (Bachelor)",
+  `3` = "Educación superior - Grado",
+  `4` = "Educación superior - Máster",
+  `5` = "Educación superior - Doctorado",
+  `6` = "Asistencia a educación superior",
+  `9` = "12º año de escolarización - No completado",
+  `10` = "11º año de escolarización - No completado",
+  `11` = "7º año (sistema antiguo)",
+  `12` = "Otro - 11º año de escolarización",
+  `13` = "2º año de curso complementario de secundaria",
+  `14` = "10º año de escolarización",
+  `18` = "Curso general de comercio",
+  `19` = "Educación básica 3er ciclo (9º/10º/11º año) o equivalente",
+  `20` = "Curso complementario de secundaria",
+  `22` = "Curso técnico-profesional",
+  `25` = "Curso complementario de secundaria - no completado",
+  `26` = "7º año de escolarización",
+  `27` = "2º ciclo del bachillerato general",
+  `29` = "9º año de escolarización - No completado",
+  `30` = "8º año de escolarización",
+  `31` = "Curso general de administración y comercio",
+  `33` = "Curso complementario de contabilidad y administración",
+  `34` = "Desconocido",
+  `35` = "No sabe leer ni escribir",
+  `36` = "Sabe leer sin haber completado 4º año",
+  `37` = "Educación básica 1er ciclo (4º/5º año) o equivalente",
+  `38` = "Educación básica 2º ciclo (6º/7º/8º año) o equivalente",
+  `39` = "Curso de especialización tecnológica",
+  `40` = "Educación superior - Grado (1er ciclo)",
+  `41` = "Curso de estudios superiores especializados",
+  `42` = "Curso técnico superior profesional",
+  `43` = "Educación superior - Máster (2º ciclo)",
+  `44` = "Educación superior - Doctorado (3er ciclo)"
+)
 
-sum(table(datos_sin_imputar$Father.s.qualification))
+sum(table(datos_sensibilidad$Father.s.qualification))
 
-sum(table(datos_sin_imputar$Father.s.qualification_recodif))
-
-datos_sin_imputar$Father_education_level <- case_when(
+datos_sensibilidad$Father_education_level <- case_when(
+  
   # BAJO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "10º año de escolarización", 
     "11º año de escolarización - No completado",
     "12º año de escolarización - No completado",
@@ -2185,13 +2598,13 @@ datos_sin_imputar$Father_education_level <- case_when(
   ) ~ "Bajo",
   
   # MEDIO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification%in% c(
     "Educación secundaria - 12º año o equivalente",
     "2º ciclo del bachillerato general"
   ) ~ "Medio",
   
   # TÉCNICO
-  datos_sin_imputar$Father.s.qualification_recodif %in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "Curso de especialización tecnológica",
     "Curso de estudios superiores especializados",
     "Curso técnico-profesional",
@@ -2205,7 +2618,7 @@ datos_sin_imputar$Father_education_level <- case_when(
   ) ~ "Técnico",
   
   # SUPERIOR
-  datos_sin_imputar$Father.s.qualification_recodif%in% c(
+  datos_sensibilidad$Father.s.qualification %in% c(
     "Educación superior - Doctorado",
     "Educación superior - Doctorado (3er ciclo)",
     "Educación superior - Grado",
@@ -2215,108 +2628,103 @@ datos_sin_imputar$Father_education_level <- case_when(
     "Educación superior - Grado (1er ciclo)",
     "Asistencia a educación superior"
   ) ~ "Superior",
+  
   TRUE ~ NA_character_
 )
 
+sum(table(datos_sensibilidad$Father_education_level)) #deberia dar 4132, puede ser, que de nuevo, uno de los multimedia fuera faltante
 
+#aqui lo podemos ver:
+View(
+  datos_sin_imputar %>%
+    filter(
+      Father.s.qualification == 34 &
+        Course == 171
+    )
+)
 
-sum(table(datos_sin_imputar$Father_education_level)) #coincide con 4424 -112 faltantes
-tabla_dad_educ_target_sin_imputar <- table(datos_sin_imputar$Father_education_level,
-                                           datos_sin_imputar$Target_bin)
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Father_education_level))
+sum(is.na(datos_sensibilidad$Father_education_level))
+
+tabla_dad_educ_target_sin_imputar <- table(
+  datos_sensibilidad$Father_education_level,
+  datos_sensibilidad$Target_bin
+)
 sum(tabla_dad_educ_target_sin_imputar)
 
 prop.table(tabla_dad_educ_target_sin_imputar, 1)
 prop.table(tabla_dad_educ_target_sin_imputar, 2)
 
 cramersV(tabla_dad_educ_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Father_education_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Father_education_level)
+GK_assoc(datos_sensibilidad$Father_education_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Father_education_level)
 
 chisq.test(tabla_dad_educ_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_dad_educ_target_sin_imputar)$expected
 
-#Cambiamos a nombres más cortos:
-datos_sin_imputar$Father_education_level_group_short <- dplyr::recode(
-  datos_sin_imputar$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sensibilidad$Father_education_level_group_short <- dplyr::recode(
+  datos_sensibilidad$Father_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_sin_imputar,  
+
+# Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin,
+       data = datos_sensibilidad,
        shade = TRUE, legend = TRUE)
 
 
-
-#Mother occupation level:
-
-table(datos_recodificados$Mother_occupation_level)
-unique(datos_recodificados$Mother_occupation_level)
-tabla_mum_ocup_target <- table(datos_recodificados$Mother_occupation_level,
-                               datos_recodificados$Target_bin)
-tabla_mum_ocup_target
-
-prop.table(tabla_mum_ocup_target, 1)
-prop.table(tabla_mum_ocup_target, 2)
-
-cramersV(tabla_mum_ocup_target)
-GK_assoc(datos_recodificados$Mother_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_occupation_level)
-
-chisq.test(tabla_mum_ocup_target, correct = FALSE)
-chisq.test(tabla_mum_ocup_target)$expected
-#Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
-
-
+#Mother occupation sin imputados:
 
 #Analizamos Mother occupation level sin los datos imputados para ver como cambia respecto a la imputación
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Mother.s.occupation_recodif<-recode(datos_sin_imputar$Mother.s.occupation,
-                                                `0` = "Estudiante",
-                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                `2` = "Especialistas en actividades intelectuales y científicas",
-                                                `3` = "Técnicos y profesiones de nivel intermedio",
-                                                `4` = "Personal administrativo",
-                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanos",
-                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                `9` = "Trabajadores no cualificados",
-                                                `10` = "Profesiones de las fuerzas armadas",
-                                                `90` = "Otra situación",
-                                                `99` = "(en blanco)",
-                                                `122` = "Profesionales de la salud",
-                                                `123` = "Profesores",
-                                                `125` = "Especialistas en tecnologías de la información y la comunicación (TIC)",
-                                                `131` = "Técnicos y profesiones intermedias en ciencia e ingeniería",
-                                                `132` = "Técnicos y profesionales de nivel intermedio en salud",
-                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos, culturales y similares",
-                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                `143` = "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
-                                                `144` = "Otro personal de apoyo administrativo",
-                                                `151` = "Trabajadores de servicios personales",
-                                                `152` = "Vendedores",
-                                                `153` = "Trabajadores de cuidado personal y similares",
-                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                `173` = "Trabajadores cualificados en impresión, instrumentos de precisión, joyería y artesanía",
-                                                `175` = "Trabajadores en procesamiento de alimentos, madera, textil y otras industrias",
-                                                `191` = "Trabajadores de limpieza",
-                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                `193` = "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
-                                                `194` = "Ayudantes de preparación de comidas")
+datos_sensibilidad$Mother.s.occupation<-recode(datos_sensibilidad$Mother.s.occupation,
+                                               `0` = "Estudiante",
+                                               `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                               `2` = "Especialistas en actividades intelectuales y científicas",
+                                               `3` = "Técnicos y profesiones de nivel intermedio",
+                                               `4` = "Personal administrativo",
+                                               `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                               `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                               `7` = "Trabajadores cualificados de la industria, construcción y artesanos",
+                                               `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                               `9` = "Trabajadores no cualificados",
+                                               `10` = "Profesiones de las fuerzas armadas",
+                                               `90` = "Otra situación",
+                                               `99` = "(en blanco)",
+                                               `122` = "Profesionales de la salud",
+                                               `123` = "Profesores",
+                                               `125` = "Especialistas en tecnologías de la información y la comunicación (TIC)",
+                                               `131` = "Técnicos y profesiones intermedias en ciencia e ingeniería",
+                                               `132` = "Técnicos y profesionales de nivel intermedio en salud",
+                                               `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos, culturales y similares",
+                                               `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                               `143` = "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
+                                               `144` = "Otro personal de apoyo administrativo",
+                                               `151` = "Trabajadores de servicios personales",
+                                               `152` = "Vendedores",
+                                               `153` = "Trabajadores de cuidado personal y similares",
+                                               `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                               `173` = "Trabajadores cualificados en impresión, instrumentos de precisión, joyería y artesanía",
+                                               `175` = "Trabajadores en procesamiento de alimentos, madera, textil y otras industrias",
+                                               `191` = "Trabajadores de limpieza",
+                                               `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                               `193` = "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
+                                               `194` = "Ayudantes de preparación de comidas")
 
-sum(table(datos_sin_imputar$Mother.s.occupation))
+sum(table(datos_sensibilidad$Mother.s.occupation))
 
-sum(table(datos_sin_imputar$Mother.s.occupation_recodif))
 
-datos_sin_imputar$Mother_occupation_level <- case_when(
+
+datos_sensibilidad$Mother_occupation_level <- case_when(
   
   # ALTA CUALIFICACIÓN
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Representantes del poder legislativo y ejecutivo, directores y gerentes",
     "Especialistas en actividades intelectuales y científicas",
     "Especialistas en tecnologías de la información y la comunicación (TIC)",
@@ -2325,7 +2733,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Alta cualificación",
   
   # CUALIFICACIÓN MEDIA
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Personal administrativo",
     "Empleados de oficina, secretarios y operadores de datos",
     "Operadores de datos, contabilidad, estadística, servicios financieros y registros",
@@ -2337,7 +2745,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Cualificación media",
   
   # BAJA CUALIFICACIÓN
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Trabajadores de servicios personales, seguridad y vendedores",
     "Trabajadores de servicios personales",
     "Vendedores",
@@ -2352,7 +2760,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "Baja cualificación",
   
   # NO CUALIFICADOS
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Trabajadores no cualificados",
     "Trabajadores no cualificados en agricultura, pesca y silvicultura",
     "Trabajadores no cualificados en industria extractiva, construcción, manufactura y transporte",
@@ -2360,7 +2768,7 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   ) ~ "No cualificados",
   
   # OTROS
-  datos_sin_imputar$Mother.s.occupation_recodif %in% c(
+  datos_sensibilidad$Mother.s.occupation %in% c(
     "Estudiante",
     "Otra situación",
     "Profesiones de las fuerzas armadas"
@@ -2368,113 +2776,92 @@ datos_sin_imputar$Mother_occupation_level <- case_when(
   TRUE ~ NA_character_
   
 )
-  
 
 
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Mother_occupation_level))
+sum(is.na(datos_sensibilidad$Mother_occupation_level))
 
 
-sum(table(datos_sin_imputar$Mother_occupation_level)) #coincide con 4424 -17 faltantes
-tabla_mum_ocup_target_sin_imputar <- table(datos_sin_imputar$Mother_occupation_level,
-                                           datos_sin_imputar$Target_bin)
+sum(table(datos_sensibilidad$Mother_occupation_level)) #coincide con 4244-17 faltantes
+tabla_mum_ocup_target_sin_imputar <- table(datos_sensibilidad$Mother_occupation_level,
+                                           datos_sensibilidad$Target_bin)
 sum(tabla_mum_ocup_target_sin_imputar)
 
 prop.table(tabla_mum_ocup_target_sin_imputar, 1)
 prop.table(tabla_mum_ocup_target_sin_imputar, 2)
 
 cramersV(tabla_mum_ocup_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Mother_occupation_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Mother_occupation_level)
+GK_assoc(datos_sensibilidad$Mother_occupation_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Mother_occupation_level)
 
 chisq.test(tabla_mum_ocup_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_mum_ocup_target_sin_imputar)$expected
 
 
 #Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_sin_imputar,  
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_sensibilidad,  
        shade = TRUE, legend = TRUE)
 
-
-
-#Father occupation level:
-table(datos_recodificados$Father_occupation_level)
-unique(datos_recodificados$Father_occupation_level)
-tabla_dad_ocup_target <- table(datos_recodificados$Father_occupation_level,
-                               datos_recodificados$Target_bin)
-tabla_dad_ocup_target
-
-prop.table(tabla_dad_ocup_target, 1)
-prop.table(tabla_dad_ocup_target, 2)
-
-cramersV(tabla_dad_ocup_target)
-GK_assoc(datos_recodificados$Father_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_occupation_level)
-
-chisq.test(tabla_dad_ocup_target, correct = FALSE)
-chisq.test(tabla_dad_ocup_target)$expected
-
-#Gráficos:
-mosaic(~ Father_occupation_level + Target_bin, data = datos_recodificados,  
-       shade = TRUE, legend = TRUE)
 
 #Analizamos Father occupation level sin los datos imputados para ver como cambia respecto a la imputación
 
 # Recodificamos primero la variable:
-datos_sin_imputar$Father.s.occupation_recodif<-recode(datos_sin_imputar$Father.s.occupation,
-                                                `0` = "Estudiante",
-                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                `2` = "Especialistas en actividades intelectuales y científicas",
-                                                `3` = "Técnicos y profesiones de nivel intermedio",
-                                                `4` = "Personal administrativo",
-                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
-                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                `9` = "Trabajadores no cualificados",
-                                                `10` = "Profesiones de las fuerzas armadas",
-                                                `90` = "Otra situación",
-                                                `99` = "(en blanco)",
-                                                `101` = "Oficiales de las fuerzas armadas",
-                                                `102` = "Sargentos de las fuerzas armadas",
-                                                `103` = "Otro personal de las fuerzas armadas",
-                                                `112` = "Directores de servicios administrativos y comerciales",
-                                                `114` = "Directores de hostelería, comercio y otros servicios",
-                                                `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
-                                                `122` = "Profesionales de la salud",
-                                                `123` = "Profesores",
-                                                `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
-                                                `131` = "Técnicos intermedios en ciencia e ingeniería",
-                                                `132` = "Técnicos y profesionales intermedios de salud",
-                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
-                                                `135` = "Técnicos en tecnologías de la información y la comunicación",
-                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
-                                                `144` = "Otro personal de apoyo administrativo",
-                                                `151` = "Trabajadores de servicios personales",
-                                                `152` = "Vendedores",
-                                                `153` = "Trabajadores de cuidado personal y similares",
-                                                `154` = "Personal de protección y seguridad",
-                                                `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
-                                                `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
-                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
-                                                `174` = "Trabajadores cualificados en electricidad y electrónica",
-                                                `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
-                                                `181` = "Operadores de instalaciones y maquinaria fija",
-                                                `182` = "Trabajadores de montaje",
-                                                `183` = "Conductores de vehículos y operadores de maquinaria móvil",
-                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                `193` = "Trabajadores no cualificados en industria, construcción y transporte",
-                                                `194` = "Ayudantes de preparación de comidas",
-                                                `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
+datos_sensibilidad$Father.s.occupation<-recode(datos_sensibilidad$Father.s.occupation,
+                                               `0` = "Estudiante",
+                                               `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                               `2` = "Especialistas en actividades intelectuales y científicas",
+                                               `3` = "Técnicos y profesiones de nivel intermedio",
+                                               `4` = "Personal administrativo",
+                                               `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                               `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                               `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
+                                               `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                               `9` = "Trabajadores no cualificados",
+                                               `10` = "Profesiones de las fuerzas armadas",
+                                               `90` = "Otra situación",
+                                               `99` = "(en blanco)",
+                                               `101` = "Oficiales de las fuerzas armadas",
+                                               `102` = "Sargentos de las fuerzas armadas",
+                                               `103` = "Otro personal de las fuerzas armadas",
+                                               `112` = "Directores de servicios administrativos y comerciales",
+                                               `114` = "Directores de hostelería, comercio y otros servicios",
+                                               `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
+                                               `122` = "Profesionales de la salud",
+                                               `123` = "Profesores",
+                                               `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
+                                               `131` = "Técnicos intermedios en ciencia e ingeniería",
+                                               `132` = "Técnicos y profesionales intermedios de salud",
+                                               `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
+                                               `135` = "Técnicos en tecnologías de la información y la comunicación",
+                                               `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                               `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
+                                               `144` = "Otro personal de apoyo administrativo",
+                                               `151` = "Trabajadores de servicios personales",
+                                               `152` = "Vendedores",
+                                               `153` = "Trabajadores de cuidado personal y similares",
+                                               `154` = "Personal de protección y seguridad",
+                                               `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
+                                               `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
+                                               `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                               `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
+                                               `174` = "Trabajadores cualificados en electricidad y electrónica",
+                                               `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
+                                               `181` = "Operadores de instalaciones y maquinaria fija",
+                                               `182` = "Trabajadores de montaje",
+                                               `183` = "Conductores de vehículos y operadores de maquinaria móvil",
+                                               `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                               `193` = "Trabajadores no cualificados en industria, construcción y transporte",
+                                               `194` = "Ayudantes de preparación de comidas",
+                                               `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
 
-sum(table(datos_sin_imputar$Father.s.occupation))
+sum(table(datos_sensibilidad$Father.s.occupation))
 
-sum(table(datos_sin_imputar$Father.s.occupation_recodif))
 
-datos_sin_imputar$Father_occupation_level <- case_when(
+datos_sensibilidad$Father_occupation_level <- case_when(
   
   # ALTA CUALIFICACIÓN
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Representantes del poder legislativo y ejecutivo, directores y gerentes",
     "Directores de servicios administrativos y comerciales",
     "Directores de hostelería, comercio y otros servicios",
@@ -2486,7 +2873,7 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Alta cualificación",
   
   # CUALIFICACIÓN MEDIA
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Personal administrativo",
     "Empleados de oficina, secretarios y operadores de datos",
     "Operadores de datos, contabilidad, estadística y servicios financieros",
@@ -2499,7 +2886,7 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Cualificación media",
   
   # BAJA CUALIFICACIÓN
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Trabajadores de servicios personales, seguridad y vendedores",
     "Trabajadores de servicios personales",
     "Vendedores",
@@ -2522,21 +2909,21 @@ datos_sin_imputar$Father_occupation_level <- case_when(
   ) ~ "Baja cualificación",
   
   # NO CUALIFICADOS
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Trabajadores no cualificados",
     "Trabajadores no cualificados en agricultura, pesca y silvicultura",
     "Trabajadores no cualificados en industria, construcción y transporte"
   ) ~ "No cualificados",
   
   # OTROS
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Estudiante",
     "Otra situación"
     
   ) ~ "Otros",
   
   # MILITAR
-  datos_sin_imputar$Father.s.occupation_recodif %in% c(
+  datos_sensibilidad$Father.s.occupation %in% c(
     "Profesiones de las fuerzas armadas",
     "Oficiales de las fuerzas armadas",
     "Sargentos de las fuerzas armadas",
@@ -2547,68 +2934,30 @@ datos_sin_imputar$Father_occupation_level <- case_when(
 )
 
 
+nrow(datos_sensibilidad)
+sum(table(datos_sensibilidad$Father_occupation_level))
+sum(is.na(datos_sensibilidad$Father_occupation_level))
 
 
-
-sum(table(datos_sin_imputar$Father_occupation_level)) #coincide con 4424 -19 faltantes
-tabla_dad_ocup_target_sin_imputar <- table(datos_sin_imputar$Father_occupation_level,
-                                           datos_sin_imputar$Target_bin)
+sum(table(datos_sensibilidad$Father_occupation_level)) #coincide con 4244-19 faltantes
+tabla_dad_ocup_target_sin_imputar <- table(datos_sensibilidad$Father_occupation_level,
+                                           datos_sensibilidad$Target_bin)
 sum(tabla_dad_ocup_target_sin_imputar)
 
 prop.table(tabla_dad_ocup_target_sin_imputar, 1)
 prop.table(tabla_dad_ocup_target_sin_imputar, 2)
 
 cramersV(tabla_dad_ocup_target_sin_imputar)
-GK_assoc(datos_sin_imputar$Father_occupation_level, datos_sin_imputar$Target_bin)
-GK_assoc(datos_sin_imputar$Target_bin, datos_sin_imputar$Father_occupation_level)
+GK_assoc(datos_sensibilidad$Father_occupation_level, datos_sensibilidad$Target_bin)
+GK_assoc(datos_sensibilidad$Target_bin, datos_sensibilidad$Father_occupation_level)
 
 chisq.test(tabla_dad_ocup_target_sin_imputar, correct = FALSE)
 chisq.test(tabla_dad_ocup_target_sin_imputar)$expected
 
 
 #Gráfico:
-mosaic(~ Father_occupation_level + Target_bin, data = datos_sin_imputar,  
+mosaic(~ Father_occupation_level + Target_bin, data = datos_sensibilidad,  
        shade = TRUE, legend = TRUE)
-#
-#probando
-install.packages("effsize")
-library(effsize)
-
-cohen.d(Curricular.units.1st.sem.grade_10 ~ Target_bin, 
-        data = datos_recodificados)
-
-cohen.d(Curricular.units.2nd.sem.grade_10 ~ Target_bin, 
-        data = datos_recodificados)
-cohen.d(GDP ~ Target_bin, 
-        data = datos_recodificados)
-
-
-
-#no hacer caso
-View(datos_recodificados[datos_recodificados$Application.order == 0, ])
-
-sum(datos_recodificados[datos_recodificados$Curricular.units.1st.sem..enrolled. == 0, ])
-table(datos_recodificados$Course)
-
-datos_multimedia <- datos_recodificados[
-  datos_recodificados$Course == "Diseño de Animación y Multimedia", 
-]
-View(datos_multimedia)
-
-datos_multimedia_año <- datos_recodificados[
-  datos_recodificados$Course == "Diseño de Animación y Multimedia" &
-    datos_recodificados$year == 2016,
-]
-View(datos_multimedia_año)
-
-colnames(datos_recodificados)
-
-library(clickR)
-table(datos_recodificados$Curricular.units.1st.sem..approved.)
-table(datos_recodificados$Curricular.units.1st.sem..credited.)
-table(datos_recodificados$Curricular.units.1st.sem..enrolled.)
-table(datos_recodificados$Curricular.units.1st.sem..evaluations.)
-table(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 
 
 
@@ -2716,42 +3065,91 @@ View(datos_recodificados[
 ])
 datos_recodificados$Application.mode_group
 
-#Análisis multivariante:
-install.packages("pscl")
-#Regresión logística binaria:
-# Aseguramos que la variable objetivo esté en formato factor
-datos_recodificados$Target_bin <- relevel(datos_recodificados$Target_bin, ref = "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
 
-# Ajustamos el modelo de regresión logística binaria
-modelo_logit <- glm(
-  Target_bin ~ Curricular.units.1st.sem.grade_10 +
-    Tuition.fees.up.to.date +
-    Scholarship.holder +
-    Debtor +
-    Admission.grade_10 +
-    Application.mode_group +
-    Course_group,
-  data = datos_recodificados,
-  family = binomial
-)
-colnames(datos_recodificados)
+#Numéricas vs Numéricas
 
-summary(modelo_logit)
-exp(coef(modelo_logit))
-exp(confint(modelo_logit))
-library(pscl)
-pR2(modelo_logit)
-datos_recodificados$Target_bin <- factor(
-  datos_recodificados$Target_bin,
-  levels = c("No Dropout", "Dropout")
-)
-levels(datos_recodificados$Target_bin)
-rm(modelo_logit)
-#no lo he acabado, no hacer caos
+#Creo dos variables numéricas que faltan:
+#Porcentaje_aprobado_sem_2
+#Carga_academica_real_sem_2
+
+datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
+datos_modelo$Carga_academica_real_sem_2 <- 
+  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
+  datos_modelo$Curricular.units.2nd.sem..credited.
 
 
+variables_numéricas<-c("Previous.qualification.grade_10",
+                       "Age.at.enrollment",
+                       "Admission.grade_10",
+                       "Application.order",
+                       "Curricular.units.1st.sem..credited.",
+                       "Curricular.units.1st.sem..enrolled.",
+                       "Curricular.units.1st.sem..evaluations.",
+                       "Curricular.units.1st.sem..approved.",
+                       "Curricular.units.1st.sem.grade_10",
+                       "Curricular.units.1st.sem..without.evaluations.",
+                       "Curricular.units.2nd.sem..credited.",
+                       "Curricular.units.2nd.sem..enrolled.",
+                       "Curricular.units.2nd.sem..evaluations.",
+                       "Curricular.units.2nd.sem..approved.",
+                       "Curricular.units.2nd.sem.grade_10",
+                       "Curricular.units.2nd.sem..without.evaluations.",
+                       "Unemployment.rate",
+                       "Inflation.rate",
+                       "Porcentaje_aprobado_sem_1",
+                       "GDP",
+                       "Carga_academica_real",
+                       "Carga_academica_real_sem_2",
+                       "Porcentaje_aprobado_sem_2",
+                       "year") #si no hago esto me convierte las categoricas en numericas poniendo un numero a cada opcion en orden alfabético
+
+variables_numéricas
+descriptive(datos_modelo)
+library(psych)
+library(corrplot)
+describe(datos_modelo[,variables_numéricas])
+#hacer matriz de correlaciones
+matriz_corr_kendall<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="kendall") 
+matriz_corr_pearson<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="pearson")
+matriz_corr_spearman<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="spearman")
+#para ponerlo gráficamente
+corrplot(matriz_corr_kendall, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Kendall")
+corrplot(matriz_corr_pearson, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Pearson")
+corrplot(matriz_corr_spearman, method="color", type = "upper",
+         tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
+#ver relación entre age y application order
 #Poner datos para análisis numérico (sin los estudiantes de Multimedia con todo 0 (pero si los que tienen notas)):
+
+
+
+#otra matriz de correlaciones (Ksenia):
+vars_numericas <- datos_modelo[, c("Carga_academica_real",
+                                   "Curricular.units.1st.sem..approved.",
+                                   "Curricular.units.1st.sem.grade_10",
+                                   "Curricular.units.1st.sem..evaluations.")]
+
+matriz_cor <- cor(vars_numericas, use = "complete.obs")
+print(matriz_cor)
+
+# Pasar a formato largo para heatmap
+cor_df <- as.data.frame(as.table(matriz_cor))
+colnames(cor_df) <- c("Var1", "Var2", "Correlacion")
+
+grafico_cor <- ggplot(cor_df, aes(x = Var1, y = Var2, fill = Correlacion)) +
+  geom_tile() +
+  geom_text(aes(label = round(Correlacion, 2)), size = 4) +
+  scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick", midpoint = 0) +
+  labs(title = "5.0 Matriz de correlaciones",
+       x = "",
+       y = "",
+       fill = "Correlación") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(grafico_cor)
+
 
 datos_recodificados$Curricular.units.1st.sem..evaluations.
 
@@ -2772,3 +3170,592 @@ colnames(datos_modelo)
 table(datos_modelo$Course_limpio)
 
 
+#Análisis multivariante:
+colnames(datos_modelo)
+
+table(datos_modelo$Application.mode_group)
+table(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+
+table(datos_modelo$Course_group)
+table(datos_modelo$Course_group, datos_modelo$Target_bin)
+
+table(datos_modelo$Previous_education_level)
+table(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
+#Regresión logística bianria (Lucía):
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
+datos_modelo$Target_bin <- relevel(datos_modelo$Target_bin, ref = "No Abandono")
+
+datos_modelo$Application.mode_group <- relevel(
+  as.factor(datos_modelo$Application.mode_group),
+  ref = "Acceso normal"
+)
+
+datos_modelo$Course_group <- relevel(
+  as.factor(datos_modelo$Course_group),
+  ref = "Empresa"
+)
+
+modelo_combinado <- glm(
+  Target_bin ~ Carga_academica_real +
+    Curricular.units.1st.sem..approved. +
+    Curricular.units.1st.sem.grade_10 +
+    Curricular.units.1st.sem..evaluations. +
+    Tuition.fees.up.to.date +
+    Debtor +
+    Scholarship.holder +
+    Admission.grade_10 +
+    Age.at.enrollment +
+    Gender +
+    Course_group +
+    Application.mode_group,
+  data = datos_modelo,
+  family = binomial
+)
+
+summary(modelo_combinado)
+
+
+# Coeficientes del modelo
+coeficientes <- coef(modelo_combinado)
+
+# Convertimos los coeficientes a Odds Ratios
+OR <- exp(coeficientes)
+
+# Mostramos el resultado
+OR
+
+
+# Intervalos de confianza de los coeficientes
+IC <- confint(modelo_combinado)
+
+# Pasamos los intervalos también a escala Odds Ratio
+IC_OR <- exp(IC)
+
+# Creamos una tabla con OR e intervalos
+resultado_OR <- data.frame(
+  Variable = names(OR),
+  OR = as.numeric(OR),
+  IC_inf = IC_OR[, 1],
+  IC_sup = IC_OR[, 2]
+)
+
+print(resultado_OR)
+
+
+#Representación gráfica:
+library(dplyr)
+library(ggplot2)
+
+resultado_graf <- resultado_OR %>%
+  filter(Variable != "(Intercept)")
+
+grafico_or <- ggplot(resultado_graf,
+                     aes(x = reorder(Variable, OR), y = OR)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = IC_inf, ymax = IC_sup), width = 0.2) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  coord_flip() +
+  labs(title = "Odds Ratios del modelo logístico",
+       subtitle = "Variable respuesta: Abandono",
+       x = "Variable",
+       y = "Odds Ratio") +
+  theme_minimal()
+
+print(grafico_or)
+
+
+#Modelo nulo:
+modelo_nulo <- glm(
+  Target_bin ~ 1,
+  data = datos_modelo,
+  family = binomial
+)
+anova(modelo_nulo, modelo_combinado, test = "Chisq")
+
+#pseudo R cuadrado
+pseudo_R2 <- 1 - modelo_combinado$deviance / modelo_combinado$null.deviance
+print(pseudo_R2)
+
+#Probabilodades predichas
+datos_modelo$prob_pred <- predict(
+  modelo_combinado,
+  type = "response"
+)
+
+head(datos_modelo[, c("Target_bin", "prob_pred")])
+summary(datos_modelo$prob_pred)
+
+# Clasificación usando umbral 0.5
+datos_modelo$pred_clase <- ifelse(
+  datos_modelo$prob_pred > 0.5,
+  "Abandono",
+  "No Abandono"
+)
+
+# Convertimos la predicción a factor con los mismos niveles que Target_bin
+datos_modelo$pred_clase <- factor(
+  datos_modelo$pred_clase,
+  levels = levels(datos_modelo$Target_bin)
+)
+
+# Matriz de clasificación
+tabla_clasificacion <- table(
+  Real = datos_modelo$Target_bin,
+  Predicho = datos_modelo$pred_clase
+)
+
+tabla_clasificacion
+
+precision_global <- mean(datos_modelo$pred_clase == datos_modelo$Target_bin)
+precision_global
+
+sensibilidad <- tabla_clasificacion["Abandono", "Abandono"] /
+  sum(tabla_clasificacion["Abandono", ])
+
+sensibilidad
+
+
+especificidad <- tabla_clasificacion["No Abandono", "No Abandono"] /
+  sum(tabla_clasificacion["No Abandono", ])
+
+especificidad
+
+tabla_df <- as.data.frame(tabla_clasificacion)
+
+ggplot(tabla_df, aes(x = Real, y = Freq, fill = Predicho)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Clasificación real vs predicha",
+    x = "Situación real",
+    y = "Número de estudiantes",
+    fill = "Clase predicha"
+  ) +
+  theme_minimal()
+
+#con umbral 3:
+datos_modelo$pred_clase_03 <- ifelse(
+  datos_modelo$prob_pred > 0.3,
+  "Abandono",
+  "No Abandono"
+)
+
+datos_modelo$pred_clase_03 <- factor(
+  datos_modelo$pred_clase_03,
+  levels = levels(datos_modelo$Target_bin)
+)
+
+tabla_clasificacion_03 <- table(
+  Real = datos_modelo$Target_bin,
+  Predicho = datos_modelo$pred_clase_03
+)
+
+tabla_df_03 <- as.data.frame(tabla_clasificacion_03)
+
+ggplot(tabla_df_03, aes(x = Real, y = Freq, fill = Predicho)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Clasificación real vs predicha",
+    subtitle = "Umbral de clasificación = 0.3",
+    x = "Situación real",
+    y = "Número de estudiantes",
+    fill = "Clase predicha"
+  ) +
+  theme_minimal()
+
+ggplot(datos_modelo, aes(x = prob_pred, fill = Target_bin)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Distribución de probabilidades predichas",
+    x = "Probabilidad predicha de abandono",
+    y = "Frecuencia",
+    fill = "Situación real"
+  ) +
+  theme_minimal()
+
+
+ggplot(datos_modelo, aes(x = prob_pred, fill = Target_bin)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 30) +
+  geom_vline(xintercept = 0.3, linetype = "dashed", linewidth = 1) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "darkseagreen3",
+      "Abandono" = "indianred2"
+    )
+  ) +
+  labs(
+    title = "Distribución de probabilidades predichas",
+    subtitle = "Línea discontinua: umbral de clasificación = 0.3",
+    x = "Probabilidad predicha de abandono",
+    y = "Frecuencia",
+    fill = "Situación real"
+  ) +
+  theme_minimal()
+
+# Clasificación diferentes umbrales:
+umbrales <- c(0.2, 0.3, 0.4, 0.5)
+
+resultados_umbrales <- data.frame()
+
+for (u in umbrales) {
+  
+  pred <- ifelse(datos_modelo$prob_pred > u, "Abandono", "No Abandono")
+  pred <- factor(pred, levels = levels(datos_modelo$Target_bin))
+  
+  tabla <- table(Real = datos_modelo$Target_bin, Predicho = pred)
+  
+  accuracy <- mean(pred == datos_modelo$Target_bin)
+  
+  sensibilidad <- tabla["Abandono", "Abandono"] /
+    sum(tabla["Abandono", ])
+  
+  especificidad <- tabla["No Abandono", "No Abandono"] /
+    sum(tabla["No Abandono", ])
+  
+  resultados_umbrales <- rbind(
+    resultados_umbrales,
+    data.frame(
+      Umbral = u,
+      Accuracy = accuracy,
+      Sensibilidad = sensibilidad,
+      Especificidad = especificidad
+    )
+  )
+}
+
+resultados_umbrales
+
+
+
+install.packages("car")
+library(car)
+
+vif(modelo_combinado)
+
+
+
+
+# Instalar si no lo tienes
+# install.packages("DescTools")
+# install.packages("dplyr")
+
+library(DescTools)
+library(dplyr)
+
+descriptive(datos_modelo)
+# Variables categóricas que quieres analizar
+variables_categoricas <- c(
+  "Marital_group",
+  "Application.mode_group",
+  "Course_group",
+  "Daytime.evening.attendance.",
+  "Previous_education_level",
+  "Mother_education_level",
+  "Father_education_level",
+  "Mother_occupation_level",
+  "Father_occupation_level",
+  "Displaced",
+  "Educational.special.needs",
+  "Debtor",
+  "Tuition.fees.up.to.date",
+  "Gender",
+  "Scholarship.holder",
+  "International",
+  "Nationality_group"
+)
+
+# Función para calcular V de Cramer frente a Target_bin
+calcular_cramer <- function(var) {
+  
+  tabla <- table(datos_modelo[[var]], datos_modelo$Target_bin)
+  
+  v <- CramerV(tabla)
+  
+  data.frame(
+    Variable = var,
+    Cramer_V = as.numeric(v)
+  )
+}
+
+# Aplicar la función a todas las variables y ordenar
+resultados_cramer <- bind_rows(
+  lapply(variables_categoricas, calcular_cramer)
+) %>%
+  arrange(desc(Cramer_V))
+
+print(resultados_cramer)
+
+
+
+#Gráficos motivación:
+library(readxl)
+library(dplyr)
+library(ggplot2)
+
+archivo <- "lfso_24eab01$defaultview_spreadsheet.xlsx"
+
+datos <- read_excel(
+  archivo,
+  sheet = "Data",
+  range = "A1058:D1092",
+  col_names = FALSE
+)
+
+datos_limpios <- datos %>%
+  select(
+    pais = ...1,
+    tasa_abandono = ...4
+  ) %>%
+  filter(!is.na(pais), !is.na(tasa_abandono)) %>%
+  mutate(
+    tasa_abandono = as.numeric(tasa_abandono)
+  )
+
+datos_ue_portugal <- datos_limpios %>%
+  filter(pais %in% c("European Union - 27 countries (from 2020)", "Portugal")) %>%
+  mutate(
+    pais = recode(
+      pais,
+      "European Union - 27 countries (from 2020)" = "Unión Europea"
+    )
+  )
+
+ggplot(datos_ue_portugal, aes(x = pais, y = tasa_abandono, fill = pais)) +
+  geom_col(width = 0.55, show.legend = FALSE) +
+  geom_text(
+    aes(label = paste0(tasa_abandono, "%")),
+    vjust = -0.5,
+    size = 5,
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Tasa de abandono de educación o formación formal",
+    subtitle = "Personas de 15 a 34 años, 2024",
+    x = "",
+    y = "Porcentaje (%)",
+    caption = "Fuente: Eurostat, lfso_24eab01"
+  ) +
+  ylim(0, 20) +
+  theme_minimal()
+
+install.packages("sf")
+install.packages("rnaturalearth")
+install.packages("rnaturalearthdata")
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+
+
+# Instalar paquetes si no los tienes
+# install.packages(c("readxl", "dplyr", "plotly"))
+
+library(readxl)
+library(dplyr)
+library(plotly)
+
+# -------------------------------
+# 1. Leer el archivo de Eurostat
+# -------------------------------
+archivo <- "lfso_24eab01$defaultview_spreadsheet.xlsx"
+
+datos <- read_excel(
+  archivo,
+  sheet = "Data",
+  range = "A1058:D1092",
+  col_names = FALSE
+)
+
+# -------------------------------
+# 2. Limpiar datos
+# -------------------------------
+datos_limpios <- datos %>%
+  select(
+    pais = ...1,
+    tasa_abandono = ...4
+  ) %>%
+  filter(!is.na(pais), !is.na(tasa_abandono)) %>%
+  mutate(
+    tasa_abandono = suppressWarnings(as.numeric(tasa_abandono))
+  ) %>%
+  filter(!is.na(tasa_abandono)) %>%
+  filter(!grepl("Euro area", pais))
+
+# -------------------------------
+# 3. Tabla de equivalencias a ISO-3
+#    (necesario para plotly)
+# -------------------------------
+equivalencias_iso <- data.frame(
+  pais = c(
+    "European Union - 27 countries (from 2020)",
+    "Belgium", "Bulgaria", "Czechia", "Denmark", "Germany",
+    "Estonia", "Ireland", "Greece", "Spain", "France",
+    "Croatia", "Italy", "Cyprus", "Latvia", "Lithuania",
+    "Luxembourg", "Hungary", "Malta", "Netherlands",
+    "Austria", "Poland", "Portugal", "Romania", "Slovenia",
+    "Slovakia", "Finland", "Sweden", "Norway", "North Macedonia"
+  ),
+  pais_es = c(
+    "Unión Europea",
+    "Bélgica", "Bulgaria", "Chequia", "Dinamarca", "Alemania",
+    "Estonia", "Irlanda", "Grecia", "España", "Francia",
+    "Croacia", "Italia", "Chipre", "Letonia", "Lituania",
+    "Luxemburgo", "Hungría", "Malta", "Países Bajos",
+    "Austria", "Polonia", "Portugal", "Rumanía", "Eslovenia",
+    "Eslovaquia", "Finlandia", "Suecia", "Noruega", "Macedonia del Norte"
+  ),
+  iso3 = c(
+    "EUU",
+    "BEL", "BGR", "CZE", "DNK", "DEU",
+    "EST", "IRL", "GRC", "ESP", "FRA",
+    "HRV", "ITA", "CYP", "LVA", "LTU",
+    "LUX", "HUN", "MLT", "NLD",
+    "AUT", "POL", "PRT", "ROU", "SVN",
+    "SVK", "FIN", "SWE", "NOR", "MKD"
+  )
+)
+
+# -------------------------------
+# 4. Unir datos con ISO
+# -------------------------------
+datos_mapa <- datos_limpios %>%
+  left_join(equivalencias_iso, by = "pais") %>%
+  filter(!is.na(iso3)) %>%
+  filter(iso3 != "EUU") %>%
+  mutate(
+    texto = paste0(
+      "<b>", pais_es, "</b>",
+      "<br>Tasa de abandono: ", tasa_abandono, "%"
+    )
+  )
+# -------------------------------
+# 5. Crear texto para tooltip
+# -------------------------------
+datos_mapa <- datos_mapa %>%
+  mutate(
+    texto = paste0(
+      "<b>", pais, "</b>",
+      "<br>Tasa de abandono: ", tasa_abandono, "%"
+    )
+  )
+
+# -------------------------------
+# 6. Crear mapa interactivo
+# -------------------------------
+fig <- plotly::plot_ly(
+  data = datos_mapa,
+  type = "choropleth",
+  locations = ~iso3,
+  z = ~tasa_abandono,
+  text = ~texto,
+  hovertemplate = "%{text}<extra></extra>",
+  colorscale = list(
+    c(0.0, "#fee5d9"),
+    c(0.2, "#fcbba1"),
+    c(0.4, "#fc9272"),
+    c(0.6, "#fb6a4a"),
+    c(0.8, "#de2d26"),
+    c(1.0, "#a50f15")
+  ),
+  marker = list(
+    line = list(color = "white", width = 0.5)
+  ),
+  colorbar = list(
+    title = "Tasa (%)"
+  )
+)
+
+
+fig <- fig %>%
+  layout(
+    title = list(
+      text = "Tasa de abandono de educación o formación formal en Europa<br><sup>Personas de 15 a 34 años, 2024</sup>"
+    ),
+    geo = list(
+      scope = "europe",
+      projection = list(type = "mercator"),
+      showland = TRUE,
+      landcolor = "rgb(245,245,245)",
+      showcountries = TRUE,
+      countrycolor = "white",
+      showcoastlines = FALSE,
+      showframe = FALSE,
+      lataxis = list(range = c(34, 72)),
+      lonaxis = list(range = c(-12, 35))
+    )
+  )
+
+fig
+
+
+
+#guardar el mapa como HTML
+install.packages("htmlwidgets")
+library(htmlwidgets)
+
+saveWidget(fig, "mapa_abandono_europa.html", selfcontained = TRUE)
+
+getwd()
+
+#grafico Portugal OCDE
+library(ggplot2)
+library(dplyr)
+
+datos_ocde <- data.frame(
+  Zona = c("Portugal", "Media OCDE"),
+  Tasa = c(8, 13)
+)
+
+ggplot(datos_ocde, aes(x = Zona, y = Tasa, fill = Zona)) +
+  geom_col(width = 0.55, show.legend = FALSE) +
+  geom_text(
+    aes(label = paste0(Tasa, "%")),
+    vjust = -0.5,
+    size = 5,
+    fontface = "bold"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Portugal" = "#de2d26",
+      "Media OCDE" = "#fcae91"
+    )
+  ) +
+  labs(
+    title = "Abandono tras el primer año en programas de grado",
+    subtitle = "Estudiantes que acceden por primera vez a estudios de grado",
+    x = "",
+    y = "Porcentaje (%)",
+    caption = "Fuente: OECD, Education at a Glance"
+  ) +
+  ylim(0, 16) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text.x = element_text(size = 12, face = "bold"),
+    axis.title.y = element_text(size = 11),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+
+#target
+#Tabla de frecuencias absolutas
+freq_target <- table(datos_modelo$Target_bin)
+freq_target
+#Frecuencias relativas
+prop.table(freq_target)

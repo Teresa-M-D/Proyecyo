@@ -1,4 +1,4 @@
-#ANÁLISIS BIVARIANTE
+#ANÁLISIS BIVARIANTE SIN MULTIMEDIA:
 
 #Categóricas vs Target:
 library(clickR)
@@ -12,65 +12,65 @@ library(ggplot2)
 library(scales)
 
 
-names(datos_recodificados)[sapply(datos_recodificados, is.character)] #nombres de las variables categóricas
+names(datos_sin_multi)[sapply(datos_sin_multi, is.character)] #nombres de las variables categóricas
 
 
 #Reagrupacion variable Target:
-datos_recodificados$Target_bin <- ifelse(datos_recodificados$Target == "Dropout", "Dropout", "No Dropout")
-datos_recodificados$Target_bin <- as.factor(datos_recodificados$Target_bin)
+datos_sin_multi$Target_bin <- ifelse(datos_sin_multi$Target == "Dropout", "Abandono", "No Abandno")
+datos_sin_multi$Target_bin <- as.factor(datos_sin_multi$Target_bin)
 
 #Reagrupación de Marital_Status:
-datos_recodificados <- datos_recodificados %>%
+datos_sin_multi <- datos_sin_multi %>%
   mutate(Marital_group = case_when(
     Marital.status == "Soltero" ~ "Soltero",
     Marital.status %in% c("Casado", "Con pareja") ~ "En pareja",
     Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
   ))
-sum(table(datos_recodificados$Marital_group))
+sum(table(datos_sin_multi$Marital_group))
 
 #Proporciones:
-table(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin), 2)
+table(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin) 
+prop.table(table(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin), 2)
 
 #V de Cramer y Tau
-cramersV(table(datos_recodificados$Marital_group, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Marital_group, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Marital_group) 
+cramersV(table(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Marital_group) 
 
 
 #Chi-cuadrado con Marital_group:
-tabla <- table(datos_recodificados$Marital_group, datos_recodificados$Target_bin)
+tabla <- table(datos_sin_multi$Marital_group, datos_sin_multi$Target_bin)
 chisq.test(tabla)
 chisq.test(tabla)$expected
 
 #Gráfico mosaico:
-mosaic(~ Marital_group + Target_bin, data = datos_recodificados, 
+mosaic(~ Marital_group + Target_bin, data = datos_sin_multi, 
        shade = TRUE, legend = TRUE)
 
 
 #Daytime.evening.attendance:
-sum(table(datos_recodificados$Daytime.evening.attendance.))
-unique(datos_recodificados$Daytime.evening.attendance.)
+sum(table(datos_sin_multi$Daytime.evening.attendance.))
+unique(datos_sin_multi$Daytime.evening.attendance.)
 
 #Proporciones:
-table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin), 2)
+table(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin), 2)
 
 #Cramer y Tau:
-cramersV(table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Daytime.evening.attendance.) 
+cramersV(table(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Daytime.evening.attendance.) 
 
 #Chi-cuadrado:
-tabla_daytime_target <- table(datos_recodificados$Daytime.evening.attendance., datos_recodificados$Target_bin)
+tabla_daytime_target <- table(datos_sin_multi$Daytime.evening.attendance., datos_sin_multi$Target_bin)
 chisq.test(tabla_daytime_target, correct=FALSE)
 chisq.test(tabla_daytime_target)$expected
 
 #Gráfico:
 
-tabla_plot <- datos_recodificados %>%                  
+tabla_plot <- datos_sin_multi %>%                  
   count(Daytime.evening.attendance., Target_bin) %>%
   group_by(Daytime.evening.attendance.) %>%
   mutate(prop = n / sum(n))
@@ -88,61 +88,57 @@ ggplot(tabla_plot,
 
 
 
-#Displaced
+# Displaced
 
-sum(table(datos_recodificados$Displaced))
-unique(datos_recodificados$Displaced)
+sum(table(datos_sin_multi$Displaced))
+unique(datos_sin_multi$Displaced)
 
-#Proporciones:
-table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Displaced, datos_recodificados$Target_bin), 2)
+# Proporciones:
+table(datos_sin_multi$Displaced, datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Displaced, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Displaced, datos_sin_multi$Target_bin), 2)
 
-#Cramer y Tau:
-cramersV(table(datos_recodificados$Displaced, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Displaced, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Displaced) 
+# Cramer y Tau:
+cramersV(table(datos_sin_multi$Displaced, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Displaced, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Displaced) 
 
-#Chi-cuadrado:
-tabla_displaced_target <- table(datos_recodificados$Displaced, datos_recodificados$Target_bin)
-chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+# Chi-cuadrado:
+tabla_displaced_target <- table(datos_sin_multi$Displaced, datos_sin_multi$Target_bin)
+chisq.test(tabla_displaced_target, correct=FALSE)
 chisq.test(tabla_displaced_target)$expected
 
-#Gráfico:
-mosaic(~ Displaced + Target_bin, data = datos_recodificados,  #he elegido esta
+# Gráfico:
+mosaic(~ Displaced + Target_bin, data = datos_sin_multi,
        shade = TRUE, legend = TRUE)
 
 
 
+# Tuition fees up to date:
 
+sum(table(datos_sin_multi$Tuition.fees.up.to.date))
+unique(datos_sin_multi$Tuition.fees.up.to.date)
 
-#Tuition fees up to date:
+# Proporciones:
+table(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin), 2)
 
-sum(table(datos_recodificados$Tuition.fees.up.to.date))
-unique(datos_recodificados$Tuition.fees.up.to.date)
+# Cramer y Tau:
+cramersV(table(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Tuition.fees.up.to.date) 
 
-#Proporciones:
-table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Tuition.fees.up.to.date) 
-
-#Chi-cuadrado:
-tabla_tution_target <- table(datos_recodificados$Tuition.fees.up.to.date, datos_recodificados$Target_bin)
-chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+# Chi-cuadrado:
+tabla_tution_target <- table(datos_sin_multi$Tuition.fees.up.to.date, datos_sin_multi$Target_bin)
+chisq.test(tabla_tution_target, correct=FALSE)
 chisq.test(tabla_tution_target)$expected
 
-#Gráficos:
-mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_recodificados,  
+# Gráficos:
+mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
-
-
-tabla_plot <- datos_recodificados %>%
+tabla_plot <- datos_sin_multi %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
   mutate(prop = n / sum(n),
@@ -155,7 +151,7 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
             size = 4) +
   scale_y_continuous(labels = percent) +
   labs(
-    x = "Turno",
+    x = "Matrícula al día",
     y = "Proporción",
     fill = "Abandono",
     title = "Relación entre Matrícula al día y Abandono"
@@ -163,32 +159,31 @@ ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)
   theme_minimal()
 
 
+# Debtor:
 
-#Debtor:
+sum(table(datos_sin_multi$Debtor))
+unique(datos_sin_multi$Debtor)
 
-sum(table(datos_recodificados$Debtor))
-unique(datos_recodificados$Debtor)
-#Proporciones:
-table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Debtor, datos_recodificados$Target_bin), 2)
+# Proporciones:
+table(datos_sin_multi$Debtor, datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Debtor, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Debtor, datos_sin_multi$Target_bin), 2)
 
-#Cramer y Tau:
-cramersV(table(datos_recodificados$Debtor, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Debtor, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Debtor) 
+# Cramer y Tau:
+cramersV(table(datos_sin_multi$Debtor, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Debtor, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Debtor) 
 
-#Chi-cuadrado:
-tabla_debtor_target <- table(datos_recodificados$Debtor, datos_recodificados$Target_bin)
-chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+# Chi-cuadrado:
+tabla_debtor_target <- table(datos_sin_multi$Debtor, datos_sin_multi$Target_bin)
+chisq.test(tabla_debtor_target, correct=FALSE)
 chisq.test(tabla_debtor_target)$expected
 
-#Gráficos:
-mosaic(~ Debtor + Target_bin, data = datos_recodificados,  
+# Gráficos:
+mosaic(~ Debtor + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
-
-tabla_debtor_plot <- datos_recodificados %>%
+tabla_debtor_plot <- datos_sin_multi %>%
   count(Debtor, Target_bin) %>%
   group_by(Debtor) %>%
   mutate(
@@ -203,7 +198,7 @@ ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
             size = 4) +
   scale_y_continuous(labels = percent) +
   labs(
-    x = "Debe dinero",
+    x = "Deudor",
     y = "Proporción",
     fill = "Abandono",
     title = "Relación entre Deudor y Abandono"
@@ -212,81 +207,80 @@ ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
 
 
 
+# Scholarship_holder:
 
-#Scholarship_holder:
+sum(table(datos_sin_multi$Scholarship.holder))
+unique(datos_sin_multi$Scholarship.holder)
 
-sum(table(datos_recodificados$Scholarship.holder))
-unique(datos_recodificados$Scholarship.holder)
-#Proporciones:
-table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin), 2)
+# Proporciones:
+table(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin), 2)
 
-#Cramer y Tau:
-cramersV(table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Scholarship.holder) 
+# Cramer y Tau:
+cramersV(table(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Scholarship.holder) 
 
-#Chi-cuadrado:
-tabla_beca_target <- table(datos_recodificados$Scholarship.holder, datos_recodificados$Target_bin)
-chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+# Chi-cuadrado:
+tabla_beca_target <- table(datos_sin_multi$Scholarship.holder, datos_sin_multi$Target_bin)
+chisq.test(tabla_beca_target, correct=FALSE)
 chisq.test(tabla_beca_target)$expected
 
-#Gráficos:
-mosaic(~ Scholarship.holder + Target_bin, data = datos_recodificados,  
+# Gráficos:
+mosaic(~ Scholarship.holder + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
 
 
+# Educational_special_needs:
 
+sum(table(datos_sin_multi$Educational.special.needs))
+unique(datos_sin_multi$Educational.special.needs)
 
-#Educational_special_needs:
-sum(table(datos_recodificados$Educational.special.needs))
-unique(datos_recodificados$Educational.special.needs)
+# Proporciones:
+table(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin)
+prop.table(table(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin), 1)
+prop.table(table(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin), 2)
 
-#Proporciones:
-table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 1)
-prop.table(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin), 2)
+# Cramer y Tau:
+cramersV(table(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin))
+GK_assoc(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin) 
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Educational.special.needs) 
 
-#Cramer y Tau:
-cramersV(table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin))
-GK_assoc(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin) 
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Educational.special.needs) 
-
-#Chi-cuadrado:
-tabla_necesidades_target <- table(datos_recodificados$Educational.special.needs, datos_recodificados$Target_bin)
-chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+# Chi-cuadrado:
+tabla_necesidades_target <- table(datos_sin_multi$Educational.special.needs, datos_sin_multi$Target_bin)
+chisq.test(tabla_necesidades_target, correct=FALSE)
 chisq.test(tabla_necesidades_target)$expected
 
 
 
+# International:
 
-#International:
-sum(table(datos_recodificados$International))
-unique(datos_recodificados$International)
+sum(table(datos_sin_multi$International))
+unique(datos_sin_multi$International)
 
-#Proporciones:
-tabla_internacional_target <- table(datos_recodificados$International,
-                                    datos_recodificados$Target_bin)
+# Proporciones:
+tabla_internacional_target <- table(datos_sin_multi$International,
+                                    datos_sin_multi$Target_bin)
 tabla_internacional_target
 
 prop.table(tabla_internacional_target, 1)
 prop.table(tabla_internacional_target, 2)
 
-#Cramer y Tau:
+# Cramer y Tau:
 cramersV(tabla_internacional_target)
-GK_assoc(datos_recodificados$International, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$International)
+GK_assoc(datos_sin_multi$International, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$International)
 
-#Chi-cuadrado:
+# Chi-cuadrado:
 chisq.test(tabla_internacional_target, correct = FALSE)
 chisq.test(tabla_internacional_target)$expected
 
-#Gráfico:
-table(datos_recodificados$International)
+# Gráfico:
+table(datos_sin_multi$International)
 
-tabla_internacional_plot <- datos_recodificados %>%
+tabla_internacional_plot <- datos_sin_multi %>%
   count(International, Target_bin) %>%
   group_by(International) %>%
   mutate(prop = n / sum(n),
@@ -309,19 +303,16 @@ ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_
 
 
 
+# Application_mode:
 
-#Application_mode:
+# Reagrupación application_mode:
 
+table(datos_sin_multi$Application.mode)
 
-#Reagrupación application_mode:
-
-table(datos_recodificados$Application.mode)
-
-
-datos_recodificados$Application.mode_group <- case_when(
+datos_sin_multi$Application.mode_group <- case_when(
   
   # ACCESO NORMAL
-  datos_recodificados$Application.mode %in% c(
+  datos_sin_multi$Application.mode %in% c(
     "1ª fase - cupo general",
     "2ª fase - cupo general",
     "3ª fase - cupo general",
@@ -330,7 +321,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso normal",
   
   # MAYORES/ESPECIALES
-  datos_recodificados$Application.mode %in% c(
+  datos_sin_multi$Application.mode %in% c(
     "Mayores de 23 años",
     "Ordenanza nº 533-A/99, apartado b2 (plan diferente)",
     "Ordenanza nº 533-A/99, apartado b3 (otra institución)",
@@ -339,7 +330,7 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso mayores/especiales",
   
   # CAMBIO/TRASLADO
-  datos_recodificados$Application.mode %in% c(
+  datos_sin_multi$Application.mode %in% c(
     "Cambio de institución/titulación",
     "Cambio de titulación",
     "Traslado",
@@ -347,43 +338,37 @@ datos_recodificados$Application.mode_group <- case_when(
   ) ~ "Acceso por cambio/traslado",
   
   # FORMACIÓN PREVIA
-  datos_recodificados$Application.mode %in% c(
+  datos_sin_multi$Application.mode %in% c(
     "Titulares de diploma de ciclo corto",
     "Titulares de diploma de especialización tecnológica",
     "Titulares de otros estudios superiores"
   ) ~ "Acceso por formación previa",
   
   # INTERNACIONAL
-  datos_recodificados$Application.mode %in% c(
+  datos_sin_multi$Application.mode %in% c(
     "Estudiante internacional (grado)"
-    
-  ) ~ "Acceso internacional",
+  ) ~ "Acceso internacional"
   
 )
 
+unique(datos_sin_multi$Application.mode_group)
 
-
-
-
-unique(datos_recodificados$Application.mode_group)
-tabla_modo_app_target <- table(datos_recodificados$Application.mode_group,
-                               datos_recodificados$Target_bin)
+tabla_modo_app_target <- table(datos_sin_multi$Application.mode_group,
+                               datos_sin_multi$Target_bin)
 tabla_modo_app_target
 
 prop.table(tabla_modo_app_target, 1)
 prop.table(tabla_modo_app_target, 2)
 
 cramersV(tabla_modo_app_target)
-GK_assoc(datos_recodificados$Application.mode_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Application.mode_group)
+GK_assoc(datos_sin_multi$Application.mode_group, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Application.mode_group)
 
 chisq.test(tabla_modo_app_target, correct = FALSE)
 chisq.test(tabla_modo_app_target)$expected
 
-
-
-#Gráficos:
-tabla_modo_app_plot <- datos_recodificados %>%
+# Gráficos:
+tabla_modo_app_plot <- datos_sin_multi %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
   mutate(prop = n / sum(n),
@@ -404,70 +389,70 @@ ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Tar
   theme_minimal()
 
 
+# Género:
+unique(datos_sin_multi$Gender)
 
-#Género:
-unique(datos_recodificados$Gender)
-tabla_genero_target <- table(datos_recodificados$Gender,
-                             datos_recodificados$Target_bin)
+tabla_genero_target <- table(datos_sin_multi$Gender,
+                             datos_sin_multi$Target_bin)
 tabla_genero_target
 
 prop.table(tabla_genero_target, 1)
 prop.table(tabla_genero_target, 2)
 
 cramersV(tabla_genero_target)
-GK_assoc(datos_recodificados$Gender, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Gender)
+GK_assoc(datos_sin_multi$Gender, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Gender)
 
 chisq.test(tabla_genero_target, correct = FALSE)
 chisq.test(tabla_genero_target)$expected
-#Gráfico:
-mosaic(~ Gender + Target_bin, data = datos_recodificados,  
+
+# Gráfico:
+mosaic(~ Gender + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
 
+# Course
+# Vamos a realizar una reagrupación de las carreras para que el estudio sea fiable:
 
-
-
-#Course
-#Vamosa realizar una reagrupacion de las carreras para que el estudio se fiable:
-
-datos_recodificados$Course_group <- dplyr::case_when(
+datos_sin_multi$Course_group <- dplyr::case_when(
   
   # SALUD
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Enfermería",
     "Enfermería Veterinaria",
     "Higiene Bucodental"
   ) ~ "Salud",
   
   # INGENIERÍA / TECNOLOGÍA
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Ingeniería Informática",
     "Tecnologías de Producción de Biocombustibles",
     "Diseño de Animación y Multimedia"
   ) ~ "Ingeniería/Tech",
   
   # SOCIALES / EMPRESA
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Gestión",
+    "Gestión (turno de tarde)",
     "Gestión de Publicidad y Marketing",
     "Turismo"
   ) ~ "Empresa",
   
   # EDUCACIÓN / SOCIAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Educación Básica",
-    "Trabajo Social"
+    "Trabajo Social",
+    "Trabajo Social (turno de tarde)"
   ) ~ "Educación/Social",
   
   # COMUNICACIÓN / DISEÑO
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Diseño de Comunicación",
     "Periodismo y Comunicación"
   ) ~ "Comunicación",
   
   # AGRO / ANIMAL
-  datos_recodificados$Course_limpio %in% c(
+  datos_sin_multi$Course %in% c(
     "Agronomía",
     "Equinocultura"
   ) ~ "Agro/Animal",
@@ -475,25 +460,26 @@ datos_recodificados$Course_group <- dplyr::case_when(
   TRUE ~ NA_character_
 )
 
-sum(table(datos_recodificados$Course_group))
-unique(datos_recodificados$Course)
-tabla_course_target <- table(datos_recodificados$Course_group,
-                             datos_recodificados$Target_bin)
+sum(table(datos_sin_multi$Course_group))
+unique(datos_sin_multi$Course)
+
+tabla_course_target <- table(datos_sin_multi$Course_group,
+                             datos_sin_multi$Target_bin)
 tabla_course_target
 
 prop.table(tabla_course_target, 1)
 prop.table(tabla_course_target, 2)
 
 cramersV(tabla_course_target)
-GK_assoc(datos_recodificados$Course_group, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Course_group)
+GK_assoc(datos_sin_multi$Course_group, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Course_group)
 
 chisq.test(tabla_course_target, correct = FALSE)
 chisq.test(tabla_course_target)$expected
 
-#Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
-datos_recodificados$Course_group_short <- dplyr::recode(
-  datos_recodificados$Course_group,
+# Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
+datos_sin_multi$Course_group_short <- dplyr::recode(
+  datos_sin_multi$Course_group,
   "Ingeniería/Tech" = "Ing./Tech",
   "Educación/Social" = "Educ./Soc.",
   "Comunicación" = "Com.",
@@ -503,15 +489,12 @@ datos_recodificados$Course_group_short <- dplyr::recode(
 )
 
 mosaic(~ Course_group_short + Target_bin, 
-       data = datos_recodificados,
+       data = datos_sin_multi,
        shade = TRUE,
        legend = TRUE,
        cex.axis = 0.8)  
 
-
-
-
-tabla_course_plot <- datos_recodificados %>%
+tabla_course_plot <- datos_sin_multi %>%
   count(Course_group, Target_bin) %>%
   group_by(Course_group) %>%
   mutate(prop = n / sum(n),
@@ -531,140 +514,265 @@ ggplot(tabla_course_plot, aes(x = Course_group, y = prop, fill = Target_bin)) +
   ) +
   theme_minimal()
 
+#analizamos sin Diseño Multimedia:
 
-#Previous education level
-table(datos_recodificados$Previous_education_level)
-unique(datos_recodificados$Previous_education_level)
-tabla_prev_edu_target <- table(datos_recodificados$Previous_education_level,
-                               datos_recodificados$Target_bin)
+#empezamos creando un dataset sin multimedia:
+datos_sin_multi <- datos_recodificados[
+  datos_recodificados$Course_limpio != "Diseño de Animación y Multimedia",
+]
+sum(table(datos_sin_multi$Course_limpio))
+
+datos_sin_multi$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_sin_multi$Course_limpio %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_sin_multi$Course_limpio %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_sin_multi$Course_limpio %in% c(
+    "Gestión",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_sin_multi$Course_limpio %in% c(
+    "Educación Básica",
+    "Trabajo Social"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_sin_multi$Course_limpio %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_sin_multi$Course_limpio %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
+
+
+
+#seguimos
+sum(table(datos_sin_multi$Course_group))
+table(datos_sin_multi$Course_group)
+colnames(datos_sin_multi)
+tabla_course_sin_multi_target <- table(datos_sin_multi$Course_group,
+                                       datos_sin_multi$Target_bin)
+tabla_course_sin_multi_target
+
+
+prop.table(tabla_course_sin_multi_target, 1)
+prop.table(tabla_course_sin_multi_target, 2)
+
+cramersV(tabla_course_sin_multi_target)
+GK_assoc(datos_sin_multi$Course_group, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Course_group)
+
+chisq.test(tabla_course_sin_multi_target, correct = FALSE)
+chisq.test(tabla_course_sin_multi_target)$expected
+
+#Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
+
+datos_sin_multi$Course_group_short <- dplyr::recode(
+  datos_sin_multi$Course_group,
+  "Ingeniería/Tech" = "Ing./Tech",
+  "Educación/Social" = "Educ./Soc.",
+  "Comunicación" = "Com.",
+  "Agro/Animal" = "Agro/Anim.",
+  "Empresa" = "Empresa",
+  "Salud" = "Salud"
+)
+
+# Gráficos:
+
+mosaic(~ Course_group_short + Target_bin, 
+       data = datos_sin_multi,
+       shade = TRUE,
+       legend = TRUE,
+       cex.axis = 0.8)  
+
+tabla_course_plot <- datos_sin_multi %>%
+  count(Course_group_short, Target_bin) %>%
+  group_by(Course_group_short) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+ggplot(tabla_course_plot, aes(x = Course_group_short, y = prop, fill = Target_bin)) +
+  geom_col() +
+  geom_text(aes(label = etiqueta),
+            position = position_stack(vjust = 0.5),
+            size = 4) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = c(
+    "Dropout" = "red",
+    "No Dropout" = "lightgreen"
+  )) +
+  labs(
+    x = "Tipo de carrera",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre tipo de carrera y abandono"
+  ) +
+  theme_minimal()
+
+
+# Previous education level
+table(datos_sin_multi$Previous_education_level)
+unique(datos_sin_multi$Previous_education_level)
+
+tabla_prev_edu_target <- table(datos_sin_multi$Previous_education_level,
+                               datos_sin_multi$Target_bin)
 tabla_prev_edu_target
 
 prop.table(tabla_prev_edu_target, 1)
 prop.table(tabla_prev_edu_target, 2)
 
 cramersV(tabla_prev_edu_target)
-GK_assoc(datos_recodificados$Previous_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Previous_education_level)
+GK_assoc(datos_sin_multi$Previous_education_level, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Previous_education_level)
 
 chisq.test(tabla_prev_edu_target, correct = FALSE)
 chisq.test(tabla_prev_edu_target)$expected
 
-
-#Cambiamos a nombres más cortos:
-datos_recodificados$Previous_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Previous_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sin_multi$Previous_education_level_group_short <- dplyr::recode(
+  datos_sin_multi$Previous_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_recodificados,  
+
+# Gráfico:
+mosaic(~ Previous_education_level_group_short + Target_bin, 
+       data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
 
-#Mother education level:
-table(datos_recodificados$Mother_education_level)
-unique(datos_recodificados$Mother_education_level)
-tabla_mum_educ_target <- table(datos_recodificados$Mother_education_level,
-                               datos_recodificados$Target_bin)
+# Mother education level:
+table(datos_sin_multi$Mother_education_level)
+unique(datos_sin_multi$Mother_education_level)
+
+tabla_mum_educ_target <- table(datos_sin_multi$Mother_education_level,
+                               datos_sin_multi$Target_bin)
 tabla_mum_educ_target
 
 prop.table(tabla_mum_educ_target, 1)
 prop.table(tabla_mum_educ_target, 2)
 
 cramersV(tabla_mum_educ_target)
-GK_assoc(datos_recodificados$Mother_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_education_level)
+GK_assoc(datos_sin_multi$Mother_education_level, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Mother_education_level)
 
 chisq.test(tabla_mum_educ_target, correct = FALSE)
 chisq.test(tabla_mum_educ_target)$expected
 
-#Cambiamos a nombres más cortos:
-datos_recodificados$Mother_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Mother_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+# Cambiamos a nombres más cortos:
+datos_sin_multi$Mother_education_level_group_short <- dplyr::recode(
+  datos_sin_multi$Mother_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_recodificados,  
+
+# Gráfico:
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
+# Father education level:
+table(datos_sin_multi$Father_education_level)
+unique(datos_sin_multi$Father_education_level)
 
-#Father education level:
-table(datos_recodificados$Father_education_level)
-unique(datos_recodificados$Father_education_level)
-tabla_dad_educ_target <- table(datos_recodificados$Father_education_level,
-                               datos_recodificados$Target_bin)
+tabla_dad_educ_target <- table(datos_sin_multi$Father_education_level,
+                               datos_sin_multi$Target_bin)
 tabla_dad_educ_target
 
 prop.table(tabla_dad_educ_target, 1)
 prop.table(tabla_dad_educ_target, 2)
 
 cramersV(tabla_dad_educ_target)
-GK_assoc(datos_recodificados$Father_education_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_education_level)
+GK_assoc(datos_sin_multi$Father_education_level, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Father_education_level)
 
 chisq.test(tabla_dad_educ_target, correct = FALSE)
 chisq.test(tabla_dad_educ_target)$expected
-#Cambiamos a nombres más cortos:
-datos_recodificados$Father_education_level_group_short <- dplyr::recode(
-  datos_recodificados$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
+
+# Cambiamos a nombres más cortos:
+datos_sin_multi$Father_education_level_group_short <- dplyr::recode(
+  datos_sin_multi$Father_education_level,
+  "Bajo" = "Bajo",
+  "Medio" = "Medio",
+  "Superior" = "Sup.",
+  "Técnico" = "Técn."
 )
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_recodificados,  
+
+# Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin, 
+       data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
 
-#Mother occupation level:
+# Mother occupation level:
 
-table(datos_recodificados$Mother_occupation_level)
-unique(datos_recodificados$Mother_occupation_level)
-tabla_mum_ocup_target <- table(datos_recodificados$Mother_occupation_level,
-                               datos_recodificados$Target_bin)
+table(datos_sin_multi$Mother_occupation_level)
+unique(datos_sin_multi$Mother_occupation_level)
+
+tabla_mum_ocup_target <- table(datos_sin_multi$Mother_occupation_level,
+                               datos_sin_multi$Target_bin)
 tabla_mum_ocup_target
 
 prop.table(tabla_mum_ocup_target, 1)
 prop.table(tabla_mum_ocup_target, 2)
 
 cramersV(tabla_mum_ocup_target)
-GK_assoc(datos_recodificados$Mother_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Mother_occupation_level)
+GK_assoc(datos_sin_multi$Mother_occupation_level, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Mother_occupation_level)
 
 chisq.test(tabla_mum_ocup_target, correct = FALSE)
 chisq.test(tabla_mum_ocup_target)$expected
-#Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_recodificados,  
+
+# Gráfico:
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
 
+# Father occupation level:
 
-#Father occupation level:
-table(datos_recodificados$Father_occupation_level)
-unique(datos_recodificados$Father_occupation_level)
-tabla_dad_ocup_target <- table(datos_recodificados$Father_occupation_level,
-                               datos_recodificados$Target_bin)
+table(datos_sin_multi$Father_occupation_level)
+unique(datos_sin_multi$Father_occupation_level)
+
+tabla_dad_ocup_target <- table(datos_sin_multi$Father_occupation_level,
+                               datos_sin_multi$Target_bin)
 tabla_dad_ocup_target
 
 prop.table(tabla_dad_ocup_target, 1)
 prop.table(tabla_dad_ocup_target, 2)
 
 cramersV(tabla_dad_ocup_target)
-GK_assoc(datos_recodificados$Father_occupation_level, datos_recodificados$Target_bin)
-GK_assoc(datos_recodificados$Target_bin, datos_recodificados$Father_occupation_level)
+GK_assoc(datos_sin_multi$Father_occupation_level, datos_sin_multi$Target_bin)
+GK_assoc(datos_sin_multi$Target_bin, datos_sin_multi$Father_occupation_level)
 
 chisq.test(tabla_dad_ocup_target, correct = FALSE)
 chisq.test(tabla_dad_ocup_target)$expected
 
-#Gráficos:
-mosaic(~ Father_occupation_level + Target_bin, data = datos_recodificados,  
+# Gráficos:
+mosaic(~ Father_occupation_level + Target_bin, data = datos_sin_multi,  
        shade = TRUE, legend = TRUE)
-
 
 
 tabla_course_plot <- datos_recodificados %>%
@@ -1064,52 +1172,52 @@ mosaic(~ Mother_occupation_level + Target_bin, data = datos_sin_imputar,
 
 # Recodificamos primero la variable:
 datos_sin_imputar$Father.s.occupation_recodif<-recode(datos_sin_imputar$Father.s.occupation,
-                                                `0` = "Estudiante",
-                                                `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
-                                                `2` = "Especialistas en actividades intelectuales y científicas",
-                                                `3` = "Técnicos y profesiones de nivel intermedio",
-                                                `4` = "Personal administrativo",
-                                                `5` = "Trabajadores de servicios personales, seguridad y vendedores",
-                                                `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
-                                                `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
-                                                `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
-                                                `9` = "Trabajadores no cualificados",
-                                                `10` = "Profesiones de las fuerzas armadas",
-                                                `90` = "Otra situación",
-                                                `99` = "(en blanco)",
-                                                `101` = "Oficiales de las fuerzas armadas",
-                                                `102` = "Sargentos de las fuerzas armadas",
-                                                `103` = "Otro personal de las fuerzas armadas",
-                                                `112` = "Directores de servicios administrativos y comerciales",
-                                                `114` = "Directores de hostelería, comercio y otros servicios",
-                                                `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
-                                                `122` = "Profesionales de la salud",
-                                                `123` = "Profesores",
-                                                `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
-                                                `131` = "Técnicos intermedios en ciencia e ingeniería",
-                                                `132` = "Técnicos y profesionales intermedios de salud",
-                                                `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
-                                                `135` = "Técnicos en tecnologías de la información y la comunicación",
-                                                `141` = "Empleados de oficina, secretarios y operadores de datos",
-                                                `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
-                                                `144` = "Otro personal de apoyo administrativo",
-                                                `151` = "Trabajadores de servicios personales",
-                                                `152` = "Vendedores",
-                                                `153` = "Trabajadores de cuidado personal y similares",
-                                                `154` = "Personal de protección y seguridad",
-                                                `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
-                                                `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
-                                                `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
-                                                `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
-                                                `174` = "Trabajadores cualificados en electricidad y electrónica",
-                                                `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
-                                                `181` = "Operadores de instalaciones y maquinaria fija",
-                                                `182` = "Trabajadores de montaje",
-                                                `183` = "Conductores de vehículos y operadores de maquinaria móvil",
-                                                `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
-                                                `193` = "Trabajadores no cualificados en industria, construcción y transporte",
-                                                `194` = "Ayudantes de preparación de comidas",
-                                                `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
+                                                      `0` = "Estudiante",
+                                                      `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
+                                                      `2` = "Especialistas en actividades intelectuales y científicas",
+                                                      `3` = "Técnicos y profesiones de nivel intermedio",
+                                                      `4` = "Personal administrativo",
+                                                      `5` = "Trabajadores de servicios personales, seguridad y vendedores",
+                                                      `6` = "Agricultores y trabajadores cualificados en agricultura, pesca y silvicultura",
+                                                      `7` = "Trabajadores cualificados de la industria, construcción y artesanía",
+                                                      `8` = "Operadores de instalaciones y maquinaria y trabajadores de montaje",
+                                                      `9` = "Trabajadores no cualificados",
+                                                      `10` = "Profesiones de las fuerzas armadas",
+                                                      `90` = "Otra situación",
+                                                      `99` = "(en blanco)",
+                                                      `101` = "Oficiales de las fuerzas armadas",
+                                                      `102` = "Sargentos de las fuerzas armadas",
+                                                      `103` = "Otro personal de las fuerzas armadas",
+                                                      `112` = "Directores de servicios administrativos y comerciales",
+                                                      `114` = "Directores de hostelería, comercio y otros servicios",
+                                                      `121` = "Especialistas en ciencias físicas, matemáticas, ingeniería y afines",
+                                                      `122` = "Profesionales de la salud",
+                                                      `123` = "Profesores",
+                                                      `124` = "Especialistas en finanzas, contabilidad, organización administrativa y relaciones públicas/comerciales",
+                                                      `131` = "Técnicos intermedios en ciencia e ingeniería",
+                                                      `132` = "Técnicos y profesionales intermedios de salud",
+                                                      `134` = "Técnicos intermedios en servicios jurídicos, sociales, deportivos y culturales",
+                                                      `135` = "Técnicos en tecnologías de la información y la comunicación",
+                                                      `141` = "Empleados de oficina, secretarios y operadores de datos",
+                                                      `143` = "Operadores de datos, contabilidad, estadística y servicios financieros",
+                                                      `144` = "Otro personal de apoyo administrativo",
+                                                      `151` = "Trabajadores de servicios personales",
+                                                      `152` = "Vendedores",
+                                                      `153` = "Trabajadores de cuidado personal y similares",
+                                                      `154` = "Personal de protección y seguridad",
+                                                      `161` = "Agricultores orientados al mercado y trabajadores agrícolas cualificados",
+                                                      `163` = "Agricultores de subsistencia, pescadores, cazadores y recolectores",
+                                                      `171` = "Trabajadores cualificados de la construcción (excepto electricistas)",
+                                                      `172` = "Trabajadores cualificados en metalurgia y trabajo del metal",
+                                                      `174` = "Trabajadores cualificados en electricidad y electrónica",
+                                                      `175` = "Trabajadores en alimentación, madera, textil y otras industrias",
+                                                      `181` = "Operadores de instalaciones y maquinaria fija",
+                                                      `182` = "Trabajadores de montaje",
+                                                      `183` = "Conductores de vehículos y operadores de maquinaria móvil",
+                                                      `192` = "Trabajadores no cualificados en agricultura, pesca y silvicultura",
+                                                      `193` = "Trabajadores no cualificados en industria, construcción y transporte",
+                                                      `194` = "Ayudantes de preparación de comidas",
+                                                      `195` = "Vendedores ambulantes (excepto alimentos) y servicios callejeros")
 
 sum(table(datos_sin_imputar$Father.s.occupation))
 

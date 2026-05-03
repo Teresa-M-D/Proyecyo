@@ -769,3 +769,14 @@ table(datos_modelo$Course)
 datos_modelo$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
                                           datos_modelo$Course)
 table(datos_modelo$Course_limpio)
+
+
+
+#Creo dos variables numéricas que faltan:
+#Porcentaje_aprobado_sem_2
+#Carga_academica_real_sem_2
+
+datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
+datos_modelo$Carga_academica_real_sem_2 <- 
+  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
+  datos_modelo$Curricular.units.2nd.sem..credited.
