@@ -1725,7 +1725,7 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group)
 
 #Chi-cuadrado con Marital_group:
 tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
-chisq.test(tabla)
+chisq.test(tabla, correct=FALSE)
 chisq.test(tabla)$expected
 
 #Gráfico mosaico:
@@ -1797,8 +1797,54 @@ mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
        shade = TRUE, legend = TRUE)
 
 
+#Nationality
+
+sum(table(datos_modelo$Nationality))
+unique(datos_modelo$Nationality)
+
+#Proporciones:
+table(datos_modelo$Nationality_group, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Nationality_group, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Nationality_group, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Nationality_group, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Nationality_group, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Nationality_group) 
+
+#Chi-cuadrado:
+tabla_nationality_target <- table(datos_modelo$Nationality_group, datos_modelo$Target_bin)
+chisq.test(tabla_nationality_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_nationality_target)$expected
+
+#Gráfico:
+mosaic(~ Nationality_group + Target_bin, data = datos_modelo,  #he elegido esta
+       shade = TRUE, legend = TRUE)
 
 
+#International
+
+sum(table(datos_modelo$International))
+unique(datos_modelo$International)
+
+#Proporciones:
+table(datos_modelo$International, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$International, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$International, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$International, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$International, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$International) 
+
+#Chi-cuadrado:
+tabla_international_target <- table(datos_modelo$International, datos_modelo$Target_bin)
+chisq.test(tabla_international_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_international_target)$expected
+
+#Gráfico:
+mosaic(~ International + Target_bin, data = datos_modelo,  #he elegido esta
+       shade = TRUE, legend = TRUE)
 
 #Tuition fees up to date:
 
@@ -1818,31 +1864,40 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Tuition.fees.up.to.date)
 #Chi-cuadrado:
 tabla_tution_target <- table(datos_modelo$Tuition.fees.up.to.date, datos_modelo$Target_bin)
 chisq.test(tabla_tution_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_tution_target)$expected
+chisq.test(tabla_tution_target, correct=FALSE)$expected
 
 #Gráficos:
 mosaic(~ Tuition.fees.up.to.date + Target_bin, data = datos_modelo,  
        shade = TRUE, legend = TRUE)
 
 
-
 tabla_plot <- datos_modelo %>%
   count(Tuition.fees.up.to.date, Target_bin) %>%
   group_by(Tuition.fees.up.to.date) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = percent(prop, accuracy = 0.1))
+  mutate(
+    prop = n / sum(n),
+    etiqueta = percent(prop, accuracy = 0.1)
+  )
 
 ggplot(tabla_plot, aes(x = Tuition.fees.up.to.date, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "lightgreen"
+    )
+  ) +
   scale_y_continuous(labels = percent) +
   labs(
-    x = "Turno",
+    x = "Tasas al día",
     y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Matrícula al día y Abandono"
+    fill = "Target",
+    title = "Relación entre tasas al día y abandono"
   ) +
   theme_minimal()
 
@@ -2062,26 +2117,40 @@ GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
 chisq.test(tabla_modo_app_target, correct = FALSE)
 chisq.test(tabla_modo_app_target)$expected
 
+#Gráfico:
+mosaic(~ Application.mode_group + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
 
 
-#Gráficos:
+
+# Gráficos:
 tabla_modo_app_plot <- datos_modelo %>%
   count(Application.mode_group, Target_bin) %>%
   group_by(Application.mode_group) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = scales::percent(prop, accuracy = 0.1))
+  mutate(
+    prop = n / sum(n),
+    etiqueta = scales::percent(prop, accuracy = 0.1)
+  )
 
 ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Target_bin)) +
   geom_col(position = "fill") +
-  geom_text(aes(label = etiqueta),
-            position = position_fill(vjust = 0.5),
-            size = 4) +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "lightgreen"
+    )
+  ) +
   scale_y_continuous(labels = scales::percent) +
   labs(
     x = "Tipo de acceso al grado",
     y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre Tipo de acceso al grado y Abandono"
+    fill = "Target",
+    title = "Relación entre vía de acceso y abandono"
   ) +
   theme_minimal()
 
@@ -3025,8 +3094,7 @@ datos_recodificados$Carga_academica_real_sem2 <-
 
 View(datos_recodificados[
   datos_recodificados$Carga_academica_real_sem2==0,
-  c("Carga_academica_real_sem2",
-    "Course_limpio",
+  c("Course_limpio",
     "Target",
     "Curricular.units.2nd.sem.grade_10",
     "Curricular.units.2nd.sem..evaluations.",
@@ -3053,20 +3121,135 @@ View(datos_recodificados[
 
 View(datos_recodificados[
   datos_recodificados$Course=="Diseño de Animación y Multimedia",
-  c("Course",
-    "year",
-    "Target",
+  c("Course_limpio",
+    "Target_bin",
     "Curricular.units.1st.sem..evaluations.",
     "Curricular.units.1st.sem..enrolled.",
+    "Curricular.units.1st.sem..credited.",
+    "Curricular.units.1st.sem..approved.",
+    "Curricular.units.1st.sem.grade_10",
+    "Curricular.units.1st.sem..without.evaluations.",
+    "Curricular.units.2nd.sem..evaluations.",
+    "Curricular.units.2nd.sem..enrolled.",
+    "Curricular.units.2nd.sem..credited.",
+    "Curricular.units.2nd.sem.grade_10",
+    "Curricular.units.2nd.sem..without.evaluations.",
     "Carga_academica_real",
-    "Carga_academica_real_sem2",
     "Application.mode_group"
   )
 ])
+
 datos_recodificados$Application.mode_group
 
 
+# Variables de rendimiento académico del primer semestre
+vars_rendimiento <- c(
+  "Curricular.units.1st.sem..credited.",
+  "Curricular.units.1st.sem..enrolled.",
+  "Curricular.units.1st.sem..evaluations.",
+  "Curricular.units.1st.sem..approved.",
+  "Curricular.units.1st.sem..grade.",
+  "Curricular.units.1st.sem..without.evaluations.",
+  "Curricular.units.2nd.sem..credited.",
+  "Curricular.units.2nd.sem..enrolled.",
+  "Curricular.units.2nd.sem..evaluations.",
+  "Curricular.units.2nd.sem..approved.",
+  "Curricular.units.2nd.sem..grade.",
+  "Curricular.units.2nd.sem..without.evaluations."
+)
+
+# Detectar observaciones problemáticas:
+# estudiantes de Diseño de Animación y Multimedia con 0 en todas esas variables
+multimedia_problematicos <- datos_recodificados[
+  datos_recodificados$Course_limpio == "Diseño de Animación y Multimedia" &
+    rowSums(datos_recodificados[, vars_rendimiento] == 0, na.rm = TRUE) == length(vars_rendimiento),
+]
+
+# Ver cuántas observaciones problemáticas hay
+nrow(multimedia_problematicos)
+
+# Tabla de conteos por Target_bin
+table(multimedia_problematicos$Target_bin)
+
+# Tabla con porcentajes
+prop.table(table(multimedia_problematicos$Target_bin)) * 100
+
+
+
+
+#Vemos si los de multimedia problematicos tenían faltantes:
+# Variables de rendimiento académico
+vars_rendimiento <- c(
+  "Curricular.units.1st.sem..credited.",
+  "Curricular.units.1st.sem..enrolled.",
+  "Curricular.units.1st.sem..evaluations.",
+  "Curricular.units.1st.sem..approved.",
+  "Curricular.units.1st.sem..grade.",
+  "Curricular.units.1st.sem..without.evaluations.",
+  "Curricular.units.2nd.sem..credited.",
+  "Curricular.units.2nd.sem..enrolled.",
+  "Curricular.units.2nd.sem..evaluations.",
+  "Curricular.units.2nd.sem..approved.",
+  "Curricular.units.2nd.sem..grade.",
+  "Curricular.units.2nd.sem..without.evaluations."
+)
+
+
+# Filtrar las 180 observaciones problemáticas en datos sin imputar
+multimedia_problematicos_sin_imputar <- datos_sin_imputar[
+  datos_sin_imputar$Course == "171" &
+    rowSums(datos_sin_imputar[, vars_rendimiento] == 0, na.rm = TRUE) == length(vars_rendimiento),
+  c(
+    "Course",
+    "Target",
+    "Mother.s.qualification",
+    "Father.s.qualification",
+    "Mother.s.occupation",
+    "Father.s.occupation"
+  )
+]
+
+# Conteos concretos de valores problemáticos
+sum(multimedia_problematicos_sin_imputar$Father.s.qualification == 34, na.rm = TRUE)
+sum(multimedia_problematicos_sin_imputar$Mother.s.qualification == 34, na.rm = TRUE)
+sum(multimedia_problematicos_sin_imputar$Father.s.occupation == 99, na.rm = TRUE)
+sum(multimedia_problematicos_sin_imputar$Mother.s.occupation == 99, na.rm = TRUE)
+
+
+resumen_faltantes_multimedia <- data.frame(
+  variable = c(
+    "Father.s.qualification = 34",
+    "Mother.s.qualification = 34",
+    "Father.s.occupation = 99",
+    "Mother.s.occupation = 99"
+  ),
+  n = c(
+    sum(multimedia_problematicos_sin_imputar$Father.s.qualification == 34, na.rm = TRUE),
+    sum(multimedia_problematicos_sin_imputar$Mother.s.qualification == 34, na.rm = TRUE),
+    sum(multimedia_problematicos_sin_imputar$Father.s.occupation == 99, na.rm = TRUE),
+    sum(multimedia_problematicos_sin_imputar$Mother.s.occupation == 99, na.rm = TRUE)
+  )
+)
+
+resumen_faltantes_multimedia
+
+#vemos quien es:
+# Ver qué observaciones tienen alguno de esos valores problemáticos
+casos_familia_faltantes_multimedia <- multimedia_problematicos_sin_imputar[
+  multimedia_problematicos_sin_imputar$Father.s.qualification == 34 |
+    multimedia_problematicos_sin_imputar$Mother.s.qualification == 34 |
+    multimedia_problematicos_sin_imputar$Father.s.occupation == 99 |
+    multimedia_problematicos_sin_imputar$Mother.s.occupation == 99,
+]
+
+View(casos_familia_faltantes_multimedia)
+
+nrow(casos_familia_faltantes_multimedia)
+
+
+
 #Numéricas vs Numéricas
+
 
 #Creo dos variables numéricas que faltan:
 #Porcentaje_aprobado_sem_2
@@ -3442,6 +3625,8 @@ install.packages("car")
 library(car)
 
 vif(modelo_combinado)
+
+
 
 
 # Instalar si no lo tienes
