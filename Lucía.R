@@ -2175,11 +2175,11 @@ chisq.test(tabla_course_target)$expected
 #Simplemente cambiamos los nombres a más cortos para que en el gráfico se entienda
 datos_modelo$Course_group_short <- dplyr::recode(
   datos_modelo$Course_group,
-  "Ingeniería/Tech" = "Ing./Tech",
-  "Educación/Social" = "Educ./Soc.",
+  "Ingeniería/Tech" = "Ing/Tec",
+  "Educación/Social" = "Edu/Soc",
   "Comunicación" = "Com.",
-  "Agro/Animal" = "Agro/Anim.",
-  "Empresa" = "Empresa",
+  "Agro/Animal" = "Agr/An",
+  "Empresa" = "Emp",
   "Salud" = "Salud"
 )
 
