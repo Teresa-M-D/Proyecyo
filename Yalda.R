@@ -59,18 +59,63 @@ text(bp3, freq_tuition, labels = freq_tuition, pos = 3)
 #Course
 freq_course <- table(datos_modelo$Course_limpio)
 freq_course
+datos_modelo$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_modelo$Course_limpio %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_modelo$Course_limpio %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles",
+    "Diseño de Animación y Multimedia"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_modelo$Course_limpio %in% c(
+    "Gestión",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_modelo$Course_limpio %in% c(
+    "Educación Básica",
+    "Trabajo Social"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_modelo$Course_limpio %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_modelo$Course_limpio %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
+freq_courseG <- table(datos_modelo$Course_group)
+freq_courseG
 #como son muchas titulaciones, hacemos un diagrama de barras horizonatal
 library(ggplot2)
 library(dplyr)
 
 datos_modelo %>%
-  count(Course_limpio) %>% 
-  ggplot(aes(x = n, y = Course_limpio)) +
+  count(Course_group) %>% 
+  ggplot(aes(x = n, y = Course_group)) +
   geom_bar(stat = "identity", fill = "#4C72B0") +
   labs(
-    title = "Frecuencia de estudiantes por curso",
+    title = "Frecuencia de estudiantes por área",
     x = "Frecuencia",
-    y = "Curso"
+    y = "Área"
   ) +
   theme_minimal(base_size = 12) +
   theme(
@@ -107,9 +152,12 @@ datos_modelo$Objetivo <- ifelse(
 datos_modelo$Objetivo <- as.factor(datos_modelo$Objetivo)
 
 #NUEVA VARIBLE: aprobados_reales_1sem y aprobados_reales_2sem
-datos_modelo$aprobados_reales_1sem <- pmax(datos_modelo$Curricular.units.1st.sem..approved. - datos_modelo$Curricular.units.1st.sem..credited., 0)
-datos_modelo$aprobados_reales_2sem <- pmax(datos_modelo$Curricular.units.2nd.sem..approved. - datos_modelo$Curricular.units.2nd.sem..credited., 0)
+datos_modelo$aprobados_reales_1sem <- pmin(datos_modelo$Curricular.units.1st.sem..approved. , datos_modelo$Carga_academica_real)
+datos_modelo$aprobados_reales_2sem <- pmin(datos_modelo$Curricular.units.2nd.sem..approved. , datos_modelo$Carga_academica_real_sem_2)
+datos_modelo$aprobados_reales_2sem
 
+sum(datos_modelo$aprobados_reales_1sem == 0)
+sum(datos_modelo$Curricular.units.1st.sem..approved. == 0)
 #ANÁLISIS BIVARIANTE
 
 #Objetivo: comparar las medias de la notas del primer cuatrimestre de los estudiantes que abandonaron y los que no lo hicieron
@@ -218,8 +266,8 @@ yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo, tr = 0
 #Test Mann - Whitney
 wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo)
 wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
-wilcox.test(aprobados_reales_1sem ~ Target_bin, data = datos_modelo)
-wilcox.test(aprobados_reales_2sem ~ Target_bin, data = datos_modelo)
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_modelo)
+wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_modelo)
 wilcox.test(PIB ~ Target_bin, data=datos_modelo)
 wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
@@ -232,8 +280,8 @@ library(rstatix)
 
 wilcox_effsize(data = datos_modelo , Curricular.units.1st.sem.grade_10 ~ Target_bin)
 wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
-wilcox_effsize(aprobados_reales_1sem ~ Target_bin, data = datos_modelo)
-wilcox_effsize(aprobados_reales_2sem ~ Target_bin, data = datos_modelo)
+wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_modelo)
+wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_modelo)
 wilcox_effsize(PIB ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Inflation.rate ~ Target_bin, data=datos_modelo)
@@ -277,10 +325,8 @@ boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indi
 boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
 boxplot(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del primer semestre y abandono")
 boxplot(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Notas del segundo semestre y abandono")
-boxplot(aprobados_reales_1sem ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Unidades curriculares aprobadas en el 1º semestre y abandono")
-boxplot(aprobados_reales_2sem ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Unidades curriculares aprobadas en el 2º semestre  y abandono")
+boxplot(Porcentaje_aprobado_sem_1  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Porcentaje evaluaciones aprobadas 1º sem y abandono")
+boxplot(Porcentaje_aprobado_sem_2  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Porcentaje evaluaciones aprobadas 2º sem y abandono")
 boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
 boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
-
-
