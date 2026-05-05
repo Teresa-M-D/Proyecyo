@@ -3759,3 +3759,79 @@ freq_target <- table(datos_modelo$Target_bin)
 freq_target
 #Frecuencias relativas
 prop.table(freq_target)
+
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# Variables numéricas elegidas
+variables_cor <- c(
+  "Carga_academica_real",
+  "Curricular.units.1st.sem..approved.",
+  "Curricular.units.1st.sem.grade_10",
+  "Curricular.units.1st.sem..evaluations."
+)
+
+# Crear una base solo con esas variables
+datos_cor <- datos_modelo %>%
+  select(all_of(variables_cor))
+
+# Calcular matriz de correlación Spearman
+matriz_cor <- cor(
+  datos_cor,
+  use = "complete.obs",
+  method = "spearman"
+)
+
+matriz_cor
+
+
+# Cambiar nombres de filas y columnas
+nombres_bonitos <- c(
+  "Carga académica real",
+  "Aprobadas 1º semestre",
+  "Nota media 1º semestre",
+  "Evaluaciones 1º semestre"
+)
+
+rownames(matriz_cor) <- nombres_bonitos
+colnames(matriz_cor) <- nombres_bonitos
+
+matriz_cor_larga <- as.data.frame(matriz_cor) %>%
+  mutate(Variable_1 = rownames(.)) %>%
+  pivot_longer(
+    cols = -Variable_1,
+    names_to = "Variable_2",
+    values_to = "Correlacion"
+  )
+
+ggplot(matriz_cor_larga, aes(x = Variable_2, y = Variable_1, fill = Correlacion)) +
+  geom_tile(color = "white") +
+  geom_text(
+    aes(label = round(Correlacion, 2)),
+    size = 4,
+    color = "black"
+  ) +
+  scale_fill_gradient2(
+    low = "#2166ac",
+    mid = "white",
+    high = "#b2182b",
+    midpoint = 0,
+    limits = c(-1, 1),
+    name = "Correlación"
+  ) +
+  labs(
+    title = "Matriz de correlaciones entre variables académicas",
+    subtitle = "Correlación de Kendall",
+    x = "",
+    y = ""
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 11),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    axis.text.y = element_text(size = 10),
+    panel.grid = element_blank()
+  )
