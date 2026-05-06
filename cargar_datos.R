@@ -727,6 +727,62 @@ datos_recodificados$Father_occupation_level <- case_when(
   ) ~ "Formación militar"
   
 )
+
+
+#Reagrupación de Course
+datos_modelo$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_modelo$Course_limpio %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_modelo$Course_limpio %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles",
+    "Diseño de Animación y Multimedia"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_modelo$Course_limpio %in% c(
+    "Gestión",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_modelo$Course_limpio %in% c(
+    "Educación Básica",
+    "Trabajo Social"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_modelo$Course_limpio %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_modelo$Course_limpio %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
+
+
+
+#Reagrupación de Marital_Status:
+datos_modelo <- datos_modelo %>%
+  mutate(Marital_group = case_when(
+    Marital.status == "Soltero" ~ "Soltero",
+    Marital.status %in% c("Casado", "Con pareja") ~ "Pareja",
+    Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
+  ))
 #NUEVA VARIABLE: (Lo añado ahora)
 datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
 
