@@ -836,3 +836,4 @@ datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.s
 datos_modelo$Carga_academica_real_sem_2 <- 
   datos_modelo$Curricular.units.2nd.sem..enrolled. - 
   datos_modelo$Curricular.units.2nd.sem..credited.
+

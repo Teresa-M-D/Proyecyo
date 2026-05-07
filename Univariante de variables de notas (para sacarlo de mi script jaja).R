@@ -17,7 +17,7 @@ descriptive(datos_recodificados$Previous.qualification.grade_10)
 descriptive(datos_recodificados[,comparacion_semestres_y_nota_entrada])
 descriptive(datos_recodificados$Admission.grade_10)
 descriptive(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
-descriptive(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+descriptive(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10!=0])
 
 ""
 #Boxplots
@@ -27,24 +27,24 @@ boxplot(datos_recodificados$Previous.qualification.grade_10,
         main = "Nota estudios previos")
 axis(2, at = seq(4, 10, by = 0.5))
 boxplot(datos_recodificados$Age.at.enrollment)
-boxplot(datos_recodificados$Admission.grade_10, yaxt="n", main="Admission grade")
+boxplot(datos_recodificados$Admission.grade_10, yaxt="n", main="Nota admisión")
 axis(2, at=seq(4.5,10, by=0.5))
 boxplot(datos_recodificados$Application.order)
 boxplot(datos_recodificados$Curricular.units.1st.sem..credited.)
 boxplot(datos_recodificados$Curricular.units.1st.sem..enrolled., yaxt="n")
 axis(2, at=seq(0,25, by=1))
-boxplot(datos_recodificados$Curricular.units.1st.sem..evaluations., yaxt="n", main="Evaluations 1st Sem.")
+boxplot(datos_recodificados$Curricular.units.1st.sem..evaluations., yaxt="n", main="Evaluations 1º Sem.")
 axis(2, at=seq(0,45, by=3))
 boxplot(datos_recodificados$Curricular.units.1st.sem..approved., yaxt="n")
 axis(2, at=seq(0,25, by=1))
-boxplot(datos_recodificados$Curricular.units.1st.sem.grade_10, yaxt="n", main="Grades 1st sem.")
+boxplot(datos_recodificados$Curricular.units.1st.sem.grade_10, yaxt="n", main="Notas 1º sem.")
 axis(2, at=seq(0,10, by=1))
 boxplot(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 boxplot(datos_recodificados$Curricular.units.2nd.sem..credited.)
 boxplot(datos_recodificados$Curricular.units.2nd.sem..enrolled.)
 boxplot(datos_recodificados$Curricular.units.2nd.sem..evaluations.)
 boxplot(datos_recodificados$Curricular.units.2nd.sem..approved.)
-boxplot(datos_recodificados$Curricular.units.2nd.sem.grade_10)
+boxplot(datos_recodificados$Curricular.units.2nd.sem.grade_10, main="Notas 2º sem.")
 boxplot(datos_recodificados$Curricular.units.2nd.sem..without.evaluations.)
 boxplot(datos_recodificados$Unemployment.rate)
 boxplot(datos_recodificados$Inflation.rate)
@@ -114,19 +114,25 @@ abline(0,1)
 #Estudio de las variables dew notas de 1 y 2 sem
 #1SEM
 #histograma
-hist(datos_recodificados$Curricular.units.1st.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+hist(datos_recodificados$Curricular.units.1st.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n",  main="Notas 1º sem.")
 axis(1, at=seq(0,10, by=0.5))
-hist(datos_recodificados$Previous.qualification.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+hist(datos_recodificados$Previous.qualification.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n",  main="Nota estudios previos
+")
 axis(1, at=seq(0,10, by=0.5))
-hist(datos_recodificados$Admission.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+hist(datos_recodificados$Admission.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n",main="Nota admisión" )
 axis(1, at=seq(0,10, by=0.5))
 #media de solo los alumnos q se han presentado
 median(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
 mean(datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0])
 
 #2 SEM
-hist(datos_recodificados$Curricular.units.2nd.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n")
+hist(datos_recodificados$Curricular.units.2nd.sem.grade_10, breaks=seq(0, 10, by=0.5), xaxt="n", main="Notas 2º sem." )
 axis(1, at=seq(0,10, by=0.5))
 
 median(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
 mean(datos_recodificados$Curricular.units.2nd.sem.grade_10[datos_recodificados$Curricular.units.2nd.sem.grade_10!=0])
+
+
+#ver diferencia de ceros en nota cada semestre
+table(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.units.1st.sem.grade_10==0])
+table(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10==0])
