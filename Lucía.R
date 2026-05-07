@@ -3496,9 +3496,11 @@ resultados_cramer <- bind_rows(
 
 print(resultados_cramer)
 
+# =============================
+# GRÁFICO MOTIVACIÓN
+# UE vs Portugal
+# =============================
 
-
-#Gráficos motivación:
 library(readxl)
 library(dplyr)
 library(ggplot2)
@@ -3517,37 +3519,102 @@ datos_limpios <- datos %>%
     pais = ...1,
     tasa_abandono = ...4
   ) %>%
-  filter(!is.na(pais), !is.na(tasa_abandono)) %>%
+  filter(
+    !is.na(pais),
+    !is.na(tasa_abandono)
+  ) %>%
   mutate(
+    tasa_abandono = as.character(tasa_abandono),
+    tasa_abandono = trimws(tasa_abandono),
+    tasa_abandono = na_if(tasa_abandono, ":"),
+    tasa_abandono = gsub(",", ".", tasa_abandono),
     tasa_abandono = as.numeric(tasa_abandono)
-  )
+  ) %>%
+  filter(!is.na(tasa_abandono))
 
 datos_ue_portugal <- datos_limpios %>%
-  filter(pais %in% c("European Union - 27 countries (from 2020)", "Portugal")) %>%
+  filter(
+    pais %in% c(
+      "European Union - 27 countries (from 2020)",
+      "Portugal"
+    )
+  ) %>%
   mutate(
     pais = recode(
       pais,
       "European Union - 27 countries (from 2020)" = "Unión Europea"
-    )
+    ),
+    pais = factor(pais, levels = c("Portugal", "Unión Europea")),
+    etiqueta = paste0(round(tasa_abandono, 1), "%")
   )
 
 ggplot(datos_ue_portugal, aes(x = pais, y = tasa_abandono, fill = pais)) +
-  geom_col(width = 0.55, show.legend = FALSE) +
+  geom_col(
+    width = 0.35,
+    color = "black",
+    linewidth = 0.8,
+    show.legend = FALSE
+  ) +
   geom_text(
-    aes(label = paste0(tasa_abandono, "%")),
-    vjust = -0.5,
-    size = 5,
+    aes(label = etiqueta),
+    vjust = -0.45,
+    size = 8,
     fontface = "bold"
   ) +
+  scale_fill_manual(
+    values = c(
+      "Portugal" = "#C8102E",
+      "Unión Europea" = "#003399"
+    )
+  ) +
+  coord_cartesian(ylim = c(0, 20)) +
   labs(
     title = "Tasa de abandono de educación o formación formal",
     subtitle = "Personas de 15 a 34 años, 2024",
-    x = "",
+    x = NULL,
     y = "Porcentaje (%)",
     caption = "Fuente: Eurostat, lfso_24eab01"
   ) +
-  ylim(0, 20) +
-  theme_minimal()
+  theme_minimal(base_size = 18) +
+  theme(
+    plot.title = element_text(
+      size = 25,
+      face = "bold",
+      hjust = 0.5,
+      margin = margin(b = 8)
+    ),
+    plot.subtitle = element_text(
+      size = 19,
+      hjust = 0.5,
+      margin = margin(b = 22)
+    ),
+    axis.title.y = element_text(
+      size = 20,
+      face = "bold",
+      margin = margin(r = 12)
+    ),
+    axis.text.x = element_text(
+      size = 19,
+      face = "bold",
+      margin = margin(t = 8)
+    ),
+    axis.text.y = element_text(
+      size = 17
+    ),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.y = element_line(
+      color = "gray80",
+      linewidth = 0.45
+    ),
+    plot.caption = element_text(
+      size = 13,
+      hjust = 1,
+      margin = margin(t = 18)
+    ),
+    plot.margin = margin(20, 25, 20, 25)
+  )
 
 install.packages("sf")
 install.packages("rnaturalearth")
@@ -3703,55 +3770,6 @@ fig
 
 
 
-#guardar el mapa como HTML
-install.packages("htmlwidgets")
-library(htmlwidgets)
-
-saveWidget(fig, "mapa_abandono_europa.html", selfcontained = TRUE)
-
-getwd()
-
-#grafico Portugal OCDE
-library(ggplot2)
-library(dplyr)
-
-datos_ocde <- data.frame(
-  Zona = c("Portugal", "Media OCDE"),
-  Tasa = c(8, 13)
-)
-
-ggplot(datos_ocde, aes(x = Zona, y = Tasa, fill = Zona)) +
-  geom_col(width = 0.55, show.legend = FALSE) +
-  geom_text(
-    aes(label = paste0(Tasa, "%")),
-    vjust = -0.5,
-    size = 5,
-    fontface = "bold"
-  ) +
-  scale_fill_manual(
-    values = c(
-      "Portugal" = "#de2d26",
-      "Media OCDE" = "#fcae91"
-    )
-  ) +
-  labs(
-    title = "Abandono tras el primer año en programas de grado",
-    subtitle = "Estudiantes que acceden por primera vez a estudios de grado",
-    x = "",
-    y = "Porcentaje (%)",
-    caption = "Fuente: OECD, Education at a Glance"
-  ) +
-  ylim(0, 16) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 16, face = "bold"),
-    plot.subtitle = element_text(size = 11),
-    axis.text.x = element_text(size = 12, face = "bold"),
-    axis.title.y = element_text(size = 11),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank()
-  )
-
 
 #target
 #Tabla de frecuencias absolutas
@@ -3835,3 +3853,93 @@ ggplot(matriz_cor_larga, aes(x = Variable_2, y = Variable_1, fill = Correlacion)
     axis.text.y = element_text(size = 10),
     panel.grid = element_blank()
   )
+
+
+
+#grafico bonito target
+
+#grafico bonito Target
+# =============================
+# LIBRERÍAS
+# =============================
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# =============================
+# PREPARAR DATOS
+# =============================
+
+datos_target <- datos_modelo %>%
+  mutate(
+    Target = recode(
+      Target,
+      "Dropout" = "Abandono",
+      "Graduate" = "Graduado",
+      "Enrolled" = "Matriculado"
+    )
+  ) %>%
+  count(Target) %>%
+  mutate(
+    porcentaje = n / sum(n) * 100,
+    etiqueta = paste0(round(porcentaje, 1), "%"),
+    Target = reorder(Target, -n)
+  )
+
+
+# =============================
+# GRÁFICO DE BARRAS ORDENADO
+# =============================
+
+ggplot(datos_target, aes(x = Target, y = n, fill = Target)) +
+  geom_col(
+    width = 0.65,
+    color = "black",
+    linewidth = 0.8
+  ) +
+  geom_text(
+    aes(label = etiqueta),
+    vjust = -0.4,
+    size = 5,
+    fontface = "bold"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "#C0392B",
+      "Graduado" = "#2E8B57",
+      "Matriculado" = "#D9B56D"
+    )
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15))
+  ) +
+  labs(
+    title = "Distribución de la variable Target",
+    subtitle = "Porcentaje de estudiantes según su situación académica final",
+    x = "Categoría Target",
+    y = "Número de estudiantes"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(
+      size = 22,
+      face = "bold",
+      hjust = 0.5
+    ),
+    plot.subtitle = element_text(
+      size = 13,
+      hjust = 0.5,
+      margin = margin(b = 15)
+    ),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.position = "none",
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
