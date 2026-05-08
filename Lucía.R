@@ -1211,6 +1211,8 @@ descriptive(datos_recodificados$Age.at.enrollment)
 descriptive(datos_recodificados$Curricular.units.1st.sem..without.evaluations.)
 
 ""
+
+
 #Boxplots
 boxplot(datos_recodificados$Previous.qualification.grade_10,
         yaxt = "n",
@@ -1503,7 +1505,160 @@ tabla_cred2
 barplot(tabla_cred2)
 
 
+#añadiendo al univariante:
+#age at enrollment:
+descriptive(datos_modelo$Age.at.enrollment)
+boxplot(datos_modelo$Age.at.enrollment)
 
+ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
+  geom_boxplot(
+    fill = "#8FA6C8",
+    color = "#2F3A4A",
+    width = 0.35,
+    linewidth = 0.8,
+    outlier.color = "#4A4A4A",
+    outlier.fill = "#D9D9D9",
+    outlier.shape = 21,
+    outlier.size = 2.5,
+    outlier.stroke = 0.7
+  ) +
+  labs(
+    title = "Distribución de la edad de matriculación",
+    subtitle = "Edad de los estudiantes en el momento de su ingreso",
+    x = "Edad al matricularse",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(
+      size = 20,
+      face = "bold",
+      hjust = 0.5,
+      margin = margin(b = 6)
+    ),
+    plot.subtitle = element_text(
+      size = 13,
+      hjust = 0.5,
+      color = "gray35",
+      margin = margin(b = 18)
+    ),
+    axis.title.x = element_text(
+      size = 14,
+      face = "bold",
+      margin = margin(t = 10)
+    ),
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(
+      color = "gray85",
+      linewidth = 0.4
+    ),
+    plot.margin = margin(15, 20, 15, 20)
+  )
+
+
+#nota de admision:
+descriptive(datos_modelo$Admission.grade_10)
+boxplot(datos_modelo$Admission.grade_10)
+hist(datos_modelo$Admission.grade_10)
+
+datos_grafico <- datos_modelo %>%
+  filter(is.finite(Admission.grade_10))
+
+media_admision <- mean(datos_grafico$Admission.grade_10)
+
+
+
+# Posiciones donde quieres las pequeñas marcas
+marcas_x <- data.frame(
+  x = c(4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5)
+)
+
+ggplot(datos_grafico, aes(x = Admission.grade_10)) +
+  geom_histogram(
+    binwidth = 0.25,
+    fill = "#8FA6C8",
+    color = "white",
+    linewidth = 0.4,
+    boundary = 4
+  ) +
+  geom_vline(
+    xintercept = media_admision,
+    color = "#2F3A4A",
+    linewidth = 1.1,
+    linetype = "dashed"
+  ) +
+  annotate(
+    "text",
+    x = media_admision + 0.15,
+    y = Inf,
+    label = paste0("Media = ", round(media_admision, 2)),
+    vjust = 1.8,
+    hjust = 0,
+    size = 4.5,
+    fontface = "bold",
+    color = "#2F3A4A"
+  ) +
+  
+  # Pequeñas marcas verticales en el eje X
+  geom_segment(
+    data = marcas_x,
+    inherit.aes = FALSE,
+    aes(x = x, xend = x, y = -35, yend = 0),
+    color = "#2F3A4A",
+    linewidth = 0.8
+  ) +
+  
+  scale_x_continuous(
+    breaks = seq(4, 10, 0.5)
+  ) +
+  coord_cartesian(
+    xlim = c(4, 10),
+    ylim = c(-40, NA),
+    clip = "off"
+  ) +
+  labs(
+    title = "Distribución de la nota de admisión",
+    subtitle = "Nota de admisión transformada a escala de 0 a 10",
+    x = "Nota de admisión sobre 10",
+    y = "Número de estudiantes"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(
+      size = 21,
+      face = "bold",
+      hjust = 0.5,
+      margin = margin(b = 6)
+    ),
+    plot.subtitle = element_text(
+      size = 13,
+      hjust = 0.5,
+      color = "gray35",
+      margin = margin(b = 18)
+    ),
+    axis.title.x = element_text(
+      size = 14,
+      face = "bold",
+      margin = margin(t = 10)
+    ),
+    axis.title.y = element_text(
+      size = 14,
+      face = "bold",
+      margin = margin(r = 10)
+    ),
+    axis.text = element_text(size = 12),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_line(
+      color = "gray85",
+      linewidth = 0.4
+    ),
+    plot.margin = margin(15, 20, 30, 20)
+  )
 #Variables categóricas:
 
 
@@ -3942,4 +4097,31 @@ ggplot(datos_target, aes(x = Target, y = n, fill = Target)) +
     panel.grid.major.x = element_blank(),
     panel.grid.minor = element_blank()
   )
+colnames(datos_modelo)
 
+library(clickR)
+descriptive(datos_modelo)
+table(datos_modelo$Curricular.units.1st.sem..approved.)
+table(datos_modelo$Curricular.units.1st.sem..credited.)
+table(datos_modelo$Curricular.units.1st.sem..enrolled.)
+table(datos_modelo$Carga_academica_real)
+
+
+library(dplyr)
+
+View(
+  datos_modelo %>%
+    filter(
+      Curricular.units.1st.sem..approved. - Curricular.units.1st.sem..credited. < 0
+    ) %>%
+    select(
+      Target,
+      Carga_academica_real,
+      Curricular.units.1st.sem..approved.,
+      Curricular.units.1st.sem..credited.,
+      Curricular.units.1st.sem..enrolled.,
+      Curricular.units.1st.sem..evaluations.,
+      Curricular.units.1st.sem..without.evaluations.,
+      Application.mode
+    )
+)
