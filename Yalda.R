@@ -273,7 +273,9 @@ wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
-
+wilcox.test(Carga_academica_real  ~ Target_bin, data=datos_modelo)
+wilcox.test(Carga_academica_real_sem_2  ~ Target_bin, data=datos_modelo)
+wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
 #Tamaño del efecto
 install.packages("rstatix")
 library(rstatix)
@@ -287,7 +289,9 @@ wilcox_effsize(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Inflation.rate ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Admission.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
-
+wilcox_effsize(Carga_academica_real  ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Carga_academica_real_sem_2  ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
 library(vcd)
@@ -329,4 +333,113 @@ boxplot(Porcentaje_aprobado_sem_1  ~ Target_bin, data=datos_modelo, las=1, col =
 boxplot(Porcentaje_aprobado_sem_2  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Porcentaje evaluaciones aprobadas 2º sem y abandono")
 boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
-boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
+boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
+
+
+install.packages("tidyverse")
+library(tidyverse)
+
+#NOTAS POR SEMESTRE SEGÚN ABANDONO
+
+# Convertir a formato largo
+df_long1 <- datos_modelo %>%
+  pivot_longer(
+    cols = c(Curricular.units.1st.sem.grade_10,
+             Curricular.units.2nd.sem.grade_10),
+    names_to = "Semestre",
+    values_to = "Nota"
+  ) %>%
+  mutate(
+    Semestre = recode(Semestre,
+                      "Curricular.units.1st.sem.grade_10" = "1º Semestre",
+                      "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
+  )
+
+# Gráfico combinado
+ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Nota",
+    fill = "Semestre",
+    title = "Notas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
+
+# Convertir a formato largo
+df_long2 <- datos_modelo %>%
+  pivot_longer(
+    cols = c(Porcentaje_aprobado_sem_1,
+             Porcentaje_aprobado_sem_2),
+    names_to = "Semestre",
+    values_to = "Porcentaje_evaluaciones_aprobadas"
+  ) %>%
+  mutate(
+    Semestre = recode(Semestre,
+                      "Porcentaje_aprobado_sem_1" = "1º Semestre",
+                      "Porcentaje_aprobado_sem_2" = "2º Semestre")
+  )
+
+
+# línea para sustituir NA por 0
+df_long2$Porcentaje_evaluaciones_aprobadas[
+  is.na(df_long2$Porcentaje_evaluaciones_aprobadas)
+] <- 0
+
+# Gráfico combinado
+ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Porcentaje evaluaciones aprobadas",
+    fill = "Semestre",
+    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+summary(datos_modelo$Porcentaje_aprobado_sem_1) #Hay 169 Na´s en porcentaje aprobados 1º semestre
+summary(datos_modelo$Porcentaje_aprobado_sem_2) #Hay 221 Na´s en porcentaje aprobados 2º semestre
+
+#Los Na's se deben ha que hay valores 0/0 que R convierte en Na's. De hecho si vemos el número de estudiantes con 0 unidades curriculares aprobadas 
+#y cero evaluaciones los números coinciden
+
+sum(datos_modelo$Curricular.units.1st.sem..approved. == 0 &
+      datos_modelo$Curricular.units.1st.sem..evaluations. == 0) #Hay 169 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
+
+sum(datos_modelo$Curricular.units.2nd.sem..approved. == 0 &
+      datos_modelo$Curricular.units.2nd.sem..evaluations. == 0) #Hay 221 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
+
+#CARGA ACADEMICA REAL POR SEMESTRE SEGÚN ABANDONO
+
+# Convertir a formato largo
+df_long3 <- datos_modelo %>%
+  pivot_longer(
+    cols = c(Carga_academica_real,
+             Carga_academica_real_sem_2),
+    names_to = "Semestre",
+    values_to = "Carga_academica_real"
+  ) %>%
+  mutate(
+    Semestre = recode(Semestre,
+                      "Carga_academica_real" = "1º Semestre",
+                      "Carga_academica_real_sem_2" = "2º Semestre")
+  )
+
+
+# Gráfico combinado
+ggplot(df_long3, aes(x = Target_bin, y = Carga_academica_real, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Carga académica real",
+    fill = "Semestre",
+    title = "Carga académica real por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+
