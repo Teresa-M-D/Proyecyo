@@ -413,6 +413,79 @@ sum(datos_modelo$Curricular.units.1st.sem..approved. == 0 &
 sum(datos_modelo$Curricular.units.2nd.sem..approved. == 0 &
       datos_modelo$Curricular.units.2nd.sem..evaluations. == 0) #Hay 221 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
 
+
+#Proporcion de abandono dentro del grupo que tiene cero unidades curriculares aprobadas y cero evaluaciones
+
+library(dplyr)
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    tipo_actividad = case_when(
+      # Sin actividad en todo el año
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 &
+        Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en todo el año",
+      
+      # Sin actividad solo en 1º semestre
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 ~ "Sin actividad en 1º semestre",
+      
+      # Sin actividad solo en 2º semestre
+      Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en 2º semestre",
+      
+      # Con actividad
+      TRUE ~ "Con actividad"
+    )
+  )
+con_actividad_total <- subset(datos_modelo, tipo_actividad == "Con actividad")
+sin_actividad_total <- subset(datos_modelo, tipo_actividad == "Sin actividad en todo el año")
+no_presentados_1    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 1º semestre")
+no_presentados_2    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 2º semestre")
+
+table(con_actividad_total$Target_bin)
+table(sin_actividad_total$Target_bin)
+table(no_presentados_1$Target_bin)
+table(no_presentados_2$Target_bin)
+
+# Calcular proporciones
+datos_prop <- datos_modelo %>%
+  group_by(tipo_actividad, Target_bin) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(tipo_actividad) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+# Gráfico
+ggplot(datos_prop,
+       aes(x = tipo_actividad,
+           y = prop,
+           fill = Target_bin)) +
+  geom_bar(stat = "identity") +
+  
+  # Etiquetas dentro de la barra
+  geom_text(aes(label = etiqueta),
+            position = position_stack(vjust = 0.5),
+            color = "black",
+            size = 4) +
+  
+  scale_fill_manual(values = c(
+    "Abandono" = "indianred2",
+    "No Abandono" = "lightgreen"
+  )) +
+  
+  scale_y_continuous(labels = scales::percent) +
+  
+  labs(title = "Proporción de abandono según tipo de actividad académica",
+       x = "Tipo de actividad",
+       y = "Proporción") +
+  
+  theme_minimal()
+
+
+table(con_actividad)
+
 #CARGA ACADEMICA REAL POR SEMESTRE SEGÚN ABANDONO
 
 # Convertir a formato largo
