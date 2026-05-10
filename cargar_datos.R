@@ -846,3 +846,4 @@ tabla_años <- data.frame(
 
 datos_modelo$year <- tabla_años$year[match(datos_modelo$PIB, tabla_años$GDP)]
 
+datos_recodificados$year <- tabla_años$year[match(datos_recodificados$PIB, tabla_años$GDP)]
