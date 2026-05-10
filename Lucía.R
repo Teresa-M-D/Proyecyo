@@ -4590,3 +4590,498 @@ casos_incoherentes_ambos %>%
   View()
 
 
+#analisis univariante + categorico (presentacion)
+
+table(datos_modelo$Gender)
+prop.table(table(datos_modelo$Gender))
+
+
+library(scales)
+library(dplyr)
+resumen_genero <- datos_modelo %>%
+  count(Gender) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    porcentaje_label = percent(porcentaje, accuracy = 0.1)
+  )
+
+resumen_genero
+
+
+#grafico univariante de género
+
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+# Crear variable de género con etiquetas interpretables
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Gender_label = case_when(
+      Gender == 0 ~ "Femenino",
+      Gender == 1 ~ "Masculino",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Tabla resumen de frecuencias y porcentajes
+resumen_genero <- datos_modelo %>%
+  count(Gender_label) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    porcentaje_label = percent(porcentaje, accuracy = 0.1)
+  )
+
+resumen_genero
+
+# Gráfico univariante de género
+ggplot(resumen_genero, aes(x = Gender, y = porcentaje, fill = Gender)) +
+  geom_col(width = 0.6, alpha = 0.85) +
+  geom_text(
+    aes(label = porcentaje_label),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, 1)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Femenino" = "#E78AC3",
+      "Masculino" = "#8DA0CB"
+    )
+  ) +
+  labs(
+    title = "Distribución del alumnado según género",
+    x = "Género",
+    y = "Porcentaje de estudiantes"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+
+#gráfico de barras apilado
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+# Crear etiquetas de género
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Gender_label = case_when(
+      Gender == 0 ~ "Femenino",
+      Gender == 1 ~ "Masculino",
+      TRUE ~ NA_character_
+    )
+  )
+
+# Crear tabla resumen con proporciones dentro de cada género
+resumen_genero_target <- datos_modelo %>%
+  count(Gender_label, Target_bin) %>%
+  group_by(Gender_label) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = percent(prop, accuracy = 0.1)
+  ) %>%
+  ungroup()
+
+resumen_genero_target
+
+# Gráfico de proporciones
+
+# Crear tabla resumen con proporciones dentro de cada género
+resumen_genero_target <- datos_modelo %>%
+  count(Gender, Target_bin) %>%
+  group_by(Gender) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = percent(prop, accuracy = 0.1)
+  ) %>%
+  ungroup()
+
+resumen_genero_target
+
+
+ggplot(
+  resumen_genero_target,
+  aes(x = Gender, y = prop, fill = Target_bin)
+) +
+  geom_col(width = 0.65) +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_stack(vjust = 0.5),
+    size = 4,
+    color = "black"
+  ) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  labs(
+    title = "Abandono según género",
+    subtitle = "Proporción de abandono y no abandono dentro de cada género",
+    x = "Género",
+    y = "Proporción de estudiantes",
+    fill = "Situación final"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+  )
+
+
+#course
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+colores_course_group <- c(
+  "Salud" = "#5DADE2",                  # azul claro
+  "Empresa" = "#D4A017",                # dorado
+  "Educación/Social" = "#F28E2B",       # naranja
+  "Agro/Animal" = "#6AA84F",            # verde
+  "Ingeniería/Tech" = "#34495E",  # azul grisáceo oscuro
+  "Comunicación" = "#C77DFF"            # lila
+)
+
+# Tabla resumen de titulaciones limpias
+resumen_course <- datos_modelo %>%
+  count(Course_limpio, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_limpio = reorder(Course_limpio, n)
+  )
+
+# Ver tabla resumen
+resumen_course
+
+# Gráfico univariante de Course_limpio
+resumen_course_limpio <- datos_modelo %>%
+  count(Course_limpio, Course_group, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_limpio = reorder(Course_limpio, n)
+  )
+
+ggplot(
+  resumen_course_limpio,
+  aes(x = Course_limpio, y = porcentaje, fill = Course_group)
+) +
+  geom_col(width = 0.7, alpha = 0.9) +
+  geom_text(
+    aes(label = etiqueta),
+    hjust = -0.1,
+    size = 3.3
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_course_limpio$porcentaje) + 0.05)
+  ) +
+  scale_fill_manual(values = colores_course_group) +
+  labs(
+    title = "Distribución del alumnado según titulación",
+    subtitle = "Color según área de estudio",
+    x = "Titulación",
+    y = "Porcentaje de estudiantes",
+    fill = "Área de estudio"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    axis.text.y = element_text(size = 8.5)
+  )
+#para Course_group
+resumen_course_group <- datos_modelo %>%
+  count(Course_group, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_group = reorder(Course_group, porcentaje)
+  )
+
+ggplot(
+  resumen_course_group,
+  aes(x = Course_group, y = porcentaje, fill = Course_group)
+) +
+  geom_col(width = 0.65, alpha = 0.9) +
+  geom_text(
+    aes(label = etiqueta),
+    hjust = -0.1,
+    size = 4
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_course_group$porcentaje) + 0.08)
+  ) +
+  scale_fill_manual(values = colores_course_group) +
+  labs(
+    title = "Distribución del alumnado por área de estudio",
+    subtitle = "Agrupación de titulaciones por ramas de conocimiento",
+    x = "Área de estudio",
+    y = "Porcentaje de estudiantes"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+
+
+#application order:
+
+# ============================================================
+# APPLICATION.ORDER
+# Decisión metodológica:
+# El valor 0 aparece solo una vez.
+# Como la mayoría de estudiantes están en el valor 1,
+# interpretamos el 0 como un valor anómalo y lo agrupamos con 1.
+#
+# Después interpretamos:
+# 1 = Primera opción
+# 2 = Segunda opción
+# 3 = Tercera opción
+# 4, 5, 6, 9 = Otras opciones
+# ============================================================
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+
+# ============================================================
+# 1. CORREGIR EL 0 Y CREAR VARIABLE CATEGÓRICA SIN REAGRUPAR
+# ============================================================
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    # Corregimos el valor 0:
+    # como solo aparece una vez, lo agrupamos con el valor 1.
+    Application.order_corr = if_else(
+      Application.order == 0,
+      1,
+      Application.order
+    ),
+    
+    # Creamos la variable categórica interpretando 1 como primera opción
+    Application.order_cat = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr == 4 ~ "4ª opción",
+      Application.order_corr == 5 ~ "5ª opción",
+      Application.order_corr == 6 ~ "6ª opción",
+      Application.order_corr == 9 ~ "Última opción",
+      TRUE ~ NA_character_
+    ),
+    
+    # Factor ordenado para que salga bien en gráficos
+    Application.order_cat = factor(
+      Application.order_cat,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "4ª opción",
+        "5ª opción",
+        "6ª opción",
+        "Última opción"
+      )
+    )
+  )
+
+
+# Comprobaciones
+table(datos_modelo$Application.order)
+table(datos_modelo$Application.order_corr)
+table(datos_modelo$Application.order_cat)
+
+# Univariante sin reagrupar
+resumen_order_univariante_sin_group <- datos_modelo %>%
+  count(Application.order_cat) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.01)
+  )
+
+resumen_order_univariante_sin_group
+
+
+ggplot(
+  resumen_order_univariante_sin_group,
+  aes(x = Application.order_cat, y = porcentaje)
+) +
+  geom_col(fill = "#70020f", width = 0.65, alpha = 0.85) +
+  geom_text(
+    aes(label = etiqueta),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_order_univariante_sin_group$porcentaje) + 0.08)
+  ) +
+  labs(
+    title = "Distribución del alumnado según orden de solicitud",
+    subtitle = "Variable original tras agrupar el valor 0 con primera opción",
+    x = "Orden de solicitud",
+    y = "Porcentaje de estudiantes"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold")
+  )
+
+
+
+#reagrupada
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Application.order_group = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr %in% c(4, 5, 6, 9) ~ "Otras opciones",
+      TRUE ~ NA_character_
+    ),
+    
+    Application.order_group = factor(
+      Application.order_group,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "Otras opciones"
+      )
+    )
+  )
+
+
+# Comprobaciones
+table(datos_modelo$Application.order)
+table(datos_modelo$Application.order_corr)
+table(datos_modelo$Application.order_group)
+prop.table(table(datos_modelo$Application.order_group))
+
+resumen_order_univariante <- datos_modelo %>%
+  count(Application.order_group) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1)
+  )
+
+resumen_order_univariante
+
+
+colores_order <- c(
+  "1ª opción" = "#70020f",
+  "2ª opción" = "#A3424A",
+  "3ª opción" = "#C97A82",
+  "Otras opciones" = "#D9A5AA"
+)
+
+
+ggplot(
+  resumen_order_univariante,
+  aes(x = Application.order_group, y = porcentaje, fill = Application.order_group)
+) +
+  geom_col(width = 0.65, alpha = 0.9) +
+  geom_text(
+    aes(label = etiqueta),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_order_univariante$porcentaje) + 0.08)
+  ) +
+  scale_fill_manual(values = colores_order) +
+  labs(
+    title = "Distribución del alumnado según orden de solicitud",
+    subtitle = "Agrupación en primera, segunda, tercera y otras opciones",
+    x = "Orden de solicitud",
+    y = "Porcentaje de estudiantes"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+
+#Bivariante con target_bin
+tabla_order_target <- table(
+  datos_modelo$Application.order_group,
+  datos_modelo$Target_bin
+)
+
+tabla_order_target
+cramersV(tabla_order_target)
+# Proporciones dentro de cada orden de solicitud
+prop.table(tabla_order_target, margin = 1)
+
+# Chi-cuadrado
+chisq.test(tabla_order_target)
+
+# Frecuencias esperadas
+chisq.test(tabla_order_target)$expected
+
+#Gráfico bivariante con porcentajes
+resumen_order_target <- datos_modelo %>%
+  count(Application.order_group, Target_bin) %>%
+  group_by(Application.order_group) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = percent(prop, accuracy = 0.1)
+  ) %>%
+  ungroup()
+
+resumen_order_target
+
+
+ggplot(
+  resumen_order_target,
+  aes(x = Application.order_group, y = prop, fill = Target_bin)
+) +
+  geom_col(width = 0.65) +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_stack(vjust = 0.5),
+    size = 4,
+    color = "black"
+  ) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  labs(
+    title = "Abandono según orden de solicitud",
+    subtitle = "Proporción de abandono y no abandono dentro de cada grupo",
+    x = "Orden de solicitud",
+    y = "Proporción de estudiantes",
+    fill = "Situación final"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+  )
+
+#grafico mosaico:
+mosaic(~ Application.order_group + Target_bin, data = datos_modelo, 
+       shade = TRUE, legend = TRUE, cex.axis = 0.7)
