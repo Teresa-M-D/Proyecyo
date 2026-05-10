@@ -4125,3 +4125,468 @@ View(
       Application.mode
     )
 )
+
+
+#porcentaje aprobado
+
+
+
+# ============================================================
+# PORCENTAJE DE EVALUACIONES APROBADAS Y CASOS SIN EVALUACIONES
+# ============================================================
+
+# Cargamos librerías necesarias
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+
+# ------------------------------------------------------------
+# 0. Comprobación inicial de los porcentajes ya existentes
+# ------------------------------------------------------------
+# Esto cuenta cuántos valores NO NA hay en las variables de porcentaje.
+# Ojo: table() no cuenta los NA por defecto.
+# Sirve para ver cuántos estudiantes tienen porcentaje calculado.
+sum(table(datos_modelo$Porcentaje_aprobado_sem_1))
+sum(table(datos_modelo$Porcentaje_aprobado_sem_2))
+
+
+
+# ============================================================
+# 1. DETECTAR ESTUDIANTES SIN EVALUACIONES REGISTRADAS
+# ============================================================
+
+# Creamos variables indicadoras para saber si un estudiante tiene 0 evaluaciones.
+# TRUE  = no tiene evaluaciones registradas
+# FALSE = sí tiene al menos una evaluación registrada
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    # Primer semestre: TRUE si el número de evaluaciones registradas es 0
+    Sin_evaluaciones_sem_1 = Curricular.units.1st.sem..evaluations. == 0,
+    
+    # Segundo semestre: TRUE si el número de evaluaciones registradas es 0
+    Sin_evaluaciones_sem_2 = Curricular.units.2nd.sem..evaluations. == 0,
+    
+    
+    # Creamos etiquetas más bonitas para los gráficos del primer semestre
+    Sin_evaluaciones_sem_1_label = ifelse(
+      Sin_evaluaciones_sem_1,
+      "No hizo evaluaciones",
+      "Sí hizo evaluaciones"
+    ),
+    
+    # Creamos etiquetas más bonitas para los gráficos del segundo semestre
+    Sin_evaluaciones_sem_2_label = ifelse(
+      Sin_evaluaciones_sem_2,
+      "No hizo evaluaciones",
+      "Sí hizo evaluaciones"
+    )
+  )
+
+
+
+# ============================================================
+# 2. RELACIÓN ENTRE SIN EVALUACIONES Y ABANDONO - PRIMER SEMESTRE
+# ============================================================
+
+# Creamos una tabla resumen para ver, dentro de cada grupo:
+# - estudiantes que sí hicieron evaluaciones
+# - estudiantes que no hicieron evaluaciones
+#
+# cuántos abandonan y cuántos no abandonan.
+
+resumen_sin_eval_sem_1 <- datos_modelo %>%
+  count(Sin_evaluaciones_sem_1_label, Target_bin) %>%  # cuenta casos por grupo y Target_bin
+  group_by(Sin_evaluaciones_sem_1_label) %>%           # agrupa por si hizo evaluaciones o no
+  mutate(
+    prop = n / sum(n),                                 # proporción dentro de cada grupo
+    etiqueta = percent(prop, accuracy = 0.1)           # etiqueta en formato porcentaje
+  ) %>%
+  ungroup()
+
+# Mostramos la tabla resumen
+resumen_sin_eval_sem_1
+
+
+# Gráfico de barras apiladas en proporción.
+# Cada barra suma 100%.
+# Así comparamos qué proporción abandona dentro de:
+# - los que sí hicieron evaluaciones
+# - los que no hicieron evaluaciones
+
+ggplot(
+  resumen_sin_eval_sem_1,
+  aes(x = Sin_evaluaciones_sem_1_label, y = prop, fill = Target_bin)
+) +
+  geom_col(position = "fill", width = 0.65) +
+  
+  # Añadimos las etiquetas de porcentaje dentro de cada parte de la barra
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4,
+    color = "black"
+  ) +
+  
+  # Eje Y en formato porcentaje
+  scale_y_continuous(labels = percent_format()) +
+  
+  # Colores del proyecto:
+  # Abandono en rojo
+  # No Abandono en verde
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  
+  labs(
+    title = "Abandono según realización de evaluaciones en el primer semestre",
+    x = "",
+    y = "Proporción de estudiantes",
+    fill = "Situación final"
+  ) +
+  
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+  )
+
+
+
+# ============================================================
+# 3. RELACIÓN ENTRE SIN EVALUACIONES Y ABANDONO - SEGUNDO SEMESTRE
+# ============================================================
+
+# Hacemos lo mismo que antes, pero para el segundo semestre.
+
+resumen_sin_eval_sem_2 <- datos_modelo %>%
+  count(Sin_evaluaciones_sem_2_label, Target_bin) %>%  # cuenta casos por grupo y Target_bin
+  group_by(Sin_evaluaciones_sem_2_label) %>%           # agrupa por si hizo evaluaciones o no
+  mutate(
+    prop = n / sum(n),                                 # proporción dentro de cada grupo
+    etiqueta = percent(prop, accuracy = 0.1)           # etiqueta en porcentaje
+  ) %>%
+  ungroup()
+
+# Mostramos la tabla resumen
+resumen_sin_eval_sem_2
+
+
+# Gráfico de barras apiladas en proporción para el segundo semestre
+
+ggplot(
+  resumen_sin_eval_sem_2,
+  aes(x = Sin_evaluaciones_sem_2_label, y = prop, fill = Target_bin)
+) +
+  geom_col(position = "fill", width = 0.65) +
+  
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4,
+    color = "black"
+  ) +
+  
+  scale_y_continuous(labels = percent_format()) +
+  
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  
+  labs(
+    title = "Abandono según realización de evaluaciones en el segundo semestre",
+    x = "",
+    y = "Proporción de estudiantes",
+    fill = "Situación final"
+  ) +
+  
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(face = "bold")
+  )
+
+
+
+# ============================================================
+# 4. CREAR PORCENTAJE DE EVALUACIONES APROBADAS
+# ============================================================
+
+# Problema:
+# Si evaluations = 0, no podemos hacer:
+#
+# approved / evaluations
+#
+# porque estaríamos dividiendo entre 0.
+#
+# Solución:
+# - Si evaluations = 0, dejamos el porcentaje como NA.
+# - Si evaluations > 0, calculamos:
+#       aprobadas / evaluaciones * 100
+#
+# Así, el porcentaje se calcula solo para estudiantes con evaluaciones registradas.
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Porcentaje_aprobado_sem_1 = if_else(
+      Curricular.units.1st.sem..evaluations. == 0,
+      NA_real_,
+      Curricular.units.1st.sem..approved. /
+        Curricular.units.1st.sem..evaluations. * 100
+    ),
+    
+    Porcentaje_aprobado_sem_2 = if_else(
+      Curricular.units.2nd.sem..evaluations. == 0,
+      NA_real_,
+      Curricular.units.2nd.sem..approved. /
+        Curricular.units.2nd.sem..evaluations. * 100
+    )
+  )
+
+
+
+# ============================================================
+# 5. CREAR BASES SOLO CON ESTUDIANTES CON PORCENTAJE CALCULABLE
+# ============================================================
+
+# Para analizar el porcentaje de aprobados, quitamos los NA.
+# Es decir, nos quedamos solo con estudiantes que sí tienen evaluaciones registradas.
+
+datos_porcentaje_sem_1 <- datos_modelo %>%
+  filter(!is.na(Porcentaje_aprobado_sem_1))
+
+datos_porcentaje_sem_2 <- datos_modelo %>%
+  filter(!is.na(Porcentaje_aprobado_sem_2))
+
+
+# Comprobamos cuántas filas hay:
+# - en la base completa
+# - en la base con porcentaje calculable del semestre 1
+# - en la base con porcentaje calculable del semestre 2
+
+nrow(datos_modelo)
+nrow(datos_porcentaje_sem_1)
+nrow(datos_porcentaje_sem_2)
+
+
+# Comprobación de seguridad:
+# En estas bases no debería quedar nadie con evaluations = 0
+
+table(datos_porcentaje_sem_1$Curricular.units.1st.sem..evaluations. == 0)
+table(datos_porcentaje_sem_2$Curricular.units.2nd.sem..evaluations. == 0)
+
+
+# Comprobamos también que no queden NA en el porcentaje
+
+sum(is.na(datos_porcentaje_sem_1$Porcentaje_aprobado_sem_1))
+sum(is.na(datos_porcentaje_sem_2$Porcentaje_aprobado_sem_2))
+
+
+
+# ============================================================
+# 6. BOXPLOT DEL PORCENTAJE APROBADO - PRIMER SEMESTRE
+# ============================================================
+
+# Este boxplot compara el porcentaje de evaluaciones aprobadas
+# entre estudiantes que abandonan y estudiantes que no abandonan.
+#
+# Importante:
+# Aquí solo se usan estudiantes con evaluaciones registradas,
+# porque los que tienen 0 evaluaciones tienen porcentaje NA.
+
+ggplot(
+  datos_porcentaje_sem_1,
+  aes(x = Target_bin, y = Porcentaje_aprobado_sem_1, fill = Target_bin)
+) +
+  geom_boxplot(alpha = 0.7) +
+  
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  
+  labs(
+    title = "Porcentaje de evaluaciones aprobadas en el primer semestre",
+    subtitle = "Solo estudiantes con evaluaciones registradas",
+    x = "",
+    y = "Porcentaje de evaluaciones aprobadas"
+  ) +
+  
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+
+# ============================================================
+# 7. BOXPLOT DEL PORCENTAJE APROBADO - SEGUNDO SEMESTRE
+# ============================================================
+
+ggplot(
+  datos_porcentaje_sem_2,
+  aes(x = Target_bin, y = Porcentaje_aprobado_sem_2, fill = Target_bin)
+) +
+  geom_boxplot(alpha = 0.7) +
+  
+  scale_fill_manual(
+    values = c(
+      "Abandono" = "indianred2",
+      "No Abandono" = "darkseagreen3"
+    )
+  ) +
+  
+  labs(
+    title = "Porcentaje de evaluaciones aprobadas en el segundo semestre",
+    subtitle = "Solo estudiantes con evaluaciones registradas",
+    x = "",
+    y = "Porcentaje de evaluaciones aprobadas"
+  ) +
+  
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+
+# ============================================================
+# 8. TEST DE MANN-WHITNEY PARA EL PORCENTAJE DE APROBADOS
+# ============================================================
+
+# Comparamos si la distribución del porcentaje aprobado
+# es distinta entre Abandono y No Abandono.
+#
+# Se usa la base filtrada, porque el porcentaje solo tiene sentido
+# para estudiantes con evaluaciones registradas.
+
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_porcentaje_sem_1)
+
+wilcox.test(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_porcentaje_sem_2)
+
+
+
+# ============================================================
+# 9. DETECTAR CASOS INCOHERENTES EN EL PRIMER SEMESTRE
+# ============================================================
+
+# Buscamos casos raros donde:
+# - el estudiante tiene unidades matriculadas
+# - no tiene evaluaciones registradas
+# - y además la variable "without.evaluations" también vale 0
+#
+# Esto es raro porque, si está matriculado y no tiene evaluaciones,
+# esperaríamos que hubiese unidades sin evaluación registradas.
+
+casos_incoherentes_sem1 <- datos_modelo %>%
+  filter(
+    Curricular.units.1st.sem..enrolled. > 0,
+    Curricular.units.1st.sem..evaluations. == 0,
+    Curricular.units.1st.sem..without.evaluations. == 0
+  )
+
+# Número de casos incoherentes en el primer semestre
+nrow(casos_incoherentes_sem1)
+
+# Vemos cómo se reparten según Target y Target_bin
+casos_incoherentes_sem1 %>%
+  count(Target, Target_bin, sort = TRUE)
+
+
+
+# ============================================================
+# 10. DETECTAR CASOS INCOHERENTES EN EL SEGUNDO SEMESTRE
+# ============================================================
+
+casos_incoherentes_sem2 <- datos_modelo %>%
+  filter(
+    Curricular.units.2nd.sem..enrolled. > 0,
+    Curricular.units.2nd.sem..evaluations. == 0,
+    Curricular.units.2nd.sem..without.evaluations. == 0
+  )
+
+# Número de casos incoherentes en el segundo semestre
+nrow(casos_incoherentes_sem2)
+
+# Vemos cómo se reparten según Target y Target_bin
+casos_incoherentes_sem2 %>%
+  count(Target, Target_bin, sort = TRUE)
+
+
+
+# ============================================================
+# 11. VER CASOS INCOHERENTES EN AMBOS SEMESTRES
+# ============================================================
+
+# Creamos dos variables lógicas que indiquen si cada estudiante
+# es caso incoherente en el semestre 1 y/o en el semestre 2.
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    caso_incoherente_sem1 =
+      Curricular.units.1st.sem..enrolled. > 0 &
+      Curricular.units.1st.sem..evaluations. == 0 &
+      Curricular.units.1st.sem..without.evaluations. == 0,
+    
+    caso_incoherente_sem2 =
+      Curricular.units.2nd.sem..enrolled. > 0 &
+      Curricular.units.2nd.sem..evaluations. == 0 &
+      Curricular.units.2nd.sem..without.evaluations. == 0
+  )
+
+
+# Tabla cruzada:
+# Nos permite ver cuántos casos son incoherentes en:
+# - ningún semestre
+# - solo semestre 1
+# - solo semestre 2
+# - ambos semestres
+
+table(datos_modelo$caso_incoherente_sem1,
+      datos_modelo$caso_incoherente_sem2)
+
+
+# Guardamos los estudiantes que son incoherentes en ambos semestres
+
+casos_incoherentes_ambos <- datos_modelo %>%
+  filter(caso_incoherente_sem1 == TRUE,
+         caso_incoherente_sem2 == TRUE)
+
+# Número de estudiantes incoherentes en ambos semestres
+nrow(casos_incoherentes_ambos)
+
+# Distribución según Target
+casos_incoherentes_ambos %>%
+  count(Target, Target_bin, sort = TRUE)
+
+
+# Abrimos una vista con las variables más importantes
+# para revisar manualmente estos casos.
+
+casos_incoherentes_ambos %>%
+  select(
+    Target,
+    Target_bin,
+    Course,
+    Course_group,
+    
+    Curricular.units.1st.sem..enrolled.,
+    Curricular.units.1st.sem..evaluations.,
+    Curricular.units.1st.sem..without.evaluations.,
+    Curricular.units.1st.sem..approved.,
+    Curricular.units.1st.sem..grade.,
+    
+    Curricular.units.2nd.sem..enrolled.,
+    Curricular.units.2nd.sem..evaluations.,
+    Curricular.units.2nd.sem..without.evaluations.,
+    Curricular.units.2nd.sem..approved.,
+    Curricular.units.2nd.sem..grade.
+  ) %>%
+  View()
+
+
