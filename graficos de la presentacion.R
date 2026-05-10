@@ -268,13 +268,10 @@ cu <- c(
   "Carga_academica_real"
 )
 
-matrixcu <- cor(
-  datos_modelo[, cu],
-  use = "complete.obs",
-  method = "pearson"
-)
+matriz_corr_pearson<-cor(datos_modelo[,cu], use="complete.obs", method="pearson")
 
 round(matrixcu, 2)
+
 
 #========================
 # CORRPLOT
