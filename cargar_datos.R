@@ -837,3 +837,12 @@ datos_modelo$Carga_academica_real_sem_2 <-
   datos_modelo$Curricular.units.2nd.sem..enrolled. - 
   datos_modelo$Curricular.units.2nd.sem..credited.
 
+
+
+tabla_años <- data.frame(
+  GDP = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
+  year = c(2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
+)
+
+datos_modelo$year <- tabla_años$year[match(datos_modelo$PIB, tabla_años$GDP)]
+
