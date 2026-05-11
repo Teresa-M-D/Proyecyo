@@ -1510,6 +1510,7 @@ barplot(tabla_cred2)
 descriptive(datos_modelo$Age.at.enrollment)
 boxplot(datos_modelo$Age.at.enrollment)
 
+
 ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
   geom_boxplot(
     fill = "#8FA6C8",
@@ -1521,6 +1522,9 @@ ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
     outlier.shape = 21,
     outlier.size = 2.5,
     outlier.stroke = 0.7
+  ) +
+  scale_x_continuous(
+    breaks = seq(15, 70, by = 5)
   ) +
   labs(
     title = "Distribución de la edad de matriculación",
@@ -1556,9 +1560,9 @@ ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
       color = "gray85",
       linewidth = 0.4
     ),
-    plot.margin = margin(15, 20, 15, 20)
+    plot.margin = margin(15, 20, 15, 20),
+    aspect.ratio=0.25
   )
-
 
 #nota de admision:
 descriptive(datos_modelo$Admission.grade_10)
