@@ -264,8 +264,8 @@ yuen(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo, tr = 0
 yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo, tr = 0.2)
 
 #Test Mann - Whitney
-wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_modelo)
-wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
 wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_modelo)
 wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_modelo)
 wilcox.test(PIB ~ Target_bin, data=datos_modelo)
@@ -275,15 +275,17 @@ wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox.test(Carga_academica_real  ~ Target_bin, data=datos_modelo)
 wilcox.test(Carga_academica_real_sem_2  ~ Target_bin, data=datos_modelo)
+wilcox.test(Carga_academica_real  ~ Target_bin, data=datos_activos)
+wilcox.test(Carga_academica_real_sem_2  ~ Target_bin, data=datos_activos)
 wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
 #Tamaño del efecto
 install.packages("rstatix")
 library(rstatix)
 
-wilcox_effsize(data = datos_modelo , Curricular.units.1st.sem.grade_10 ~ Target_bin)
-wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo)
-wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_modelo)
-wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_modelo)
+wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
 wilcox_effsize(PIB ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Inflation.rate ~ Target_bin, data=datos_modelo)
@@ -291,6 +293,8 @@ wilcox_effsize(Admission.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Carga_academica_real  ~ Target_bin, data=datos_modelo)
 wilcox_effsize(Carga_academica_real_sem_2  ~ Target_bin, data=datos_modelo)
+wilcox_effsize(Carga_academica_real  ~ Target_bin, data=datos_activos)
+wilcox_effsize(Carga_academica_real_sem_2  ~ Target_bin, data=datos_activos)
 wilcox_effsize(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
 #GRAFICOS DE ASOCIACIÓN
 install.packages(c("scatterplot3d", "vcd"))
@@ -339,10 +343,13 @@ boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indi
 install.packages("tidyverse")
 library(tidyverse)
 
-#NOTAS POR SEMESTRE SEGÚN ABANDONO
+#NOTAS POR SEMESTRE SEGÚN ABANDONO (voy a hacerlo excluyendo a las 226 personas que no tienen actividad en alguno de 
+#los dos semestres o en ambos)
+
 
 # Convertir a formato largo
 df_long1 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%
   pivot_longer(
     cols = c(Curricular.units.1st.sem.grade_10,
              Curricular.units.2nd.sem.grade_10),
@@ -367,6 +374,14 @@ ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
   ) +
   theme_minimal(base_size = 14)
 
+nrow(datos_modelo)
+
+datos_activos <- datos_modelo %>% 
+  filter(tipo_actividad == "Con actividad")
+
+nrow(datos_activos)
+nrow(datos_modelo) - nrow(datos_activos)
+table(datos_activos$tipo_actividad)
 #PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
 
 # Convertir a formato largo
@@ -490,6 +505,7 @@ table(con_actividad)
 
 # Convertir a formato largo
 df_long3 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%
   pivot_longer(
     cols = c(Carga_academica_real,
              Carga_academica_real_sem_2),
