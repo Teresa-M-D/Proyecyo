@@ -3330,46 +3330,105 @@ table(datos_modelo$Course_limpio)
 
 
 #Análisis multivariante:
-colnames(datos_modelo)
 
-table(datos_modelo$Application.mode_group)
-table(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+#filtramos solo a los estudiantes que hayan tenido actividad en todo el primer curso escolar:
+con_actividad_total <- subset(datos_modelo, tipo_actividad == "Con actividad")
+descriptive(con_actividad_total)
 
-table(datos_modelo$Course_group)
-table(datos_modelo$Course_group, datos_modelo$Target_bin)
 
-table(datos_modelo$Previous_education_level)
-table(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
-#Regresión logística bianria (Lucía):
-datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
-datos_modelo$Target_bin <- relevel(datos_modelo$Target_bin, ref = "No Abandono")
+sum(table(con_actividad_total$Target_bin))
+sum(table(con_actividad_total$Carga_academica_real_sem_2))
+sum(table(con_actividad_total$Porcentaje_aprobado_sem_2))
+sum(table(con_actividad_total$Curricular.units.2nd.sem..grade.))
+sum(table(con_actividad_total$Tuition.fees.up.to.date))
+sum(table(con_actividad_total$Scholarship.holder))
+sum(table(con_actividad_total$Age.at.enrollment))
+sum(table(con_actividad_total$Gender))
+sum(table(con_actividad_total$Course_group))
+sum(table(con_actividad_total$Application.mode_group))
 
-datos_modelo$Application.mode_group <- relevel(
-  as.factor(datos_modelo$Application.mode_group),
+
+#Regresión logística bianria:
+
+# 1. Preparar la variable respuesta --------------------------------------
+
+con_actividad_total$Target_bin <- as.factor(con_actividad_total$Target_bin)
+
+con_actividad_total$Target_bin <- relevel(
+  con_actividad_total$Target_bin,
+  ref = "No Abandono"
+)
+
+# El modelo estima la probabilidad de Abandono frente a No Abandono
+
+
+# 2. Preparar las variables categóricas binarias -------------------------
+
+con_actividad_total$Tuition.fees.up.to.date <- relevel(
+  as.factor(con_actividad_total$Tuition.fees.up.to.date),
+  ref = "No"
+)
+
+# Tener las tasas al día se comparará con no tenerlas al día
+
+
+con_actividad_total$Scholarship.holder <- relevel(
+  as.factor(con_actividad_total$Scholarship.holder),
+  ref = "No"
+)
+
+# Tener beca se comparará con no tener beca
+
+
+con_actividad_total$Gender <- relevel(
+  as.factor(con_actividad_total$Gender),
+  ref = "Femenino"
+)
+
+# El género masculino se comparará con el femenino
+
+
+# 3. Preparar las variables categóricas no binarias ----------------------
+
+con_actividad_total$Application.mode_group <- relevel(
+  as.factor(con_actividad_total$Application.mode_group),
   ref = "Acceso normal"
 )
 
-datos_modelo$Course_group <- relevel(
-  as.factor(datos_modelo$Course_group),
+# Cada vía de acceso se compara con "Acceso normal"
+
+
+con_actividad_total$Course_group <- relevel(
+  as.factor(con_actividad_total$Course_group),
   ref = "Empresa"
 )
 
+# Cada grupo de titulación se compara con "Empresa"
+
+
+# 4. Ajustar el modelo de regresión logística ----------------------------
+
 modelo_combinado <- glm(
-  Target_bin ~ Carga_academica_real +
-    Curricular.units.1st.sem..approved. +
-    Curricular.units.1st.sem.grade_10 +
-    Curricular.units.1st.sem..evaluations. +
+  Target_bin ~ Carga_academica_real_sem_2 +
+    Porcentaje_aprobado_sem_2 +
+    Curricular.units.2nd.sem.grade_10 +
     Tuition.fees.up.to.date +
-    Debtor +
     Scholarship.holder +
-    Admission.grade_10 +
     Age.at.enrollment +
     Gender +
     Course_group +
     Application.mode_group,
-  data = datos_modelo,
+  
+  data = con_actividad_total,
   family = binomial
 )
+
+
+# 5. Comprobar multicolinealidad -----------------------------------------
+
+library(car)
+vif(modelo_combinado)
+
 
 summary(modelo_combinado)
 
