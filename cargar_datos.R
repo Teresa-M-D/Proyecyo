@@ -15,6 +15,8 @@ library(ggplot2)
 library(dplyr)
 library(GGally)
 library(psych)
+library(scales)
+
 
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
 
