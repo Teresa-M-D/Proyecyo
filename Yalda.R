@@ -266,8 +266,8 @@ yuen(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_modelo, tr = 0
 #Test Mann - Whitney
 wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
 wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_modelo)
-wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_modelo)
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
 wilcox.test(PIB ~ Target_bin, data=datos_modelo)
 wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
 wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
