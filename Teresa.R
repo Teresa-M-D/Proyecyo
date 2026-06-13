@@ -1,7 +1,13 @@
 #espacio para mí:)
-#COSAS BÁSICAS
-head(datos)
-descriptive(datos_recodificados)
+
+
+datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
+#Chicas añado el cambio del nombre de variable de Nacionality a Nationality
+datos_moda_condicionada$Nationality<-datos_moda_condicionada$Nacionality
+datos_moda_condicionada$Nacionality<-NULL
+datos_moda_condicionada["PIB"]=datos_moda_condicionada["GDP"]
+datos_moda_condicionada$GDP<-NULL
+
 #ver nombres variables
 names(datos)
 names(datos_recodificados)
