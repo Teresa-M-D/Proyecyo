@@ -337,6 +337,7 @@ boxplot(Porcentaje_aprobado_sem_1  ~ Target_bin, data=datos_modelo, las=1, col =
 boxplot(Porcentaje_aprobado_sem_2  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Porcentaje evaluaciones aprobadas 2º sem y abandono")
 boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
 boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
 
 
