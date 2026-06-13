@@ -158,8 +158,8 @@ boxplot(datos_recodificados$Curricular.units.1st.sem..approved.~ datos_recodific
 #****************************
 #1SEM
 datos_recodificados$Curricular.units.1st.sem..enrolled.
-descriptive(datos_recodificados$Curricular.units.1st.sem..enrolled.)
-hist(datos_recodificados$Curricular.units.1st.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
+descriptive(datos_modelo$Curricular.units.1st.sem..enrolled.)
+hist(datos_modelo$Curricular.units.1st.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
 axis(1, at=seq(0, 26, by=1),las=2)
 axis(2, at=seq(0, 2000, by=100), las=2)
 boxplot(datos_recodificados$Curricular.units.1st.sem..enrolled.~datos_recodificados$Course, las=2, cex.axis=0.7)
@@ -170,12 +170,12 @@ datos_recodificados$Curricular.units.2nd.sem..enrolled.[datos_recodificados$Curr
 
 
 #2SEM
-descriptive(datos_recodificados$Curricular.units.2nd.sem..enrolled.)
-hist(datos_recodificados$Curricular.units.2nd.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
+descriptive(datos_modelo$Curricular.units.2nd.sem..enrolled.)
+hist(datos_modelo$Curricular.units.2nd.sem..enrolled., col="pink", breaks=seq(0, 26, by=1), xaxt="n", yaxt="n")
 axis(1, at=seq(0, 26, by=1),las=2)
 axis(2, at=seq(0, 2000, by=100), las=2)
 boxplot(datos_recodificados$Curricular.units.2nd.sem..enrolled.~datos_recodificados$Course, las=2, cex.axis=0.7)
-
+descriptive((datos_modelo$Carga_academica_real_sem_2))
 #**************************
 #Creditadas(convalidadas)
 #**************************

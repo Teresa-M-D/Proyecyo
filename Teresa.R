@@ -1,5 +1,4 @@
 #espacio para mí:)
-
 descriptive(datos_modelo$Application.order)
 datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
 #Chicas añado el cambio del nombre de variable de Nacionality a Nationality
