@@ -1,0 +1,2 @@
+descriptive(datos_modelo$Porcentaje_aprobado_sem_2)
+datos_modelo$Porcentaje_aprobado_sem_1[is.na(datos_modelo$Porcentaje_aprobado_sem_1) ]=0
