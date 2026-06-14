@@ -625,6 +625,8 @@ ggplot(datos_prop,
   theme_minimal()
 
 
+
+
 #Análisis univariante numérico:
 
 
@@ -688,6 +690,22 @@ ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill
     title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
   ) +
   theme_minimal(base_size = 14)
+
+#Test de Mann - Whitney
+datos_activos <- datos_modelo %>% 
+  filter(tipo_actividad == "Con actividad")
+
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
+
+#Tamaño del efecto
+wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
+
 
 #Análisis bivariante: variabels categóricas vs Target
 
