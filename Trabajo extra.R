@@ -966,4 +966,4 @@ resumen_sensibilidad <- bind_rows(
 resumen_sensibilidad
 
 
-
+#ESTUDIO UNIVARIANTE
