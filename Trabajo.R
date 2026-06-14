@@ -311,9 +311,40 @@ ggplot(datos_target, aes(x = Target, y = n, fill = Target)) +
     panel.grid.minor = element_blank()
   )
 
-
+#······················
 #Perfil del estudiante:
+#······················
+ 
+#Orden de solicitud
+tabla<-prop.table(table(datos_modelo$Application.order))*100
+df_orden<-data.frame(Orden = c("1ª opción",
+            "2ª opción",
+            "3ª opción",
+            "4ª opción",
+            "5ª opción",
+            "6ª opción",
+            "Última opción"),
+  Porcentaje = as.numeric(tabla))
 
+ggplot(df_orden,
+       aes(x = Orden,
+           y = Porcentaje)) +
+  geom_col(fill = "#8B1E2D") +
+  geom_text(aes(label = sprintf("%.2f%%", Porcentaje)),
+            vjust = -0.3,
+            size = 4) +
+  labs(
+    title = "Distribución del alumnado según orden de solicitud",
+    subtitle = "Variable original tras agrupar el valor 0 con primera opción",
+    x = "Orden de solicitud",
+    y = "Porcentaje de estudiantes"
+  ) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12)
+  )
 #Diagrama de cajas: edad de matriculación
 
 
@@ -370,7 +401,7 @@ ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
     aspect.ratio=0.25
   )
 
-#Diagrama de barras: orden de solicitud
+
 
 resumen_order_univariante_sin_group
 
