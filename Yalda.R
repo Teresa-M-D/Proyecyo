@@ -500,7 +500,6 @@ ggplot(datos_prop,
   theme_minimal()
 
 
-table(con_actividad)
 
 #CARGA ACADEMICA REAL POR SEMESTRE SEGÚN ABANDONO
 
