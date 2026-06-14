@@ -1,4 +1,7 @@
-#Describe y descriptivos de cada una por separado
+#**************************
+#COMPARACIÓN VARIABLES NOTAS
+#***************************
+#Describe y descriptivos de cada variable por separado
 datos_recodificados$Curricular.units.1st.sem.grade_10[datos_recodificados$Curricular.units.1st.sem.grade_10!=0]
 comparacion_semestres_y_nota_entrada<-c("Previous.qualification.grade_10",
                                         "Admission.grade_10",
