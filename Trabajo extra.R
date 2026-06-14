@@ -834,6 +834,7 @@ mosaic(
   )
 )
 
+#ANÁLISIS BIVARIANTE: NÚMERICA VS TARGET
 
 #ANÁLISIS DE SENSIBILIDAD, comparamos datos imputados por moda condicionada con datos sin imputar:
 
