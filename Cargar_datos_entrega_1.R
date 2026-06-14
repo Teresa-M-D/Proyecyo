@@ -834,7 +834,6 @@ datos_recodificados$Father_occupation_level <- case_when(
 sum(table(datos_recodificados$Father_occupation_level))
 
 
-
 #CREACIÓN DE NUEVAS VARIABLES:
 
 
@@ -949,3 +948,75 @@ table(con_actividad_total$Target_bin)
 table(sin_actividad_total$Target_bin)
 table(no_presentados_1$Target_bin)
 table(no_presentados_2$Target_bin)
+
+
+
+
+#Recodificación y reagrupación de order application (orden de solicitud):
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    # Corregimos el valor 0:
+    # como solo aparece una vez, lo agrupamos con el valor 1.
+    Application.order_corr = if_else(
+      Application.order == 0,
+      1,
+      Application.order
+    ),
+    
+    # Creamos la variable categórica interpretando 1 como primera opción
+    Application.order_cat = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr == 4 ~ "4ª opción",
+      Application.order_corr == 5 ~ "5ª opción",
+      Application.order_corr == 6 ~ "6ª opción",
+      Application.order_corr == 9 ~ "Última opción",
+      TRUE ~ NA_character_
+    ),
+    
+    # Factor ordenado para que salga bien en gráficos
+    Application.order_cat = factor(
+      Application.order_cat,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "4ª opción",
+        "5ª opción",
+        "6ª opción",
+        "Última opción"
+      )
+    )
+  )
+
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Application.order_group = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr %in% c(4, 5, 6, 9) ~ "Otras opciones",
+      TRUE ~ NA_character_
+    ),
+    
+    Application.order_group = factor(
+      Application.order_group,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "Otras opciones"
+      )
+    )
+  )
+
+# Comprobaciones
+table(datos_modelo$Application.order)
+table(datos_modelo$Application.order_corr)
+table(datos_modelo$Application.order_group)
+prop.table(table(datos_modelo$Application.order_group))
+
+
