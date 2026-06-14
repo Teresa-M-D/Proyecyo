@@ -1,10 +1,10 @@
 
 
-#hacer matriz de correlaciones
+#Matrices de correlaciones
 matriz_corr_kendall<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="kendall") 
 matriz_corr_pearson<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="pearson")
 matriz_corr_spearman<-cor(datos_modelo[,variables_numéricas], use="complete.obs", method="spearman")
-#para ponerlo gráficamente
+#Gráficamente
 corrplot(matriz_corr_kendall, method="color", type = "upper",
          tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust", main="Correlaciones de Kendall")
 corrplot(matriz_corr_pearson, method="color", type = "upper",
@@ -13,7 +13,7 @@ corrplot(matriz_corr_spearman, method="color", type = "upper",
          tl.cex = 0.5,   addCoef.col = "black", number.cex=0.4, order = "hclust")
 
 
-#*************************
+#
 #GRÁFICOS DE DISPERSIÓN
 #*************************
 
