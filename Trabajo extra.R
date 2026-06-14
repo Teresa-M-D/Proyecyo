@@ -1380,4 +1380,33 @@ table(datos_modelo$Curricular.units.1st.sem.grade_10[datos_modelo$Curricular.uni
 table(datos_modelo$Curricular.units.2nd.sem.grade_10[datos_modelo$Curricular.units.2nd.sem.grade_10==0])
 
 
+#*********************
+#Application order
+#*********************
+descriptive(datos_recodificados$Application.order)
+tabla_orden<-table(datos_recodificados$Application.order)
+barplot(tabla_orden,  yaxt="n")
+axis(2, at=seq(0, 3500, by=100), las=2)
+
+
+#***********
+#Inflation rate
+#***********
+descriptive(datos_recodificados$Inflation.rate)
+barplot(table(datos_recodificados$Inflation.rate))
+table(datos_recodificados$Inflation.rate)
+#***********
+#PIB
+#***********
+descriptive(datos_recodificados$PIB)
+barplot(table(datos_recodificados$PIB))
+table(datos_recodificados$PIB)
+#***********
+#Unemployment
+#***********
+descriptive(datos_recodificados$Unemployment.rate)
+barplot(table(datos_recodificados$Unemployment.rate))
+table(datos_recodificados$Unemployment.rate)
+
+
 
