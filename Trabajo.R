@@ -316,9 +316,11 @@ ggplot(datos_target, aes(x = Target, y = n, fill = Target)) +
 #······················
 #Perfil del estudiante:
 #······················
- 
+
 #Orden de solicitud
+datos_modelo$Application.order[datos_modelo$Application.order==0]=1
 tabla<-prop.table(table(datos_modelo$Application.order))*100
+
 df_orden<-data.frame(Orden = c("1ª opción",
             "2ª opción",
             "3ª opción",
@@ -347,9 +349,9 @@ ggplot(df_orden,
     plot.title = element_text(face = "bold", size = 16),
     plot.subtitle = element_text(size = 12)
   )
+
+
 #Diagrama de cajas: edad de matriculación
-
-
 ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
   geom_boxplot(
     fill = "#8FA6C8",
@@ -401,36 +403,6 @@ ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
     ),
     plot.margin = margin(15, 20, 15, 20),
     aspect.ratio=0.25
-  )
-
-
-
-resumen_order_univariante_sin_group
-
-
-ggplot(
-  resumen_order_univariante_sin_group,
-  aes(x = Application.order_cat, y = porcentaje)
-) +
-  geom_col(fill = "#70020f", width = 0.65, alpha = 0.85) +
-  geom_text(
-    aes(label = etiqueta),
-    vjust = -0.4,
-    size = 4
-  ) +
-  scale_y_continuous(
-    labels = percent_format(),
-    limits = c(0, max(resumen_order_univariante_sin_group$porcentaje) + 0.08)
-  ) +
-  labs(
-    title = "Distribución del alumnado según orden de solicitud",
-    subtitle = "Variable original tras agrupar el valor 0 con primera opción",
-    x = "Orden de solicitud",
-    y = "Porcentaje de estudiantes"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold")
   )
 
 
