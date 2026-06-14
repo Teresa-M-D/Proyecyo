@@ -1,6 +1,8 @@
-#imputación de datos faltantes por moda condicionada:
-install.packages("lsr")
-install.packages("corrplot")
+# Instalar paquetes solo si no están instalados
+paquetes <- c(
+  "dplyr", "ggplot2", "DescTools", "clickR", "corrplot", "gridExtra",
+  "plotly", "scatterplot3d", "vcd", "lsr", "GGally", "psych", "scales", "sf", "rnaturalearth", "rnaturalearthdata", "car", "pROC", "caret"
+)
 
 #Librerías a usar:
 library(corrplot)
@@ -16,7 +18,14 @@ library(dplyr)
 library(GGally)
 library(psych)
 library(scales)
-
+library(readxl)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(car)
+library(pROC)
+library(caret)
+#CARGA DE DATOS:
 
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
 
@@ -25,78 +34,68 @@ datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
 #Cambio nombre Nacionality a Nationality:
 datos_moda_condicionada$Nationality<-datos_moda_condicionada$Nacionality
 datos_moda_condicionada$Nacionality<-NULL
+#Renombramos GDP como PIB:
 datos_moda_condicionada["PIB"]=datos_moda_condicionada["GDP"]
 datos_moda_condicionada$GDP<-NULL
 
 
 
-#===============
-#IMPUTACIÓN
-#===============
- 
+#IMPUTACIÓN DE VALORES DESCONOCIDOS MEDIANTE MODA CONDICIONADA:
 
-
-descriptive(datos_moda_condicionada)
-names(datos_moda_condicionada)
 # Convertimos los códigos de desconocido a NA
 datos_moda_condicionada$Mother.s.qualification[datos_moda_condicionada$Mother.s.qualification == 34] <- NA
 datos_moda_condicionada$Father.s.qualification[datos_moda_condicionada$Father.s.qualification == 34] <- NA
 datos_moda_condicionada$Mother.s.occupation[datos_moda_condicionada$Mother.s.occupation == 99] <- NA
 datos_moda_condicionada$Father.s.occupation[datos_moda_condicionada$Father.s.occupation == 99] <- NA
 
-#funcion para calcular la moda
+#Función para calcular la moda
 moda <- function(x) {
   ux <- na.omit(x)
   ux[which.max(tabulate(match(ux, ux)))]
 }
-#imputar por target
 
-#mother.s.occupation
-datos_moda_condicionada$Mother.s.occupation <- ave(
+
+#Función para imputar por moda condicionada al Target:
+
+imputar_moda_por_target <- function(variable, target) {
+  ave(
+    variable,
+    target,
+    FUN = function(x) {
+      valor_moda <- moda(x)
+      x[is.na(x)] <- valor_moda
+      return(x)
+    }
+  )
+}
+
+
+# Imputación por moda condicionada a Target
+datos_moda_condicionada$Mother.s.occupation <- imputar_moda_por_target(
   datos_moda_condicionada$Mother.s.occupation,
-  datos_moda_condicionada$Target,
-  FUN = function(x) {
-    x[is.na(x)] <- moda(x)
-    return(x)
-  }
+  datos_moda_condicionada$Target
 )
 
-#father.s.occupation
-datos_moda_condicionada$Father.s.occupation <- ave(
+datos_moda_condicionada$Father.s.occupation <- imputar_moda_por_target(
   datos_moda_condicionada$Father.s.occupation,
-  datos_moda_condicionada$Target,
-  FUN = function(x) {
-    x[is.na(x)] <- moda(x)
-    return(x)
-  }
+  datos_moda_condicionada$Target
 )
 
-#mother.s.qualification
-datos_moda_condicionada$Mother.s.qualification <- ave(
+datos_moda_condicionada$Mother.s.qualification <- imputar_moda_por_target(
   datos_moda_condicionada$Mother.s.qualification,
-  datos_moda_condicionada$Target,
-  FUN = function(x) {
-    x[is.na(x)] <- moda(x)
-    return(x)
-  }
+  datos_moda_condicionada$Target
 )
 
-#father.s.qualification
-
-datos_moda_condicionada$Father.s.qualification <- ave(
+datos_moda_condicionada$Father.s.qualification <- imputar_moda_por_target(
   datos_moda_condicionada$Father.s.qualification,
-  datos_moda_condicionada$Target,
-  FUN = function(x) {
-    x[is.na(x)] <- moda(x)
-    return(x)
-  }
+  datos_moda_condicionada$Target
 )
+
+# Comprobación de valores faltantes tras la imputación
 colSums(is.na(datos_moda_condicionada))
 
 
-#=============================
-#Recodificación de variables:
-#==============================
+#RECODIFICACIÓN DE VARIABLES CATEGÓRICAS:
 
 datos_recodificados<-datos_moda_condicionada
 
@@ -125,7 +124,7 @@ datos_recodificados$Nationality<-recode(datos_recodificados$Nationality,
                                         `108` = "Cubano",
                                         `109` = "Colombiano")
 
-descriptive(datos_recodificados)
+
 
 #Course
 datos_recodificados$Course<-recode(datos_recodificados$Course, 
@@ -146,6 +145,16 @@ datos_recodificados$Course<-recode(datos_recodificados$Course,
                                    `9773` = "Periodismo y Comunicación",
                                    `9853` = "Educación Básica",
                                    `9991` = "Gestión (turno de tarde)")
+
+
+#Limpieza de Course:
+datos_recodificados$Course_limpio <- gsub(
+  " \\(turno de tarde\\)",
+  "",
+  datos_recodificados$Course
+)
+
+
 #Mother's Cualification
 datos_recodificados$Mother.s.qualification<-recode(datos_recodificados$Mother.s.qualification,
                                                    `1` = "Educación secundaria - 12º año o equivalente",
@@ -398,28 +407,30 @@ datos_recodificados$Daytime.evening.attendance.<-recode(datos_recodificados$Dayt
                                                         `0` = "Tarde")
 
 
-#===========================================
-#REAGRUPACIONES Y TRANSFORMACIONES LINEALES
-#===========================================
 
-#Transformacion lineal notas sobre 200 a sobre 10:
+#TRANSFORMACIONES LINEALES:
 
-#Previos qualification grade (nota de estudios previos):
-datos_recodificados$Previous.qualification.grade_10 <- (datos_recodificados$Previous.qualification..grade. / 20)
+# Nota de estudios previos sobre 10
+datos_recodificados$Previous.qualification.grade_10 <- 
+  datos_recodificados$Previous.qualification..grade. / 20
 
-#Admission grade (nota de adimisión):
-datos_recodificados$Admission.grade_10 <- (datos_recodificados$Admission.grade / 20)
+# Nota de admisión sobre 10
+datos_recodificados$Admission.grade_10 <- 
+  datos_recodificados$Admission.grade / 20
 
-#Tranformación lineal de nota media de semestres sobre 20 a sobre 10
-datos_recodificados$Curricular.units.1st.sem.grade_10<-(datos_recodificados$Curricular.units.1st.sem..grade./2)
-datos_recodificados$Curricular.units.2nd.sem.grade_10<-(datos_recodificados$Curricular.units.2nd.sem..grade./2)
+# Nota media del primer semestre sobre 10
+datos_recodificados$Curricular.units.1st.sem.grade_10 <- 
+  datos_recodificados$Curricular.units.1st.sem..grade. / 2
 
-#Reagrupaciones:
+# Nota media del segundo semestre sobre 10
+datos_recodificados$Curricular.units.2nd.sem.grade_10 <- 
+  datos_recodificados$Curricular.units.2nd.sem..grade. / 2
 
-#Reagrupamos Nacionalidades en categorías Portugal, Europa, África y América Latina
 
-table(datos_recodificados$Nationality)
 
+#REAGRUPACIÓN DE VARIABLES CATEGÓRICAS:
+
+#Reagrupación nacionalidad:
 
 datos_recodificados$Nationality_group <- ifelse(
   datos_recodificados$Nationality == "Portugués", "Portugal",
@@ -438,7 +449,7 @@ datos_recodificados$Nationality_group <- ifelse(
   )
 )
 
-
+sum(table(datos_recodificados$Nationality_group))
 
 #Marital Status:
 datos_recodificados <- datos_recodificados %>%
@@ -494,6 +505,7 @@ datos_recodificados$Application.mode_group <- case_when(
   
 )
 
+sum(table(datos_recodificados$Application.mode_group))
 
 #Course:
 datos_recodificados$Course_group <- dplyr::case_when(
@@ -540,9 +552,10 @@ datos_recodificados$Course_group <- dplyr::case_when(
   TRUE ~ NA_character_
 )
 
+sum(table(datos_recodificados$Course_group))
+
 
 #Previous qualification:
-table(datos_recodificados$Previous.qualification)
 datos_recodificados$Previous_education_level <- case_when(
   
   # BAJO
@@ -579,13 +592,9 @@ datos_recodificados$Previous_education_level <- case_when(
   ) ~ "Superior"
 )
 
-descriptive(datos_recodificados)
-table(datos_recodificados$Previous_education_level)
+sum(table(datos_recodificados$Previous_education_level))
 
-#Mother qualification en nivel bajo, medio, técnico y superior
-table(datos_recodificados$Mother.s.qualification)
-
-
+#Mother qualification
 datos_recodificados$Mother_education_level <- case_when(
   
   # BAJO
@@ -633,11 +642,9 @@ datos_recodificados$Mother_education_level <- case_when(
   ) ~ "Superior"
 )
 
-table(datos_recodificados$Mother_education_level)
+sum(table(datos_recodificados$Mother_education_level))
 
-#Father qualification en nivel bajo, medio, técnico y superior
-table(datos_recodificados$Father.s.qualification)
-
+#Father qualification
 datos_recodificados$Father_education_level <- case_when(
   # BAJO
   datos_recodificados$Father.s.qualification %in% c(
@@ -688,13 +695,10 @@ datos_recodificados$Father_education_level <- case_when(
     "Asistencia a educación superior"
   ) ~ "Superior"
 )
-table(datos_recodificados$Father_education_level)
+sum(table(datos_recodificados$Father_education_level))
 
 
 #Mother occupation
-
-table(datos_recodificados$Mother.s.occupation)
-
 datos_recodificados$Mother_occupation_level <- case_when(
   
   # ALTA CUALIFICACIÓN
@@ -750,12 +754,8 @@ datos_recodificados$Mother_occupation_level <- case_when(
   
 )
 sum(table(datos_recodificados$Mother_occupation_level))
-table(datos_recodificados$Mother.s.occupation)
 
 #Father occupation
-
-table(datos_recodificados$Father.s.occupation)
-
 
 datos_recodificados$Father_occupation_level <- case_when(
   
@@ -831,47 +831,43 @@ datos_recodificados$Father_occupation_level <- case_when(
   
 )
 
+sum(table(datos_recodificados$Father_occupation_level))
 
-#NUEVAS VARIABLES:
 
-#Porcentaje aprobado:
+#CREACIÓN DE NUEVAS VARIABLES:
+
+
+#Porcentaje de evaluaciones aprobadas: 
 datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
-datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
+datos_recodificados$Porcentaje_aprobado_sem_2<-100*(datos_recodificados$Curricular.units.2nd.sem..approved./datos_recodificados$Curricular.units.2nd.sem..evaluations.)
 
 #Carga académica real:
 datos_recodificados$Carga_academica_real <- 
   datos_recodificados$Curricular.units.1st.sem..enrolled. - 
   datos_recodificados$Curricular.units.1st.sem..credited.
 
-datos_modelo$Carga_academica_real_sem_2 <- 
-  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
-  datos_modelo$Curricular.units.2nd.sem..credited.
+datos_recodificados$Carga_academica_real_sem_2 <- 
+  datos_recodificados$Curricular.units.2nd.sem..enrolled. - 
+  datos_recodificados$Curricular.units.2nd.sem..credited.
 
 
-#año
-
+#AÑO ASOCIADO AL PIB:
 
 tabla_años <- data.frame(
-  GDP = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
+  PIB = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
   year = c(2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
 )
 
-datos_modelo$year <- tabla_años$year[match(datos_modelo$PIB, tabla_años$GDP)]
-
-datos_recodificados$year <- tabla_años$year[match(datos_recodificados$PIB, tabla_años$GDP)]
-
-
-#Limpieza variable Course:
-datos_recodificados$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
-                                          datos_recodificados$Course)
+datos_recodificados$year <- tabla_años$year[match(datos_recodificados$PIB, tabla_años$PIB)]
 
 
 
-#Eliminación observaciones Multimedia problemáticas:
+#ELIMINACIÓN DE REGISTROS PROBLEMÁTICOS:
 
-datos_recodificados$Curricular.units.1st.sem..evaluations.
 
-library(dplyr)
+
+#Eliminación de observaciones del grado Multimedia sin actividad académica:
+
 
 datos_modelo <- datos_recodificados %>%
   filter(!(Curricular.units.1st.sem.grade_10 == 0 &
@@ -881,20 +877,146 @@ datos_modelo <- datos_recodificados %>%
              Curricular.units.1st.sem..enrolled. ==0 
   ))
 
-nrow(datos_recodificados)
-nrow(datos_modelo) #vemos que si que encaja, da 4244, 4244=4424-180
-colnames(datos_modelo)
+#Creación Target_bin:
 
-table(datos_modelo$Course_limpio)
+datos_modelo$Target_bin <- ifelse(
+  datos_modelo$Target == "Dropout",
+  "Abandono",
+  "No Abandono"
+)
+
+datos_modelo$Target_bin <- as.factor(datos_modelo$Target_bin)
+
+table(datos_modelo$Target_bin)
+
+# Comprobación de valores faltantes
+colSums(is.na(datos_modelo))
+
+# Comprobación de variables agrupadas
+table(datos_modelo$Nationality_group, useNA = "ifany")
+table(datos_modelo$Marital_group, useNA = "ifany")
+table(datos_modelo$Application.mode_group, useNA = "ifany")
+table(datos_modelo$Course_group, useNA = "ifany")
+table(datos_modelo$Previous_education_level, useNA = "ifany")
+table(datos_modelo$Mother_education_level, useNA = "ifany")
+table(datos_modelo$Father_education_level, useNA = "ifany")
+table(datos_modelo$Mother_occupation_level, useNA = "ifany")
+table(datos_modelo$Father_occupation_level, useNA = "ifany")
+
+# Comprobación de la variable objetivo
+table(datos_modelo$Target, useNA = "ifany")
+
+# Comprobación de titulaciones limpias
+table(datos_modelo$Course_limpio, useNA = "ifany")
+
+# Vista general final
+str(datos_modelo)
+summary(datos_modelo)
+
+descriptive(datos_modelo)
+
+#Estudiantes con actividad durante todo el año:
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    tipo_actividad = case_when(
+      # Sin actividad en todo el año
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 &
+        Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en todo el año",
+      
+      # Sin actividad solo en 1º semestre
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 ~ "Sin actividad en 1º semestre",
+      
+      # Sin actividad solo en 2º semestre
+      Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en 2º semestre",
+      
+      # Con actividad
+      TRUE ~ "Con actividad"
+    )
+  )
+con_actividad_total <- subset(datos_modelo, tipo_actividad == "Con actividad")
+con_actividad_total <- subset(datos_modelo, tipo_actividad == "Con actividad")
+sin_actividad_total <- subset(datos_modelo, tipo_actividad == "Sin actividad en todo el año")
+no_presentados_1    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 1º semestre")
+no_presentados_2    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 2º semestre")
+
+table(con_actividad_total$Target_bin)
+table(sin_actividad_total$Target_bin)
+table(no_presentados_1$Target_bin)
+table(no_presentados_2$Target_bin)
 
 
-#Variable Course_limpio
-table(datos_modelo$Course)
-datos_modelo$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
-                                          datos_modelo$Course)
-table(datos_modelo$Course_limpio)
 
 
+#Recodificación y reagrupación de order application (orden de solicitud):
 
+datos_modelo <- datos_modelo %>%
+  mutate(
+    # Corregimos el valor 0:
+    # como solo aparece una vez, lo agrupamos con el valor 1.
+    Application.order_corr = if_else(
+      Application.order == 0,
+      1,
+      Application.order
+    ),
+    
+    # Creamos la variable categórica interpretando 1 como primera opción
+    Application.order_cat = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr == 4 ~ "4ª opción",
+      Application.order_corr == 5 ~ "5ª opción",
+      Application.order_corr == 6 ~ "6ª opción",
+      Application.order_corr == 9 ~ "Última opción",
+      TRUE ~ NA_character_
+    ),
+    
+    # Factor ordenado para que salga bien en gráficos
+    Application.order_cat = factor(
+      Application.order_cat,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "4ª opción",
+        "5ª opción",
+        "6ª opción",
+        "Última opción"
+      )
+    )
+  )
+
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Application.order_group = case_when(
+      Application.order_corr == 1 ~ "1ª opción",
+      Application.order_corr == 2 ~ "2ª opción",
+      Application.order_corr == 3 ~ "3ª opción",
+      Application.order_corr %in% c(4, 5, 6, 9) ~ "Otras opciones",
+      TRUE ~ NA_character_
+    ),
+    
+    Application.order_group = factor(
+      Application.order_group,
+      levels = c(
+        "1ª opción",
+        "2ª opción",
+        "3ª opción",
+        "Otras opciones"
+      )
+    )
+  )
+
+# Comprobaciones
+table(datos_modelo$Application.order)
+table(datos_modelo$Application.order_corr)
+table(datos_modelo$Application.order_group)
+prop.table(table(datos_modelo$Application.order_group))
 
 
