@@ -514,11 +514,154 @@ ggplot(
 
 
 
+
+
+#-------------------
+#Abandono temprano
+#-------------------
+summary(datos_modelo$Porcentaje_aprobado_sem_1) #Hay 169 Na´s en porcentaje aprobados 1º semestre
+summary(datos_modelo$Porcentaje_aprobado_sem_2) #Hay 221 Na´s en porcentaje aprobados 2º semestre
+
+#Los Na's se deben ha que hay valores 0/0 que R convierte en Na's. De hecho si vemos el número de estudiantes con 0 unidades curriculares aprobadas 
+#y cero evaluaciones los números coinciden
+
+sum(datos_modelo$Curricular.units.1st.sem..approved. == 0 &
+      datos_modelo$Curricular.units.1st.sem..evaluations. == 0) #Hay 169 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
+
+sum(datos_modelo$Curricular.units.2nd.sem..approved. == 0 &
+      datos_modelo$Curricular.units.2nd.sem..evaluations. == 0) #Hay 221 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
+
+#Proporcion de abandono dentro del grupo que tiene cero unidades curriculares aprobadas y cero evaluaciones
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    tipo_actividad = case_when(
+      # Sin actividad en todo el año
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 &
+        Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en todo el año",
+      
+      # Sin actividad solo en 1º semestre
+      Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 ~ "Sin actividad en 1º semestre",
+      
+      # Sin actividad solo en 2º semestre
+      Curricular.units.2nd.sem..approved. == 0 &
+        Curricular.units.2nd.sem..evaluations. == 0 ~ "Sin actividad en 2º semestre",
+      
+      # Con actividad
+      TRUE ~ "Con actividad"
+    )
+  )
+con_actividad_total <- subset(datos_modelo, tipo_actividad == "Con actividad")
+sin_actividad_total <- subset(datos_modelo, tipo_actividad == "Sin actividad en todo el año")
+no_presentados_1    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 1º semestre")
+no_presentados_2    <- subset(datos_modelo, tipo_actividad == "Sin actividad en 2º semestre")
+
+table(con_actividad_total$Target_bin)
+table(sin_actividad_total$Target_bin)
+table(no_presentados_1$Target_bin)
+table(no_presentados_2$Target_bin)
+
+# Calcular proporciones
+datos_prop <- datos_modelo %>%
+  group_by(tipo_actividad, Target_bin) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(tipo_actividad) %>%
+  mutate(prop = n / sum(n),
+         etiqueta = scales::percent(prop, accuracy = 0.1))
+
+# Gráfico
+ggplot(datos_prop,
+       aes(x = tipo_actividad,
+           y = prop,
+           fill = Target_bin)) +
+  geom_bar(stat = "identity") +
+  
+  # Etiquetas dentro de la barra
+  geom_text(aes(label = etiqueta),
+            position = position_stack(vjust = 0.5),
+            color = "black",
+            size = 4) +
+  
+  scale_fill_manual(values = c(
+    "Abandono" = "indianred2",
+    "No Abandono" = "lightgreen"
+  )) +
+  
+  scale_y_continuous(labels = scales::percent) +
+  
+  labs(title = "Proporción de abandono según tipo de actividad académica",
+       x = "Tipo de actividad",
+       y = "Proporción") +
+  
+  theme_minimal()
+
+
 #Análisis univariante numérico:
+
 
 
 #Análisis bivariante: variables numéricas vs Target
 
+#NOTAS POR SEMESTRE SEGÚN ABANDONO (voy a hacerlo excluyendo a las personas que no tienen actividad en alguno de 
+#los dos semestres o en ambos)
+
+# Convertir a formato largo
+df_long1 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%
+  pivot_longer(
+    cols = c(Curricular.units.1st.sem.grade_10,
+             Curricular.units.2nd.sem.grade_10),
+    names_to = "Semestre",
+    values_to = "Nota"
+  ) %>%
+  mutate(
+    Semestre = recode(Semestre,
+                      "Curricular.units.1st.sem.grade_10" = "1º Semestre",
+                      "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
+  )
+
+# Gráfico combinado
+ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Nota",
+    fill = "Semestre",
+    title = "Notas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
+
+df_long2 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%   
+  pivot_longer(
+    cols = c(Porcentaje_aprobado_sem_1,
+             Porcentaje_aprobado_sem_2),
+    names_to = "Semestre",
+    values_to = "Porcentaje_evaluaciones_aprobadas"
+  ) %>%
+  mutate(
+    Semestre = recode(Semestre,
+                      "Porcentaje_aprobado_sem_1" = "1º Semestre",
+                      "Porcentaje_aprobado_sem_2" = "2º Semestre")
+  )
+
+ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Porcentaje evaluaciones aprobadas",
+    fill = "Semestre",
+    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
 
 #Análisis bivariante: variabels categóricas vs Target
 
