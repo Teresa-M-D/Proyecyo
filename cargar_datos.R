@@ -1,8 +1,8 @@
 #imputación de datos faltantes por moda condicionada:
 install.packages("lsr")
 install.packages("corrplot")
-library(corrplot)
-#he añadido todas las librerías que creo q hemos usado hasta ahora
+
+#Librerías a usar:
 library(corrplot)
 library(gridExtra)
 library(clickR)
@@ -21,7 +21,8 @@ library(scales)
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
 
 datos_moda_condicionada<- read.csv("estudiantes.csv", header = TRUE, sep = ";")
-#Chicas añado el cambio del nombre de variable de Nacionality a Nationality
+
+#Cambio nombre Nacionality a Nationality:
 datos_moda_condicionada$Nationality<-datos_moda_condicionada$Nacionality
 datos_moda_condicionada$Nacionality<-NULL
 datos_moda_condicionada["PIB"]=datos_moda_condicionada["GDP"]
@@ -439,6 +440,106 @@ datos_recodificados$Nationality_group <- ifelse(
 
 
 
+#Marital Status:
+datos_recodificados <- datos_recodificados %>%
+  mutate(Marital_group = case_when(
+    Marital.status == "Soltero" ~ "Soltero",
+    Marital.status %in% c("Casado", "Con pareja") ~ "En pareja",
+    Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
+  ))
+sum(table(datos_recodificados$Marital_group))
+
+#Application mode:
+
+datos_recodificados$Application.mode_group <- case_when(
+  
+  # ACCESO NORMAL
+  datos_recodificados$Application.mode %in% c(
+    "1ª fase - cupo general",
+    "2ª fase - cupo general",
+    "3ª fase - cupo general",
+    "1ª fase - cupo especial (Isla de Madeira)",
+    "1ª fase - cupo especial (Islas Azores)"
+  ) ~ "Acceso normal",
+  
+  # MAYORES/ESPECIALES
+  datos_recodificados$Application.mode %in% c(
+    "Mayores de 23 años",
+    "Ordenanza nº 533-A/99, apartado b2 (plan diferente)",
+    "Ordenanza nº 533-A/99, apartado b3 (otra institución)",
+    "Ordenanza nº 612/93",
+    "Ordenanza nº 854-B/99"
+  ) ~ "Acceso mayores/especiales",
+  
+  # CAMBIO/TRASLADO
+  datos_recodificados$Application.mode %in% c(
+    "Cambio de institución/titulación",
+    "Cambio de titulación",
+    "Traslado",
+    "Cambio de institución/titulación (internacional)"
+  ) ~ "Acceso por cambio/traslado",
+  
+  # FORMACIÓN PREVIA
+  datos_recodificados$Application.mode %in% c(
+    "Titulares de diploma de ciclo corto",
+    "Titulares de diploma de especialización tecnológica",
+    "Titulares de otros estudios superiores"
+  ) ~ "Acceso por formación previa",
+  
+  # INTERNACIONAL
+  datos_recodificados$Application.mode %in% c(
+    "Estudiante internacional (grado)"
+    
+  ) ~ "Acceso internacional",
+  
+)
+
+
+#Course:
+datos_recodificados$Course_group <- dplyr::case_when(
+  
+  # SALUD
+  datos_recodificados$Course_limpio %in% c(
+    "Enfermería",
+    "Enfermería Veterinaria",
+    "Higiene Bucodental"
+  ) ~ "Salud",
+  
+  # INGENIERÍA / TECNOLOGÍA
+  datos_recodificados$Course_limpio %in% c(
+    "Ingeniería Informática",
+    "Tecnologías de Producción de Biocombustibles",
+    "Diseño de Animación y Multimedia"
+  ) ~ "Ingeniería/Tech",
+  
+  # SOCIALES / EMPRESA
+  datos_recodificados$Course_limpio %in% c(
+    "Gestión",
+    "Gestión de Publicidad y Marketing",
+    "Turismo"
+  ) ~ "Empresa",
+  
+  # EDUCACIÓN / SOCIAL
+  datos_recodificados$Course_limpio %in% c(
+    "Educación Básica",
+    "Trabajo Social"
+  ) ~ "Educación/Social",
+  
+  # COMUNICACIÓN / DISEÑO
+  datos_recodificados$Course_limpio %in% c(
+    "Diseño de Comunicación",
+    "Periodismo y Comunicación"
+  ) ~ "Comunicación",
+  
+  # AGRO / ANIMAL
+  datos_recodificados$Course_limpio %in% c(
+    "Agronomía",
+    "Equinocultura"
+  ) ~ "Agro/Animal",
+  
+  TRUE ~ NA_character_
+)
+
 
 #Previous qualification:
 table(datos_recodificados$Previous.qualification)
@@ -731,77 +832,42 @@ datos_recodificados$Father_occupation_level <- case_when(
 )
 
 
-#Reagrupación de Course
-datos_modelo$Course_group <- dplyr::case_when(
-  
-  # SALUD
-  datos_modelo$Course_limpio %in% c(
-    "Enfermería",
-    "Enfermería Veterinaria",
-    "Higiene Bucodental"
-  ) ~ "Salud",
-  
-  # INGENIERÍA / TECNOLOGÍA
-  datos_modelo$Course_limpio %in% c(
-    "Ingeniería Informática",
-    "Tecnologías de Producción de Biocombustibles",
-    "Diseño de Animación y Multimedia"
-  ) ~ "Ingeniería/Tech",
-  
-  # SOCIALES / EMPRESA
-  datos_modelo$Course_limpio %in% c(
-    "Gestión",
-    "Gestión de Publicidad y Marketing",
-    "Turismo"
-  ) ~ "Empresa",
-  
-  # EDUCACIÓN / SOCIAL
-  datos_modelo$Course_limpio %in% c(
-    "Educación Básica",
-    "Trabajo Social"
-  ) ~ "Educación/Social",
-  
-  # COMUNICACIÓN / DISEÑO
-  datos_modelo$Course_limpio %in% c(
-    "Diseño de Comunicación",
-    "Periodismo y Comunicación"
-  ) ~ "Comunicación",
-  
-  # AGRO / ANIMAL
-  datos_modelo$Course_limpio %in% c(
-    "Agronomía",
-    "Equinocultura"
-  ) ~ "Agro/Animal",
-  
-  TRUE ~ NA_character_
-)
+#NUEVAS VARIABLES:
 
-
-
-#Reagrupación de Marital_Status:
-datos_modelo <- datos_modelo %>%
-  mutate(Marital_group = case_when(
-    Marital.status == "Soltero" ~ "Soltero",
-    Marital.status %in% c("Casado", "Con pareja") ~ "Pareja",
-    Marital.status %in% c("Divorciado", "Separado legalmente", "Viudo") ~ "Otros"
-  ))
-#NUEVA VARIABLE: (Lo añado ahora)
+#Porcentaje aprobado:
 datos_recodificados$Porcentaje_aprobado_sem_1<-100*(datos_recodificados$Curricular.units.1st.sem..approved./datos_recodificados$Curricular.units.1st.sem..evaluations.)
+datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
 
-#NUEVA VARIABLE:
+#Carga académica real:
 datos_recodificados$Carga_academica_real <- 
   datos_recodificados$Curricular.units.1st.sem..enrolled. - 
   datos_recodificados$Curricular.units.1st.sem..credited.
 
+datos_modelo$Carga_academica_real_sem_2 <- 
+  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
+  datos_modelo$Curricular.units.2nd.sem..credited.
 
 
-#mas cosas:
+#año
+
+
+tabla_años <- data.frame(
+  GDP = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
+  year = c(2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
+)
+
+datos_modelo$year <- tabla_años$year[match(datos_modelo$PIB, tabla_años$GDP)]
+
+datos_recodificados$year <- tabla_años$year[match(datos_recodificados$PIB, tabla_años$GDP)]
+
+
+#Limpieza variable Course:
 datos_recodificados$Course_limpio <- gsub(" \\(turno de tarde\\)", "", 
                                           datos_recodificados$Course)
 
 
 
-#Poner datos para análisis numérico (sin los estudiantes de Multimedia con todo 0 (pero si los que tienen notas)):
+#Eliminación observaciones Multimedia problemáticas:
 
 datos_recodificados$Curricular.units.1st.sem..evaluations.
 
@@ -830,22 +896,5 @@ table(datos_modelo$Course_limpio)
 
 
 
-#Creo dos variables numéricas que faltan:
-#Porcentaje_aprobado_sem_2
-#Carga_academica_real_sem_2
-
-datos_modelo$Porcentaje_aprobado_sem_2<-100*(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..evaluations.)
-datos_modelo$Carga_academica_real_sem_2 <- 
-  datos_modelo$Curricular.units.2nd.sem..enrolled. - 
-  datos_modelo$Curricular.units.2nd.sem..credited.
 
 
-
-tabla_años <- data.frame(
-  GDP = c(0.32, -3.12, 1.74, -1.70, -4.06, -0.92, 0.79, 1.79, 2.02, 3.51),
-  year = c(2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
-)
-
-datos_modelo$year <- tabla_años$year[match(datos_modelo$PIB, tabla_años$GDP)]
-
-datos_recodificados$year <- tabla_años$year[match(datos_recodificados$PIB, tabla_años$GDP)]
