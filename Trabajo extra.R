@@ -836,6 +836,9 @@ mosaic(
 
 #ANÁLISIS BIVARIANTE: NÚMERICA VS TARGET
 
+#digramas de cajas
+
+
 #ANÁLISIS DE SENSIBILIDAD, comparamos datos imputados por moda condicionada con datos sin imputar:
 
 # Base sin imputar con el mismo filtro que datos_modelo
