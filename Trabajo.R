@@ -542,9 +542,9 @@ ggplot(
 
 
 
--------------------
+#-------------------
 #Abandono temprano
--------------------
+#-------------------
 summary(datos_modelo$Porcentaje_aprobado_sem_1) #Hay 169 Na´s en porcentaje aprobados 1º semestre
 summary(datos_modelo$Porcentaje_aprobado_sem_2) #Hay 221 Na´s en porcentaje aprobados 2º semestre
 
@@ -558,8 +558,6 @@ sum(datos_modelo$Curricular.units.2nd.sem..approved. == 0 &
       datos_modelo$Curricular.units.2nd.sem..evaluations. == 0) #Hay 221 estudiantes con cero unidades curriculares aprobadas y cero evaluaciones
 
 #Proporcion de abandono dentro del grupo que tiene cero unidades curriculares aprobadas y cero evaluaciones
-
-library(dplyr)
 
 datos_modelo <- datos_modelo %>%
   mutate(
@@ -635,9 +633,6 @@ ggplot(datos_prop,
 
 #NOTAS POR SEMESTRE SEGÚN ABANDONO (voy a hacerlo excluyendo a las personas que no tienen actividad en alguno de 
 #los dos semestres o en ambos)
-
-library(ggplot2)
-library(tidyr)
 
 # Convertir a formato largo
 df_long1 <- datos_modelo %>%
