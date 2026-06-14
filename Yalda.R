@@ -339,7 +339,7 @@ boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "light
 boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
 boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
 boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
-
+median(Dropouts$Age.at.enrollment)
 
 install.packages("tidyverse")
 library(tidyverse)
@@ -532,4 +532,4 @@ ggplot(df_long3, aes(x = Target_bin, y = Carga_academica_real, fill = Semestre))
   ) +
   theme_minimal(base_size = 14)
 
-
+sum(datos_modelo$Age.at.enrollment == 70)
