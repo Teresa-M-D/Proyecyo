@@ -1,4 +1,6 @@
+#·················
 #MOTIVACIÓN:
+#·················
 
 #Diagrama de barras abandono de la educación en personas de 15 a 34 años en Europa (2024):
 
