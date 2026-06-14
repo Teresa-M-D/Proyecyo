@@ -836,7 +836,38 @@ mosaic(
 
 #ANÁLISIS BIVARIANTE: NÚMERICA VS TARGET
 
-#digramas de cajas
+#diagramas de cajas
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Nota de admisión y abandono")
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
+boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
+boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
+boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
+
+
+#T-test
+t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_activos)
+t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_activos)
+#En estas variables ya vemos que la media de notas tanto en el primer semestre como el segundo del grupo
+#abandono no es representiva comoparandolo con la media, por ello optamos por el test de Mann - Whitney
+
+
+
+#Test de Mann - Whitney
+wilcox.test(PIB ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
+
+#Tamaño del efecto
+wilcox.test(PIB ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
 
 
 #ANÁLISIS DE SENSIBILIDAD, comparamos datos imputados por moda condicionada con datos sin imputar:
