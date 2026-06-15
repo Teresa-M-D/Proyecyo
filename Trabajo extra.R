@@ -190,816 +190,6 @@ diferencia_proporciones
 
 
 
-#Análisis univariante categórico: gráficos de titulación y titulación reagrupada que se encuentra en la presentación (los demás de la presentación se pueden encontrar en el script de Trabajo):
-
-
-colores_course_group <- c(
-  "Salud" = "#5DADE2",                  # azul claro
-  "Empresa" = "#D4A017",                # dorado
-  "Educación/Social" = "#F28E2B",       # naranja
-  "Agro/Animal" = "#6AA84F",            # verde
-  "Ingeniería/Tech" = "#34495E",  # azul grisáceo oscuro
-  "Comunicación" = "#C77DFF"            # lila
-)
-
-# Tabla resumen de titulaciones limpias
-resumen_course <- datos_modelo %>%
-  count(Course_limpio, sort = TRUE) %>%
-  mutate(
-    porcentaje = n / sum(n),
-    etiqueta = percent(porcentaje, accuracy = 0.1),
-    Course_limpio = reorder(Course_limpio, n)
-  )
-
-# Ver tabla resumen
-resumen_course
-
-# Gráfico univariante de Course_limpio
-resumen_course_limpio <- datos_modelo %>%
-  count(Course_limpio, Course_group, sort = TRUE) %>%
-  mutate(
-    porcentaje = n / sum(n),
-    etiqueta = percent(porcentaje, accuracy = 0.1),
-    Course_limpio = reorder(Course_limpio, n)
-  )
-
-ggplot(
-  resumen_course_limpio,
-  aes(x = Course_limpio, y = porcentaje, fill = Course_group)
-) +
-  geom_col(width = 0.7, alpha = 0.9) +
-  geom_text(
-    aes(label = etiqueta),
-    hjust = -0.1,
-    size = 3.3
-  ) +
-  coord_flip() +
-  scale_y_continuous(
-    labels = percent_format(),
-    limits = c(0, max(resumen_course_limpio$porcentaje) + 0.05)
-  ) +
-  scale_fill_manual(values = colores_course_group) +
-  labs(
-    title = "Distribución del alumnado según titulación",
-    subtitle = "Color según área de estudio",
-    x = "Titulación",
-    y = "Porcentaje de estudiantes",
-    fill = "Área de estudio"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    legend.position = "bottom",
-    axis.text.y = element_text(size = 8.5)
-  )
-#para Course_group
-resumen_course_group <- datos_modelo %>%
-  count(Course_group, sort = TRUE) %>%
-  mutate(
-    porcentaje = n / sum(n),
-    etiqueta = percent(porcentaje, accuracy = 0.1),
-    Course_group = reorder(Course_group, porcentaje)
-  )
-
-ggplot(
-  resumen_course_group,
-  aes(x = Course_group, y = porcentaje, fill = Course_group)
-) +
-  geom_col(width = 0.65, alpha = 0.9) +
-  geom_text(
-    aes(label = etiqueta),
-    hjust = -0.1,
-    size = 4
-  ) +
-  coord_flip() +
-  scale_y_continuous(
-    labels = percent_format(),
-    limits = c(0, max(resumen_course_group$porcentaje) + 0.08)
-  ) +
-  scale_fill_manual(values = colores_course_group) +
-  labs(
-    title = "Distribución del alumnado por área de estudio",
-    subtitle = "Agrupación de titulaciones por ramas de conocimiento",
-    x = "Área de estudio",
-    y = "Porcentaje de estudiantes"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold"),
-    legend.position = "none"
-  )
-
-
-
-
-
-#ANÁLISIS BIVARIANTE: VARIABLE CATEGÓRICA VS TARGET de las variables que no estaban en la memoria:
-
-#MARITAL STATUS:
-
-#Proporciones:
-table(datos_modelo$Marital_group, datos_modelo$Target_bin) 
-prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 2)
-
-#V de Cramer y Tau
-cramersV(table(datos_modelo$Marital_group, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Marital_group, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group) 
-
-
-#Chi-cuadrado con Marital_group:
-tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
-chisq.test(tabla)
-chisq.test(tabla)$expected
-
-# Nombres más cortos para el gráfico
-datos_modelo$Marital_group_short <- dplyr::recode(
-  datos_modelo$Marital_group,
-  "Soltero" = "Soltero",
-  "En pareja" = "Pareja",
-  "Otros" = "Otros"
-)
-
-#Gráfico:
-datos_modelo$Marital_group_short <- factor(datos_modelo$Marital_group_short, levels=c("Otros", "Pareja", "Soltero"))
-
-datos_modelo$Target_bin <- factor(
-  datos_modelo$Target_bin,
-  levels = c("Abandono", "No Abandono")
-)
-
-
-mosaic(
-  ~ Marital_group_short + Target_bin,
-  data = datos_modelo,
-  shade = TRUE,
-  legend = TRUE,
-  cex.axis = 0.8,
-  labeling_args = list(
-    set_varnames = c(
-      Marital_group_short = "Estado civil",
-      Target_bin = "Abandono"
-    )
-  )
-)
-
-
-#DAYTIME EVENING ATTENDANCE:
-sum(table(datos_modelo$Daytime.evening.attendance.))
-unique(datos_modelo$Daytime.evening.attendance.)
-
-#Proporciones:
-table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Daytime.evening.attendance.) 
-
-#Chi-cuadrado:
-tabla_daytime_target <- table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
-chisq.test(tabla_daytime_target, correct=FALSE)
-chisq.test(tabla_daytime_target)$expected
-
-#Gráfico:
-
-tabla_plot <- datos_modelo %>%                  
-  count(Daytime.evening.attendance., Target_bin) %>%
-  group_by(Daytime.evening.attendance.) %>%
-  mutate(prop = n / sum(n))
-
-ggplot(tabla_plot, 
-       aes(x = Daytime.evening.attendance., y = prop, fill = Target_bin)) +
-  geom_col(position = "dodge") +
-  labs(
-    x = "Turno",
-    y = "Proporción",
-    fill = "Abandono"
-  ) +
-  theme_minimal()
-
-
-
-
-#DISPLACED:
-
-sum(table(datos_modelo$Displaced))
-unique(datos_modelo$Displaced)
-
-#Proporciones:
-table(datos_modelo$Displaced, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Displaced, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Displaced, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Displaced) 
-
-#Chi-cuadrado:
-tabla_displaced_target <- table(datos_modelo$Displaced, datos_modelo$Target_bin)
-chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_displaced_target)$expected
-
-#Gráfico:
-mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
-       shade = TRUE, legend = TRUE)
-
-
-#INTERNATIONAL:
-sum(table(datos_modelo$International))
-unique(datos_modelo$International)
-
-#Proporciones:
-tabla_internacional_target <- table(datos_modelo$International,
-                                    datos_modelo$Target_bin)
-tabla_internacional_target
-
-prop.table(tabla_internacional_target, 1)
-prop.table(tabla_internacional_target, 2)
-
-#Cramer y Tau:
-cramersV(tabla_internacional_target)
-GK_assoc(datos_modelo$International, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$International)
-
-#Chi-cuadrado:
-chisq.test(tabla_internacional_target, correct = FALSE)
-chisq.test(tabla_internacional_target)$expected
-
-#Gráfico:
-table(datos_modelo$International)
-
-tabla_internacional_plot <- datos_modelo %>%
-  mutate(
-    Target_bin = factor(
-      Target_bin,
-      levels = c("No Abandono", "Abandono")
-    )
-  ) %>%
-  count(International, Target_bin) %>%
-  group_by(International) %>%
-  mutate(
-    prop = n / sum(n),
-    etiqueta = scales::percent(prop, accuracy = 0.1)
-  )
-
-ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(
-    aes(label = etiqueta),
-    position = position_fill(vjust = 0.5),
-    size = 4
-  ) +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(
-    values = c(
-      "No Abandono" = "lightblue",
-      "Abandono" = "indianred"
-    ),
-    breaks = c("No Abandono", "Abandono")
-  ) +
-  labs(
-    x = "Estudiante internacional",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre estudiantes internacionales y abandono"
-  ) +
-  theme_minimal()
-
-
-#APPLICATION MODE:
-
-sum(table(datos_modelo$Application.mode_group))
-tabla_modo_app_target <- table(datos_modelo$Application.mode_group,
-                               datos_modelo$Target_bin)
-tabla_modo_app_target
-
-prop.table(tabla_modo_app_target, 1)
-prop.table(tabla_modo_app_target, 2)
-
-cramersV(tabla_modo_app_target)
-GK_assoc(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
-
-chisq.test(tabla_modo_app_target, correct = FALSE)
-chisq.test(tabla_modo_app_target)$expected
-
-
-
-#Gráficos:
-tabla_modo_app_plot <- datos_modelo %>%
-  mutate(
-    Target_bin = factor(
-      Target_bin,
-      levels = c("No Abandono", "Abandono")
-    )
-  ) %>%
-  count(Application.mode_group, Target_bin) %>%
-  group_by(Application.mode_group) %>%
-  mutate(
-    prop = n / sum(n),
-    etiqueta = scales::percent(prop, accuracy = 0.1)
-  )
-
-ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(
-    aes(label = etiqueta),
-    position = position_fill(vjust = 0.5),
-    size = 4
-  ) +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(
-    values = c(
-      "No Abandono" = "lightblue",
-      "Abandono" = "indianred"
-    ),
-    breaks = c("No Abandono", "Abandono")
-  ) +
-  labs(
-    x = "Tipo de acceso al grado",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre tipo de acceso al grado y abandono"
-  ) +
-  theme_minimal()
-
-
-#DEBTOR:
-
-sum(table(datos_modelo$Debtor))
-unique(datos_modelo$Debtor)
-#Proporciones:
-table(datos_modelo$Debtor, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Debtor, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Debtor, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Debtor) 
-
-#Chi-cuadrado:
-tabla_debtor_target <- table(datos_modelo$Debtor, datos_modelo$Target_bin)
-chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_debtor_target)$expected
-
-#Gráfico:
-tabla_debtor_plot <- datos_modelo %>%
-  mutate(
-    Target_bin = factor(
-      Target_bin,
-      levels = c("No Abandono", "Abandono")
-    )
-  ) %>%
-  count(Debtor, Target_bin) %>%
-  group_by(Debtor) %>%
-  mutate(
-    prop = n / sum(n),
-    etiqueta = scales::percent(prop, accuracy = 0.1)
-  )
-
-ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
-  geom_col(position = "fill") +
-  geom_text(
-    aes(label = etiqueta),
-    position = position_fill(vjust = 0.5),
-    size = 4
-  ) +
-  scale_y_continuous(labels = scales::percent_format()) +
-  scale_fill_manual(
-    values = c(
-      "No Abandono" = "lightblue",
-      "Abandono" = "indianred"
-    ),
-    breaks = c("No Abandono", "Abandono")
-  ) +
-  labs(
-    x = "Debe dinero",
-    y = "Proporción",
-    fill = "Abandono",
-    title = "Relación entre deudor y abandono"
-  ) +
-  theme_minimal()
-
-#SCHOLARSHIP_HOLDER:
-
-sum(table(datos_modelo$Scholarship.holder))
-unique(datos_modelo$Scholarship.holder)
-#Proporciones:
-table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Scholarship.holder, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Scholarship.holder) 
-
-#Chi-cuadrado:
-tabla_beca_target <- table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
-chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_beca_target)$expected
-
-#Gráficos:
-datos_modelo$Scholarship.holder <- factor(datos_modelo$Scholarship.holder, levels=c("No", "Sí"))
-
-datos_modelo$Target_bin <- factor(
-  datos_modelo$Target_bin,
-  levels = c("Abandono", "No Abandono")
-)
-
-#Gráficos:
-mosaic(
-  ~ Scholarship.holder + Target_bin,
-  data = datos_modelo,
-  shade = TRUE,
-  legend = TRUE,
-  cex.axis = 0.8,
-  labeling_args = list(
-    set_varnames = c(
-      Scholarship.holder = "Becado",
-      Target_bin = "Abandono"
-    )
-  )
-)
-
-
-
-
-
-#EDUCATIONAL SPECIAL NEEDS:
-sum(table(datos_modelo$Educational.special.needs))
-unique(datos_modelo$Educational.special.needs)
-
-#Proporciones:
-table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
-prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 1)
-prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 2)
-
-#Cramer y Tau:
-cramersV(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin))
-GK_assoc(datos_modelo$Educational.special.needs, datos_modelo$Target_bin) 
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Educational.special.needs) 
-
-#Chi-cuadrado:
-tabla_necesidades_target <- table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
-chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
-chisq.test(tabla_necesidades_target)$expected
-
-
-
-
-#PREVIOUS EDUCATION LEVEL:
-table(datos_modelo$Previous_education_level)
-unique(datos_modelo$Previous_education_level)
-tabla_prev_edu_target <- table(datos_modelo$Previous_education_level,
-                               datos_modelo$Target_bin)
-tabla_prev_edu_target
-
-prop.table(tabla_prev_edu_target, 1)
-prop.table(tabla_prev_edu_target, 2)
-
-cramersV(tabla_prev_edu_target)
-GK_assoc(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Previous_education_level)
-
-chisq.test(tabla_prev_edu_target, correct = FALSE)
-chisq.test(tabla_prev_edu_target)$expected
-
-
-#Cambiamos a nombres más cortos:
-datos_modelo$Previous_education_level_group_short <- dplyr::recode(
-  datos_modelo$Previous_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-datos_modelo$Previous_education_level_group_short <- factor(datos_modelo$Previous_education_level_group_short, levels=c("Bajo", "Medio", "Sup.", "Técn."))
-
-datos_modelo$Target_bin <- factor(
-  datos_modelo$Target_bin,
-  levels = c("Abandono", "No Abandono")
-)
-
-mosaic(
-  ~ Previous_education_level_group_short + Target_bin,
-  data = datos_modelo,
-  shade = TRUE,
-  legend = TRUE,
-  cex.axis = 0.8,
-  labeling_args = list(
-    set_varnames = c(
-      Previous_education_level_group_short = "Nivel de titulación previa",
-      Target_bin = "Abandono"
-    )
-  )
-)
-
-mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_modelo,  
-       shade = TRUE, legend = TRUE)
-
-
-#MOTHER EDUCATION LEVEL.
-table(datos_modelo$Mother_education_level)
-unique(datos_modelo$Mother_education_level)
-tabla_mum_educ_target <- table(datos_modelo$Mother_education_level,
-                               datos_modelo$Target_bin)
-tabla_mum_educ_target
-
-prop.table(tabla_mum_educ_target, 1)
-prop.table(tabla_mum_educ_target, 2)
-
-cramersV(tabla_mum_educ_target)
-GK_assoc(datos_modelo$Mother_education_level, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_education_level)
-
-chisq.test(tabla_mum_educ_target, correct = FALSE)
-chisq.test(tabla_mum_educ_target)$expected
-
-#Cambiamos a nombres más cortos:
-datos_modelo$Mother_education_level_group_short <- dplyr::recode(
-  datos_modelo$Mother_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_modelo,  
-       shade = TRUE, legend = TRUE)
-
-
-#FATHER EDUCATION LEVEL:
-table(datos_modelo$Father_education_level)
-unique(datos_modelo$Father_education_level)
-tabla_dad_educ_target <- table(datos_modelo$Father_education_level,
-                               datos_modelo$Target_bin)
-tabla_dad_educ_target
-
-prop.table(tabla_dad_educ_target, 1)
-prop.table(tabla_dad_educ_target, 2)
-
-cramersV(tabla_dad_educ_target)
-GK_assoc(datos_modelo$Father_education_level, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_education_level)
-
-chisq.test(tabla_dad_educ_target, correct = FALSE)
-chisq.test(tabla_dad_educ_target)$expected
-#Cambiamos a nombres más cortos:
-datos_modelo$Father_education_level_group_short <- dplyr::recode(
-  datos_modelo$Father_education_level,
-  "Bajo"= "Bajo",
-  "Medio"= "Medio",
-  "Superior"= "Sup.",
-  "Técnico"= "Técn."
-)
-#Gráfico:
-mosaic(~ Father_education_level_group_short + Target_bin, data = datos_modelo,  
-       shade = TRUE, legend = TRUE)
-
-
-#MOTHER OCCUPATION LEVEL:
-
-sum(table(datos_modelo$Mother_occupation_level))
-unique(datos_modelo$Mother_occupation_level)
-tabla_mum_ocup_target <- table(datos_modelo$Mother_occupation_level,
-                               datos_modelo$Target_bin)
-tabla_mum_ocup_target
-
-prop.table(tabla_mum_ocup_target, 1)
-prop.table(tabla_mum_ocup_target, 2)
-
-cramersV(tabla_mum_ocup_target)
-GK_assoc(datos_modelo$Mother_occupation_level, datos_modelo$Target_bin)
-GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_occupation_level)
-
-chisq.test(tabla_mum_ocup_target, correct = FALSE)
-chisq.test(tabla_mum_ocup_target)$expected
-#Gráfico:
-mosaic(~ Mother_occupation_level + Target_bin, data = datos_modelo,  
-       shade = TRUE, legend = TRUE)
-
-
-#FATHER OCCUPATION LEVEL:
-
-
-datos_modelo <- datos_modelo %>%
-  mutate(
-    Father_occupation_level = trimws(as.character(Father_occupation_level)),
-    Father_occupation_short = case_when(
-      Father_occupation_level == "Alta cualificación" ~ "Alta cualif.",
-      Father_occupation_level == "Baja cualificación" ~ "Baja cualif.",
-      Father_occupation_level == "Cualificación media" ~ "Media cualif.",
-      Father_occupation_level == "Formación militar" ~ "FM",
-      Father_occupation_level == "No cualificados" ~ "Sin cualif.",
-      Father_occupation_level == "Otros" ~ "Otros",
-      TRUE ~ Father_occupation_level
-    )
-  )
-
-
-tabla_dad_ocup_target <- table(
-  datos_modelo$Father_occupation_short,
-  datos_modelo$Target_bin
-)
-
-tabla_dad_ocup_target
-
-prop.table(tabla_dad_ocup_target, 1)
-prop.table(tabla_dad_ocup_target, 2)
-
-cramersV(tabla_dad_ocup_target)
-
-chisq.test(tabla_dad_ocup_target, correct = FALSE)
-chisq.test(tabla_dad_ocup_target)$expected
-
-
-mosaic(
-  ~ Father_occupation_short + Target_bin,
-  data = datos_modelo,
-  shade = TRUE,
-  legend = TRUE,
-  labeling_args = list(
-    set_varnames = c(
-      Father_occupation_short = "Ocupación del padre",
-      Target_bin = "Abandono"
-    )
-  )
-)
-
-#ANÁLISIS BIVARIANTE: NÚMERICA VS TARGET
-
-#diagramas de cajas
-boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Nota de admisión y abandono")
-boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
-boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
-boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
-boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
-boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
-
-
-#T-test
-t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_activos)
-t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_activos)
-#En estas variables ya vemos que la media de notas tanto en el primer semestre como el segundo del grupo
-#abandono no es representiva comoparandolo con la media, por ello optamos por el test de Mann - Whitney
-
-
-
-#Test de Mann - Whitney
-wilcox.test(PIB ~ Target_bin, data=datos_modelo)
-wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
-wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
-wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
-wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
-wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
-
-#Tamaño del efecto
-wilcox.test(PIB ~ Target_bin, data=datos_modelo)
-wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
-wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
-wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
-wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
-wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
-
-
-#ANÁLISIS DE SENSIBILIDAD, comparamos datos imputados por moda condicionada con datos sin imputar:
-
-# Base sin imputar con el mismo filtro que datos_modelo
-datos_sensibilidad <- datos_sin_imputar %>%
-  filter(
-    !(Curricular.units.1st.sem..grade. == 0 &
-        Curricular.units.1st.sem..approved. == 0 &
-        Curricular.units.1st.sem..evaluations. == 0 &
-        Curricular.units.1st.sem..credited. == 0 &
-        Curricular.units.1st.sem..enrolled. == 0)
-  )
-
-# Variable objetivo
-datos_sensibilidad$Target_bin <- ifelse(
-  datos_sensibilidad$Target == "Dropout",
-  "Abandono",
-  "No Abandono"
-)
-
-datos_sensibilidad$Target_bin <- factor(
-  datos_sensibilidad$Target_bin,
-  levels = c("No Abandono", "Abandono")
-)
-
-datos_modelo$Target_bin <- factor(
-  datos_modelo$Target_bin,
-  levels = c("No Abandono", "Abandono")
-)
-
-
-
-# Reagrupación directa de las variables afectadas por imputación
-
-
-datos_sensibilidad <- datos_sensibilidad %>%
-  mutate(
-    
-    Mother_education_level = case_when(
-      Mother.s.qualification %in% c(9, 10, 11, 12, 14, 19, 26, 29, 30, 35, 36, 37, 38) ~ "Bajo",
-      Mother.s.qualification %in% c(1, 27) ~ "Medio",
-      Mother.s.qualification %in% c(18, 22, 39, 41, 42) ~ "Técnico",
-      Mother.s.qualification %in% c(2, 3, 4, 5, 6, 40, 43, 44) ~ "Superior",
-      Mother.s.qualification == 34 ~ NA_character_,
-      TRUE ~ NA_character_
-    ),
-    
-    Father_education_level = case_when(
-      Father.s.qualification %in% c(9, 10, 11, 12, 14, 19, 26, 29, 30, 35, 36, 37, 38) ~ "Bajo",
-      Father.s.qualification %in% c(1, 27) ~ "Medio",
-      Father.s.qualification %in% c(13, 18, 20, 22, 25, 31, 33, 39, 41, 42) ~ "Técnico",
-      Father.s.qualification %in% c(2, 3, 4, 5, 6, 40, 43, 44) ~ "Superior",
-      Father.s.qualification == 34 ~ NA_character_,
-      TRUE ~ NA_character_
-    ),
-    
-    Mother_occupation_level = case_when(
-      Mother.s.occupation %in% c(1, 2, 122, 123, 125) ~ "Alta cualificación",
-      Mother.s.occupation %in% c(3, 4, 131, 132, 134, 141, 143, 144) ~ "Cualificación media",
-      Mother.s.occupation %in% c(5, 6, 7, 8, 151, 152, 153, 171, 173, 175, 194) ~ "Baja cualificación",
-      Mother.s.occupation %in% c(9, 191, 192, 193) ~ "No cualificados",
-      Mother.s.occupation %in% c(0, 10, 90) ~ "Otros",
-      Mother.s.occupation == 99 ~ NA_character_,
-      TRUE ~ NA_character_
-    ),
-    
-    Father_occupation_level = case_when(
-      Father.s.occupation %in% c(1, 2, 112, 114, 121, 122, 123, 124) ~ "Alta cualificación",
-      Father.s.occupation %in% c(3, 4, 131, 132, 134, 135, 141, 143, 144) ~ "Cualificación media",
-      Father.s.occupation %in% c(5, 6, 7, 8, 151, 152, 153, 154, 161, 163, 171, 172, 174, 175, 181, 182, 183, 194, 195) ~ "Baja cualificación",
-      Father.s.occupation %in% c(9, 192, 193) ~ "No cualificados",
-      Father.s.occupation %in% c(0, 90) ~ "Otros",
-      Father.s.occupation %in% c(10, 101, 102, 103) ~ "Formación militar",
-      Father.s.occupation == 99 ~ NA_character_,
-      TRUE ~ NA_character_
-    )
-  )
-
-
-# Función para calcular métricas
-
-
-calcular_metricas_sensibilidad <- function(datos, variable, nombre_base) {
-  
-  datos_aux <- datos %>%
-    filter(!is.na(.data[[variable]]), !is.na(Target_bin))
-  
-  tabla <- table(datos_aux[[variable]], datos_aux$Target_bin)
-  chi <- chisq.test(tabla, correct = FALSE)
-  
-  data.frame(
-    Variable = variable,
-    Base = nombre_base,
-    N_usado = sum(tabla),
-    N_perdidos = nrow(datos) - nrow(datos_aux),
-    V_Cramer = as.numeric(cramersV(tabla)),
-    p_valor_chi = chi$p.value
-  )
-}
-
-
-
-# Tabla resumen final
-
-
-resumen_sensibilidad <- bind_rows(
-  calcular_metricas_sensibilidad(datos_modelo, "Mother_education_level", "Imputado"),
-  calcular_metricas_sensibilidad(datos_sensibilidad, "Mother_education_level", "Sin imputar"),
-  
-  calcular_metricas_sensibilidad(datos_modelo, "Father_education_level", "Imputado"),
-  calcular_metricas_sensibilidad(datos_sensibilidad, "Father_education_level", "Sin imputar"),
-  
-  calcular_metricas_sensibilidad(datos_modelo, "Mother_occupation_level", "Imputado"),
-  calcular_metricas_sensibilidad(datos_sensibilidad, "Mother_occupation_level", "Sin imputar"),
-  
-  calcular_metricas_sensibilidad(datos_modelo, "Father_occupation_level", "Imputado"),
-  calcular_metricas_sensibilidad(datos_sensibilidad, "Father_occupation_level", "Sin imputar")
-) %>%
-  mutate(
-    V_Cramer = round(V_Cramer, 4),
-    p_valor_chi = format.pval(p_valor_chi, digits = 4),
-    Interpretacion = case_when(
-      Variable == "Mother_education_level" & Base == "Sin imputar" ~ "No robusta",
-      Variable %in% c("Mother_occupation_level", "Father_occupation_level") ~ "Robusta",
-      Variable == "Father_education_level" ~ "Robusta débil",
-      TRUE ~ ""
-    )
-  )
-
-resumen_sensibilidad
-
 
 
 #############################
@@ -1700,4 +890,988 @@ ggplot(datos_modelo, aes(x = Curricular.units.1st.sem..without.evaluations.,
 ggplot(datos_modelo, aes(x = Curricular.units.1st.sem..without.evaluations.,
                          y = Curricular.units.1st.sem..evaluations.)) +
   geom_point(alpha = 0.25) 
+
+
+
+#Análisis univariante categórico: 
+
+
+colores_course_group <- c(
+  "Salud" = "#5DADE2",                  # azul claro
+  "Empresa" = "#D4A017",                # dorado
+  "Educación/Social" = "#F28E2B",       # naranja
+  "Agro/Animal" = "#6AA84F",            # verde
+  "Ingeniería/Tech" = "#34495E",  # azul grisáceo oscuro
+  "Comunicación" = "#C77DFF"            # lila
+)
+
+# Tabla resumen de titulaciones limpias
+resumen_course <- datos_modelo %>%
+  count(Course_limpio, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_limpio = reorder(Course_limpio, n)
+  )
+
+# Ver tabla resumen
+resumen_course
+
+# Gráfico univariante de Course_limpio
+resumen_course_limpio <- datos_modelo %>%
+  count(Course_limpio, Course_group, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_limpio = reorder(Course_limpio, n)
+  )
+
+ggplot(
+  resumen_course_limpio,
+  aes(x = Course_limpio, y = porcentaje, fill = Course_group)
+) +
+  geom_col(width = 0.7, alpha = 0.9) +
+  geom_text(
+    aes(label = etiqueta),
+    hjust = -0.1,
+    size = 3.3
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_course_limpio$porcentaje) + 0.05)
+  ) +
+  scale_fill_manual(values = colores_course_group) +
+  labs(
+    title = "Distribución del alumnado según titulación",
+    subtitle = "Color según área de estudio",
+    x = "Titulación",
+    y = "Porcentaje de estudiantes",
+    fill = "Área de estudio"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom",
+    axis.text.y = element_text(size = 8.5)
+  )
+#para Course_group
+resumen_course_group <- datos_modelo %>%
+  count(Course_group, sort = TRUE) %>%
+  mutate(
+    porcentaje = n / sum(n),
+    etiqueta = percent(porcentaje, accuracy = 0.1),
+    Course_group = reorder(Course_group, porcentaje)
+  )
+
+ggplot(
+  resumen_course_group,
+  aes(x = Course_group, y = porcentaje, fill = Course_group)
+) +
+  geom_col(width = 0.65, alpha = 0.9) +
+  geom_text(
+    aes(label = etiqueta),
+    hjust = -0.1,
+    size = 4
+  ) +
+  coord_flip() +
+  scale_y_continuous(
+    labels = percent_format(),
+    limits = c(0, max(resumen_course_group$porcentaje) + 0.08)
+  ) +
+  scale_fill_manual(values = colores_course_group) +
+  labs(
+    title = "Distribución del alumnado por área de estudio",
+    subtitle = "Agrupación de titulaciones por ramas de conocimiento",
+    x = "Área de estudio",
+    y = "Porcentaje de estudiantes"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
+  )
+
+
+
+
+
+#ANÁLISIS BIVARIANTE: NÚMERICA VS TARGET
+
+#diagramas de cajas
+boxplot(Admission.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Nota de admisión y abandono")
+boxplot(Previous.qualification.grade_10 ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Calificación previa y abandono" )
+boxplot(PIB ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "PIB y abandono")
+boxplot(Unemployment.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de desempleo y abandono")
+boxplot(Inflation.rate ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Tasa de inflación y abandono")
+boxplot(Age.at.enrollment  ~ Target_bin, data=datos_modelo, las=1, col = c("indianred2", "lightgreen"),  main= "Edad de matriculación y abandono")
+
+
+#T-test
+t.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data=datos_activos)
+t.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data=datos_activos)
+#En estas variables ya vemos que la media de notas tanto en el primer semestre como el segundo del grupo
+#abandono no es representiva comoparandolo con la media, por ello optamos por el test de Mann - Whitney
+
+
+
+#Test de Mann - Whitney
+wilcox.test(PIB ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
+
+#Tamaño del efecto
+wilcox.test(PIB ~ Target_bin, data=datos_modelo)
+wilcox.test(Unemployment.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Inflation.rate ~ Target_bin, data=datos_modelo)
+wilcox.test(Admission.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Previous.qualification.grade_10  ~ Target_bin, data=datos_modelo)
+wilcox.test(Age.at.enrollment  ~ Target_bin, data=datos_modelo)
+
+
+#ANÁLISIS BIVARIANTE: CATEGÓRICA VS TARGET 
+
+#MARITAL STATUS:
+
+#Proporciones:
+table(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Marital_group, datos_modelo$Target_bin), 2)
+
+#V de Cramer y Tau
+cramersV(table(datos_modelo$Marital_group, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Marital_group, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Marital_group) 
+
+
+#Chi-cuadrado con Marital_group:
+tabla <- table(datos_modelo$Marital_group, datos_modelo$Target_bin)
+chisq.test(tabla)
+chisq.test(tabla)$expected
+
+# Nombres más cortos para el gráfico
+datos_modelo$Marital_group_short <- dplyr::recode(
+  datos_modelo$Marital_group,
+  "Soltero" = "Soltero",
+  "En pareja" = "Pareja",
+  "Otros" = "Otros"
+)
+
+#Gráfico:
+datos_modelo$Marital_group_short <- factor(datos_modelo$Marital_group_short, levels=c("Otros", "Pareja", "Soltero"))
+
+datos_modelo$Target_bin <- factor(
+  datos_modelo$Target_bin,
+  levels = c("Abandono", "No Abandono")
+)
+
+
+mosaic(
+  ~ Marital_group_short + Target_bin,
+  data = datos_modelo,
+  shade = TRUE,
+  legend = TRUE,
+  cex.axis = 0.8,
+  labeling_args = list(
+    set_varnames = c(
+      Marital_group_short = "Estado civil",
+      Target_bin = "Abandono"
+    )
+  )
+)
+
+
+#DAYTIME EVENING ATTENDANCE:
+sum(table(datos_modelo$Daytime.evening.attendance.))
+unique(datos_modelo$Daytime.evening.attendance.)
+
+#Proporciones:
+table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Daytime.evening.attendance.) 
+
+#Chi-cuadrado:
+tabla_daytime_target <- table(datos_modelo$Daytime.evening.attendance., datos_modelo$Target_bin)
+chisq.test(tabla_daytime_target, correct=FALSE)
+chisq.test(tabla_daytime_target)$expected
+
+#Gráfico:
+
+tabla_plot <- datos_modelo %>%                  
+  count(Daytime.evening.attendance., Target_bin) %>%
+  group_by(Daytime.evening.attendance.) %>%
+  mutate(prop = n / sum(n))
+
+ggplot(tabla_plot, 
+       aes(x = Daytime.evening.attendance., y = prop, fill = Target_bin)) +
+  geom_col(position = "dodge") +
+  labs(
+    x = "Turno",
+    y = "Proporción",
+    fill = "Abandono"
+  ) +
+  theme_minimal()
+
+
+
+
+#DISPLACED:
+
+sum(table(datos_modelo$Displaced))
+unique(datos_modelo$Displaced)
+
+#Proporciones:
+table(datos_modelo$Displaced, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Displaced, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Displaced, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Displaced, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Displaced) 
+
+#Chi-cuadrado:
+tabla_displaced_target <- table(datos_modelo$Displaced, datos_modelo$Target_bin)
+chisq.test(tabla_displaced_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_displaced_target)$expected
+
+#Gráfico:
+mosaic(~ Displaced + Target_bin, data = datos_modelo,  #he elegido esta
+       shade = TRUE, legend = TRUE)
+
+
+#INTERNATIONAL:
+sum(table(datos_modelo$International))
+unique(datos_modelo$International)
+
+#Proporciones:
+tabla_internacional_target <- table(datos_modelo$International,
+                                    datos_modelo$Target_bin)
+tabla_internacional_target
+
+prop.table(tabla_internacional_target, 1)
+prop.table(tabla_internacional_target, 2)
+
+#Cramer y Tau:
+cramersV(tabla_internacional_target)
+GK_assoc(datos_modelo$International, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$International)
+
+#Chi-cuadrado:
+chisq.test(tabla_internacional_target, correct = FALSE)
+chisq.test(tabla_internacional_target)$expected
+
+#Gráfico:
+table(datos_modelo$International)
+
+tabla_internacional_plot <- datos_modelo %>%
+  mutate(
+    Target_bin = factor(
+      Target_bin,
+      levels = c("No Abandono", "Abandono")
+    )
+  ) %>%
+  count(International, Target_bin) %>%
+  group_by(International) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = scales::percent(prop, accuracy = 0.1)
+  )
+
+ggplot(tabla_internacional_plot, aes(x = International, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "lightblue",
+      "Abandono" = "indianred"
+    ),
+    breaks = c("No Abandono", "Abandono")
+  ) +
+  labs(
+    x = "Estudiante internacional",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre estudiantes internacionales y abandono"
+  ) +
+  theme_minimal()
+
+
+#APPLICATION MODE:
+
+sum(table(datos_modelo$Application.mode_group))
+tabla_modo_app_target <- table(datos_modelo$Application.mode_group,
+                               datos_modelo$Target_bin)
+tabla_modo_app_target
+
+prop.table(tabla_modo_app_target, 1)
+prop.table(tabla_modo_app_target, 2)
+
+cramersV(tabla_modo_app_target)
+GK_assoc(datos_modelo$Application.mode_group, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Application.mode_group)
+
+chisq.test(tabla_modo_app_target, correct = FALSE)
+chisq.test(tabla_modo_app_target)$expected
+
+
+
+#Gráficos:
+tabla_modo_app_plot <- datos_modelo %>%
+  mutate(
+    Target_bin = factor(
+      Target_bin,
+      levels = c("No Abandono", "Abandono")
+    )
+  ) %>%
+  count(Application.mode_group, Target_bin) %>%
+  group_by(Application.mode_group) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = scales::percent(prop, accuracy = 0.1)
+  )
+
+ggplot(tabla_modo_app_plot, aes(x = Application.mode_group, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "lightblue",
+      "Abandono" = "indianred"
+    ),
+    breaks = c("No Abandono", "Abandono")
+  ) +
+  labs(
+    x = "Tipo de acceso al grado",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre tipo de acceso al grado y abandono"
+  ) +
+  theme_minimal()
+
+
+#DEBTOR:
+
+sum(table(datos_modelo$Debtor))
+unique(datos_modelo$Debtor)
+#Proporciones:
+table(datos_modelo$Debtor, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Debtor, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Debtor, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Debtor, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Debtor) 
+
+#Chi-cuadrado:
+tabla_debtor_target <- table(datos_modelo$Debtor, datos_modelo$Target_bin)
+chisq.test(tabla_debtor_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_debtor_target)$expected
+
+#Gráfico:
+tabla_debtor_plot <- datos_modelo %>%
+  mutate(
+    Target_bin = factor(
+      Target_bin,
+      levels = c("No Abandono", "Abandono")
+    )
+  ) %>%
+  count(Debtor, Target_bin) %>%
+  group_by(Debtor) %>%
+  mutate(
+    prop = n / sum(n),
+    etiqueta = scales::percent(prop, accuracy = 0.1)
+  )
+
+ggplot(tabla_debtor_plot, aes(x = Debtor, y = prop, fill = Target_bin)) +
+  geom_col(position = "fill") +
+  geom_text(
+    aes(label = etiqueta),
+    position = position_fill(vjust = 0.5),
+    size = 4
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_manual(
+    values = c(
+      "No Abandono" = "lightblue",
+      "Abandono" = "indianred"
+    ),
+    breaks = c("No Abandono", "Abandono")
+  ) +
+  labs(
+    x = "Debe dinero",
+    y = "Proporción",
+    fill = "Abandono",
+    title = "Relación entre deudor y abandono"
+  ) +
+  theme_minimal()
+
+#SCHOLARSHIP_HOLDER:
+
+sum(table(datos_modelo$Scholarship.holder))
+unique(datos_modelo$Scholarship.holder)
+#Proporciones:
+table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Scholarship.holder, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Scholarship.holder) 
+
+#Chi-cuadrado:
+tabla_beca_target <- table(datos_modelo$Scholarship.holder, datos_modelo$Target_bin)
+chisq.test(tabla_beca_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_beca_target)$expected
+
+#Gráficos:
+datos_modelo$Scholarship.holder <- factor(datos_modelo$Scholarship.holder, levels=c("No", "Sí"))
+
+datos_modelo$Target_bin <- factor(
+  datos_modelo$Target_bin,
+  levels = c("Abandono", "No Abandono")
+)
+
+#Gráficos:
+mosaic(
+  ~ Scholarship.holder + Target_bin,
+  data = datos_modelo,
+  shade = TRUE,
+  legend = TRUE,
+  cex.axis = 0.8,
+  labeling_args = list(
+    set_varnames = c(
+      Scholarship.holder = "Becado",
+      Target_bin = "Abandono"
+    )
+  )
+)
+
+
+
+
+
+#EDUCATIONAL SPECIAL NEEDS:
+sum(table(datos_modelo$Educational.special.needs))
+unique(datos_modelo$Educational.special.needs)
+
+#Proporciones:
+table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 1)
+prop.table(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin), 2)
+
+#Cramer y Tau:
+cramersV(table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin))
+GK_assoc(datos_modelo$Educational.special.needs, datos_modelo$Target_bin) 
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Educational.special.needs) 
+
+#Chi-cuadrado:
+tabla_necesidades_target <- table(datos_modelo$Educational.special.needs, datos_modelo$Target_bin)
+chisq.test(tabla_necesidades_target, correct=FALSE) #Quitamos el criterio de correccion que aplica R automáticamente en las tablas 2x2
+chisq.test(tabla_necesidades_target)$expected
+
+
+
+
+#PREVIOUS EDUCATION LEVEL:
+table(datos_modelo$Previous_education_level)
+unique(datos_modelo$Previous_education_level)
+tabla_prev_edu_target <- table(datos_modelo$Previous_education_level,
+                               datos_modelo$Target_bin)
+tabla_prev_edu_target
+
+prop.table(tabla_prev_edu_target, 1)
+prop.table(tabla_prev_edu_target, 2)
+
+cramersV(tabla_prev_edu_target)
+GK_assoc(datos_modelo$Previous_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Previous_education_level)
+
+chisq.test(tabla_prev_edu_target, correct = FALSE)
+chisq.test(tabla_prev_edu_target)$expected
+
+
+#Cambiamos a nombres más cortos:
+datos_modelo$Previous_education_level_group_short <- dplyr::recode(
+  datos_modelo$Previous_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+datos_modelo$Previous_education_level_group_short <- factor(datos_modelo$Previous_education_level_group_short, levels=c("Bajo", "Medio", "Sup.", "Técn."))
+
+datos_modelo$Target_bin <- factor(
+  datos_modelo$Target_bin,
+  levels = c("Abandono", "No Abandono")
+)
+
+mosaic(
+  ~ Previous_education_level_group_short + Target_bin,
+  data = datos_modelo,
+  shade = TRUE,
+  legend = TRUE,
+  cex.axis = 0.8,
+  labeling_args = list(
+    set_varnames = c(
+      Previous_education_level_group_short = "Nivel de titulación previa",
+      Target_bin = "Abandono"
+    )
+  )
+)
+
+mosaic(~ Previous_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#MOTHER EDUCATION LEVEL.
+table(datos_modelo$Mother_education_level)
+unique(datos_modelo$Mother_education_level)
+tabla_mum_educ_target <- table(datos_modelo$Mother_education_level,
+                               datos_modelo$Target_bin)
+tabla_mum_educ_target
+
+prop.table(tabla_mum_educ_target, 1)
+prop.table(tabla_mum_educ_target, 2)
+
+cramersV(tabla_mum_educ_target)
+GK_assoc(datos_modelo$Mother_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_education_level)
+
+chisq.test(tabla_mum_educ_target, correct = FALSE)
+chisq.test(tabla_mum_educ_target)$expected
+
+#Cambiamos a nombres más cortos:
+datos_modelo$Mother_education_level_group_short <- dplyr::recode(
+  datos_modelo$Mother_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+mosaic(~ Mother_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#FATHER EDUCATION LEVEL:
+table(datos_modelo$Father_education_level)
+unique(datos_modelo$Father_education_level)
+tabla_dad_educ_target <- table(datos_modelo$Father_education_level,
+                               datos_modelo$Target_bin)
+tabla_dad_educ_target
+
+prop.table(tabla_dad_educ_target, 1)
+prop.table(tabla_dad_educ_target, 2)
+
+cramersV(tabla_dad_educ_target)
+GK_assoc(datos_modelo$Father_education_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Father_education_level)
+
+chisq.test(tabla_dad_educ_target, correct = FALSE)
+chisq.test(tabla_dad_educ_target)$expected
+#Cambiamos a nombres más cortos:
+datos_modelo$Father_education_level_group_short <- dplyr::recode(
+  datos_modelo$Father_education_level,
+  "Bajo"= "Bajo",
+  "Medio"= "Medio",
+  "Superior"= "Sup.",
+  "Técnico"= "Técn."
+)
+#Gráfico:
+mosaic(~ Father_education_level_group_short + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#MOTHER OCCUPATION LEVEL:
+
+sum(table(datos_modelo$Mother_occupation_level))
+unique(datos_modelo$Mother_occupation_level)
+tabla_mum_ocup_target <- table(datos_modelo$Mother_occupation_level,
+                               datos_modelo$Target_bin)
+tabla_mum_ocup_target
+
+prop.table(tabla_mum_ocup_target, 1)
+prop.table(tabla_mum_ocup_target, 2)
+
+cramersV(tabla_mum_ocup_target)
+GK_assoc(datos_modelo$Mother_occupation_level, datos_modelo$Target_bin)
+GK_assoc(datos_modelo$Target_bin, datos_modelo$Mother_occupation_level)
+
+chisq.test(tabla_mum_ocup_target, correct = FALSE)
+chisq.test(tabla_mum_ocup_target)$expected
+#Gráfico:
+mosaic(~ Mother_occupation_level + Target_bin, data = datos_modelo,  
+       shade = TRUE, legend = TRUE)
+
+
+#FATHER OCCUPATION LEVEL:
+
+
+datos_modelo <- datos_modelo %>%
+  mutate(
+    Father_occupation_level = trimws(as.character(Father_occupation_level)),
+    Father_occupation_short = case_when(
+      Father_occupation_level == "Alta cualificación" ~ "Alta cualif.",
+      Father_occupation_level == "Baja cualificación" ~ "Baja cualif.",
+      Father_occupation_level == "Cualificación media" ~ "Media cualif.",
+      Father_occupation_level == "Formación militar" ~ "FM",
+      Father_occupation_level == "No cualificados" ~ "Sin cualif.",
+      Father_occupation_level == "Otros" ~ "Otros",
+      TRUE ~ Father_occupation_level
+    )
+  )
+
+
+tabla_dad_ocup_target <- table(
+  datos_modelo$Father_occupation_short,
+  datos_modelo$Target_bin
+)
+
+tabla_dad_ocup_target
+
+prop.table(tabla_dad_ocup_target, 1)
+prop.table(tabla_dad_ocup_target, 2)
+
+cramersV(tabla_dad_ocup_target)
+
+chisq.test(tabla_dad_ocup_target, correct = FALSE)
+chisq.test(tabla_dad_ocup_target)$expected
+
+
+mosaic(
+  ~ Father_occupation_short + Target_bin,
+  data = datos_modelo,
+  shade = TRUE,
+  legend = TRUE,
+  labeling_args = list(
+    set_varnames = c(
+      Father_occupation_short = "Ocupación del padre",
+      Target_bin = "Abandono"
+    )
+  )
+)
+
+
+
+#ANÁLISIS DE SENSIBILIDAD, comparamos datos imputados por moda condicionada con datos sin imputar:
+
+# Base sin imputar con el mismo filtro que datos_modelo
+datos_sensibilidad <- datos_sin_imputar %>%
+  filter(
+    !(Curricular.units.1st.sem..grade. == 0 &
+        Curricular.units.1st.sem..approved. == 0 &
+        Curricular.units.1st.sem..evaluations. == 0 &
+        Curricular.units.1st.sem..credited. == 0 &
+        Curricular.units.1st.sem..enrolled. == 0)
+  )
+
+# Variable objetivo
+datos_sensibilidad$Target_bin <- ifelse(
+  datos_sensibilidad$Target == "Dropout",
+  "Abandono",
+  "No Abandono"
+)
+
+datos_sensibilidad$Target_bin <- factor(
+  datos_sensibilidad$Target_bin,
+  levels = c("No Abandono", "Abandono")
+)
+
+datos_modelo$Target_bin <- factor(
+  datos_modelo$Target_bin,
+  levels = c("No Abandono", "Abandono")
+)
+
+
+
+# Reagrupación directa de las variables afectadas por imputación
+
+
+datos_sensibilidad <- datos_sensibilidad %>%
+  mutate(
+    
+    Mother_education_level = case_when(
+      Mother.s.qualification %in% c(9, 10, 11, 12, 14, 19, 26, 29, 30, 35, 36, 37, 38) ~ "Bajo",
+      Mother.s.qualification %in% c(1, 27) ~ "Medio",
+      Mother.s.qualification %in% c(18, 22, 39, 41, 42) ~ "Técnico",
+      Mother.s.qualification %in% c(2, 3, 4, 5, 6, 40, 43, 44) ~ "Superior",
+      Mother.s.qualification == 34 ~ NA_character_,
+      TRUE ~ NA_character_
+    ),
+    
+    Father_education_level = case_when(
+      Father.s.qualification %in% c(9, 10, 11, 12, 14, 19, 26, 29, 30, 35, 36, 37, 38) ~ "Bajo",
+      Father.s.qualification %in% c(1, 27) ~ "Medio",
+      Father.s.qualification %in% c(13, 18, 20, 22, 25, 31, 33, 39, 41, 42) ~ "Técnico",
+      Father.s.qualification %in% c(2, 3, 4, 5, 6, 40, 43, 44) ~ "Superior",
+      Father.s.qualification == 34 ~ NA_character_,
+      TRUE ~ NA_character_
+    ),
+    
+    Mother_occupation_level = case_when(
+      Mother.s.occupation %in% c(1, 2, 122, 123, 125) ~ "Alta cualificación",
+      Mother.s.occupation %in% c(3, 4, 131, 132, 134, 141, 143, 144) ~ "Cualificación media",
+      Mother.s.occupation %in% c(5, 6, 7, 8, 151, 152, 153, 171, 173, 175, 194) ~ "Baja cualificación",
+      Mother.s.occupation %in% c(9, 191, 192, 193) ~ "No cualificados",
+      Mother.s.occupation %in% c(0, 10, 90) ~ "Otros",
+      Mother.s.occupation == 99 ~ NA_character_,
+      TRUE ~ NA_character_
+    ),
+    
+    Father_occupation_level = case_when(
+      Father.s.occupation %in% c(1, 2, 112, 114, 121, 122, 123, 124) ~ "Alta cualificación",
+      Father.s.occupation %in% c(3, 4, 131, 132, 134, 135, 141, 143, 144) ~ "Cualificación media",
+      Father.s.occupation %in% c(5, 6, 7, 8, 151, 152, 153, 154, 161, 163, 171, 172, 174, 175, 181, 182, 183, 194, 195) ~ "Baja cualificación",
+      Father.s.occupation %in% c(9, 192, 193) ~ "No cualificados",
+      Father.s.occupation %in% c(0, 90) ~ "Otros",
+      Father.s.occupation %in% c(10, 101, 102, 103) ~ "Formación militar",
+      Father.s.occupation == 99 ~ NA_character_,
+      TRUE ~ NA_character_
+    )
+  )
+
+
+# Función para calcular métricas
+
+
+calcular_metricas_sensibilidad <- function(datos, variable, nombre_base) {
+  
+  datos_aux <- datos %>%
+    filter(!is.na(.data[[variable]]), !is.na(Target_bin))
+  
+  tabla <- table(datos_aux[[variable]], datos_aux$Target_bin)
+  chi <- chisq.test(tabla, correct = FALSE)
+  
+  data.frame(
+    Variable = variable,
+    Base = nombre_base,
+    N_usado = sum(tabla),
+    N_perdidos = nrow(datos) - nrow(datos_aux),
+    V_Cramer = as.numeric(cramersV(tabla)),
+    p_valor_chi = chi$p.value
+  )
+}
+
+
+
+# Tabla resumen final
+
+
+resumen_sensibilidad <- bind_rows(
+  calcular_metricas_sensibilidad(datos_modelo, "Mother_education_level", "Imputado"),
+  calcular_metricas_sensibilidad(datos_sensibilidad, "Mother_education_level", "Sin imputar"),
+  
+  calcular_metricas_sensibilidad(datos_modelo, "Father_education_level", "Imputado"),
+  calcular_metricas_sensibilidad(datos_sensibilidad, "Father_education_level", "Sin imputar"),
+  
+  calcular_metricas_sensibilidad(datos_modelo, "Mother_occupation_level", "Imputado"),
+  calcular_metricas_sensibilidad(datos_sensibilidad, "Mother_occupation_level", "Sin imputar"),
+  
+  calcular_metricas_sensibilidad(datos_modelo, "Father_occupation_level", "Imputado"),
+  calcular_metricas_sensibilidad(datos_sensibilidad, "Father_occupation_level", "Sin imputar")
+) %>%
+  mutate(
+    V_Cramer = round(V_Cramer, 4),
+    p_valor_chi = format.pval(p_valor_chi, digits = 4),
+    Interpretacion = case_when(
+      Variable == "Mother_education_level" & Base == "Sin imputar" ~ "No robusta",
+      Variable %in% c("Mother_occupation_level", "Father_occupation_level") ~ "Robusta",
+      Variable == "Father_education_level" ~ "Robusta débil",
+      TRUE ~ ""
+    )
+  )
+
+resumen_sensibilidad
+
+
+
+
+# VALIDACIÓN TRAIN / TEST 70/30 -------------------------------------------
+
+library(pROC)
+
+set.seed(123)
+
+# Variables que usa el modelo
+vars_modelo <- c(
+  "Target_bin",
+  "Carga_academica_real_sem_2",
+  "Porcentaje_aprobado_sem_2",
+  "Curricular.units.2nd.sem.grade_10",
+  "Tuition.fees.up.to.date",
+  "Scholarship.holder",
+  "Age.at.enrollment",
+  "Gender",
+  "Course_group",
+  "Application.mode_group"
+)
+
+# Nos quedamos solo con las variables necesarias y eliminamos posibles NA
+datos_tt <- con_actividad_total[, vars_modelo]
+datos_tt <- datos_tt[complete.cases(datos_tt), ]
+
+# Aseguramos el orden de la variable respuesta
+datos_tt$Target_bin <- factor(
+  datos_tt$Target_bin,
+  levels = c("No Abandono", "Abandono")
+)
+
+# División estratificada 70/30
+# Mantiene proporción parecida de Abandono / No Abandono en train y test
+indices_train <- unlist(
+  tapply(
+    1:nrow(datos_tt),
+    datos_tt$Target_bin,
+    function(ind) sample(ind, size = floor(0.7 * length(ind)))
+  )
+)
+
+train <- datos_tt[indices_train, ]
+test <- datos_tt[-indices_train, ]
+
+# Comprobamos tamaños y proporciones
+table(train$Target_bin)
+table(test$Target_bin)
+
+prop.table(table(train$Target_bin))
+prop.table(table(test$Target_bin))
+
+
+# MODELO AJUSTADO EN TRAIN ------------------------------------------------
+
+modelo_train <- glm(
+  Target_bin ~ Carga_academica_real_sem_2 +
+    Porcentaje_aprobado_sem_2 +
+    Curricular.units.2nd.sem.grade_10 +
+    Tuition.fees.up.to.date +
+    Scholarship.holder +
+    Age.at.enrollment +
+    Gender +
+    Course_group +
+    Application.mode_group,
+  data = train,
+  family = binomial
+)
+
+summary(modelo_train)
+
+
+# PROBABILIDADES PREDICHAS EN TRAIN ---------------------------------------
+
+train$prob_pred <- predict(
+  modelo_train,
+  newdata = train,
+  type = "response"
+)
+
+roc_train <- pROC::roc(
+  response = train$Target_bin,
+  predictor = train$prob_pred,
+  levels = c("No Abandono", "Abandono"),
+  direction = "<"
+)
+
+auc_train <- pROC::auc(roc_train)
+auc_train
+
+
+# UMBRAL ÓPTIMO DE YOUDEN EN TRAIN ----------------------------------------
+
+punto_youden_train <- pROC::coords(
+  roc_train,
+  x = "best",
+  best.method = "youden",
+  ret = c("threshold", "sensitivity", "specificity", "accuracy"),
+  transpose = FALSE
+)
+
+punto_youden_train
+
+umbral_youden_train <- as.numeric(punto_youden_train$threshold[1])
+umbral_youden_train
+
+
+# PREDICCIÓN SOBRE TEST ---------------------------------------------------
+
+test$prob_pred <- predict(
+  modelo_train,
+  newdata = test,
+  type = "response"
+)
+
+summary(test$prob_pred)
+
+
+# CLASIFICACIÓN EN TEST CON UMBRAL DE YOUDEN ------------------------------
+
+test$pred_clase_youden <- ifelse(
+  test$prob_pred >= umbral_youden_train,
+  "Abandono",
+  "No Abandono"
+)
+
+test$pred_clase_youden <- factor(
+  test$pred_clase_youden,
+  levels = levels(test$Target_bin)
+)
+
+tabla_test_youden <- table(
+  Real = test$Target_bin,
+  Predicho = test$pred_clase_youden
+)
+
+tabla_test_youden
+
+
+# MÉTRICAS EN TEST --------------------------------------------------------
+
+accuracy_test_youden <- mean(
+  test$pred_clase_youden == test$Target_bin
+)
+
+sensibilidad_test_youden <- tabla_test_youden["Abandono", "Abandono"] /
+  sum(tabla_test_youden["Abandono", ])
+
+especificidad_test_youden <- tabla_test_youden["No Abandono", "No Abandono"] /
+  sum(tabla_test_youden["No Abandono", ])
+
+accuracy_test_youden
+sensibilidad_test_youden
+especificidad_test_youden
+
+
+# ROC Y AUC EN TEST -------------------------------------------------------
+
+roc_test <- pROC::roc(
+  response = test$Target_bin,
+  predictor = test$prob_pred,
+  levels = c("No Abandono", "Abandono"),
+  direction = "<"
+)
+
+auc_test <- pROC::auc(roc_test)
+auc_test
+
 
