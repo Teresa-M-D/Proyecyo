@@ -179,9 +179,9 @@ ggplot(datos_long,
   
   scale_color_discrete(
     labels = c(
-      "Nota media 1º semestre",
-      "Nota media 2º semestre",
       "Nota estudios previos",
+      "Nota media 2º semestre",
+      "Nota media 1º semestre",
       "Nota de admisión"
     )
   ) +
@@ -289,3 +289,5 @@ corrplot(
   tl.cex = 0.7,
   number.cex = 0.6
 )
+
+

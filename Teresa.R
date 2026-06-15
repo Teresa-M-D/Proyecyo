@@ -48,3 +48,54 @@ variables_numéricas<-c("Previous.qualification.grade_10",
 
 describe(datos_recodificados[,variables_numéricas])
 descriptive(datos_modelo[,variables_numéricas])
+
+library(ggplot2)
+library(tidyr)
+
+#Variables a usar
+notas <- datos_modelo[, c(
+  "Previous.qualification.grade_10",
+  "Admission.grade_10",
+  "Curricular.units.1st.sem.grade_10",
+  "Curricular.units.2nd.sem.grade_10"
+)]
+
+#Leyenda
+colnames(notas) <- c(
+  "Nota estudios previos",
+  "Nota de admisión",
+  "Nota media 1º semestre",
+  "Nota media 2º semestre"
+)
+
+
+#Gráfico
+ggplot(notas_largas,
+       aes(x = Nota,
+           colour = Variable)) +
+  geom_density(linewidth = 1) +
+  labs(
+    x = "Nota sobre 10",
+    y = "Densidad",
+    colour = "Variable"
+  ) +
+  theme_bw()
+
+
+library(ggplot2)
+
+ggplot(datos_modelo,
+       aes(x = factor(year),
+           y = Curricular.units.1st.sem..approved.)) +
+  geom_boxplot() +
+  facet_wrap(~ Course) +
+  labs(
+    title = "Unidades curriculares aprobadas en cada año según la carrera",
+    x = "PIB",
+    y = "Unidades curriculares aprobadas"
+  ) +
+  theme_bw()
+datos_modelo$yea
+
+boxplot(datos_modelo$Porcentaje_aprobado_sem_2~datos_modelo$Course, las=2,cex.axis=0.7)
+par(mar = c(12,4,4,2))
