@@ -453,8 +453,8 @@ ggplot(resumen_genero, aes(x = Gender, y = porcentaje, fill = Gender)) +
 
 # Crear tabla resumen con proporciones dentro de cada género
 resumen_genero_target <- datos_modelo %>%
-  count(Gender_label, Target_bin) %>%
-  group_by(Gender_label) %>%
+  count(Gender, Target_bin) %>%
+  group_by(Gender) %>%
   mutate(
     prop = n / sum(n),
     etiqueta = percent(prop, accuracy = 0.1)
