@@ -637,10 +637,6 @@ ggplot(datos_prop,
 
 
 
-#Análisis univariante numérico:
-
-
-
 #Densidades de calificaciones
 datos_long <- datos_modelo %>%
   pivot_longer(
