@@ -405,6 +405,17 @@ ggplot(datos_modelo, aes(x = Age.at.enrollment)) +
     aspect.ratio=0.25
   )
 
+#Boxplot edad de matriculación según abandono
+boxplot(Age.at.enrollment ~ Target_bin,
+        data = con_actividad_total,
+        col = c("salmon", "lightgreen"),
+        names = c("Abandono", "No Abandono"),
+        main = "Edad de matriculación y abandono",
+        xlab = "Target_bin",
+        ylab = "Age.at.enrollment")
+
+
+
 
 #Diagrama de barras género con proporciones:
 datos_modelo$Gender <- factor(
