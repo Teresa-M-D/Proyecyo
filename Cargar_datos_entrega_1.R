@@ -101,7 +101,7 @@ datos_recodificados<-datos_moda_condicionada
 
 #Nacionality:
 
-datos_recodificados$Nationality<-recode(datos_recodificados$Nationality, 
+datos_recodificados$Nationality<-dplyr::recode(datos_recodificados$Nationality, 
                                         `1` = "Portugués",
                                         `2` = "Alemán",
                                         `6` = "Español",
@@ -127,7 +127,7 @@ datos_recodificados$Nationality<-recode(datos_recodificados$Nationality,
 
 
 #Course
-datos_recodificados$Course<-recode(datos_recodificados$Course, 
+datos_recodificados$Course<-dplyr::recode(datos_recodificados$Course, 
                                    `33` = "Tecnologías de Producción de Biocombustibles",
                                    `171` = "Diseño de Animación y Multimedia",
                                    `8014` = "Trabajo Social (turno de tarde)",
@@ -156,7 +156,7 @@ datos_recodificados$Course_limpio <- gsub(
 
 
 #Mother's Cualification
-datos_recodificados$Mother.s.qualification<-recode(datos_recodificados$Mother.s.qualification,
+datos_recodificados$Mother.s.qualification<-dplyr::recode(datos_recodificados$Mother.s.qualification,
                                                    `1` = "Educación secundaria - 12º año o equivalente",
                                                    `2` = "Educación superior - Grado (Bachelor)",
                                                    `3` = "Educación superior - Grado",
@@ -189,7 +189,7 @@ datos_recodificados$Mother.s.qualification<-recode(datos_recodificados$Mother.s.
 
 
 #Father qualification:
-datos_recodificados$Father.s.qualification <- recode(datos_recodificados$Father.s.qualification,
+datos_recodificados$Father.s.qualification <- dplyr::recode(datos_recodificados$Father.s.qualification,
                                                      `1` = "Educación secundaria - 12º año o equivalente",
                                                      `2` = "Educación superior - Grado (Bachelor)",
                                                      `3` = "Educación superior - Grado",
@@ -227,7 +227,7 @@ datos_recodificados$Father.s.qualification <- recode(datos_recodificados$Father.
 
 #Mothers occupation
 datos_recodificados$Mother.s.occupation <- as.integer(datos_moda_condicionada$Mother.s.occupation)
-datos_recodificados$Mother.s.occupation<-recode(datos_recodificados$Mother.s.occupation,
+datos_recodificados$Mother.s.occupation<-dplyr::recode(datos_recodificados$Mother.s.occupation,
                                                 `0` = "Estudiante",
                                                 `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
                                                 `2` = "Especialistas en actividades intelectuales y científicas",
@@ -262,7 +262,7 @@ datos_recodificados$Mother.s.occupation<-recode(datos_recodificados$Mother.s.occ
                                                 `194` = "Ayudantes de preparación de comidas")
 
 #Father's occupation:
-datos_recodificados$Father.s.occupation<-recode(datos_recodificados$Father.s.occupation,
+datos_recodificados$Father.s.occupation<-dplyr::recode(datos_recodificados$Father.s.occupation,
                                                 `0` = "Estudiante",
                                                 `1` = "Representantes del poder legislativo y ejecutivo, directores y gerentes",
                                                 `2` = "Especialistas en actividades intelectuales y científicas",
@@ -312,43 +312,43 @@ datos_recodificados$Father.s.occupation<-recode(datos_recodificados$Father.s.occ
 
 #Displaced
 
-datos_recodificados$Displaced<-recode(datos_recodificados$Displaced,
+datos_recodificados$Displaced<-dplyr::recode(datos_recodificados$Displaced,
                                       `1` = "Sí",
                                       `0` = "No")
 
 
 #Education special needs:
-datos_recodificados$Educational.special.needs<-recode(datos_recodificados$Educational.special.needs,
+datos_recodificados$Educational.special.needs<-dplyr::recode(datos_recodificados$Educational.special.needs,
                                                       `1` = "Sí",
                                                       `0` = "No")
 
 #Debtor:
-datos_recodificados$Debtor<-recode(datos_recodificados$Debtor,
+datos_recodificados$Debtor<-dplyr::recode(datos_recodificados$Debtor,
                                    `1` = "Sí",
                                    `0` = "No")
 
 #Tution feets up:
-datos_recodificados$Tuition.fees.up.to.date<-recode(datos_recodificados$Tuition.fees.up.to.date,
+datos_recodificados$Tuition.fees.up.to.date<-dplyr::recode(datos_recodificados$Tuition.fees.up.to.date,
                                                     `1` = "Sí",
                                                     `0` = "No")
 
 #International:
-datos_recodificados$International<-recode(datos_recodificados$International,
+datos_recodificados$International<-dplyr::recode(datos_recodificados$International,
                                           `1` = "Sí",
                                           `0` = "No")
 
 #Gender:
-datos_recodificados$Gender<-recode(datos_recodificados$Gender,
+datos_recodificados$Gender<-dplyr::recode(datos_recodificados$Gender,
                                    `1` = "Masculino",
                                    `0` = "Femenino")
 
 #Scholarship holder:
-datos_recodificados$Scholarship.holder<-recode(datos_recodificados$Scholarship.holder,
+datos_recodificados$Scholarship.holder<-dplyr::recode(datos_recodificados$Scholarship.holder,
                                                `1` = "Sí",
                                                `0` = "No")
 
 #Marital Status:
-datos_recodificados$Marital.status<-recode(datos_recodificados$Marital.status,
+datos_recodificados$Marital.status<-dplyr::recode(datos_recodificados$Marital.status,
                                            `1` = "Soltero",
                                            `2` = "Casado",
                                            `3` = "Viudo",
@@ -359,7 +359,7 @@ datos_recodificados$Marital.status<-recode(datos_recodificados$Marital.status,
 
 
 #Application mode:
-datos_recodificados$Application.mode<-recode(datos_recodificados$Application.mode,
+datos_recodificados$Application.mode<-dplyr::recode(datos_recodificados$Application.mode,
                                              `1` = "1ª fase - cupo general",
                                              `2` = "Ordenanza nº 612/93",
                                              `5` = "1ª fase - cupo especial (Islas Azores)",
@@ -381,7 +381,7 @@ datos_recodificados$Application.mode<-recode(datos_recodificados$Application.mod
 
 
 #Previous qualification:
-datos_recodificados$Previous.qualification<-recode(datos_recodificados$Previous.qualification,
+datos_recodificados$Previous.qualification<-dplyr::recode(datos_recodificados$Previous.qualification,
                                                    `1` = "Educación secundaria",
                                                    `2` = "Educación superior - grado (bachelor)",
                                                    `3` = "Educación superior - grado",
@@ -402,7 +402,7 @@ datos_recodificados$Previous.qualification<-recode(datos_recodificados$Previous.
 
 
 #Daytime evening attendance:
-datos_recodificados$Daytime.evening.attendance.<-recode(datos_recodificados$Daytime.evening.attendance.,
+datos_recodificados$Daytime.evening.attendance.<-dplyr::recode(datos_recodificados$Daytime.evening.attendance.,
                                                         `1` = "Mañana",
                                                         `0` = "Tarde")
 
