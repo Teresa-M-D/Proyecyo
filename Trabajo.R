@@ -546,7 +546,9 @@ prop.table(table(datos_modelo$Carga_academica_real_sem_2))
 (0.2669651272+0.4429783223+0.2841658812+0.4415645617)/2
 
 #Porcentaje de aprobados
-descriptive(datos_recodificados$Porcentaje_aprobado_sem_1[datos_recodificados$Course=="Diseño de Animación y Multimedia"])
+#No incluímos los valores cero de multimedia. Nos fijamos en los NAs
+descriptive(datos_recodificados$Porcentaje_aprobado_sem_1[datos_recodificados$Course!="Diseño de Animación y Multimedia"])
+descriptive(datos_recodificados$Porcentaje_aprobado_sem_2[datos_recodificados$Course!="Diseño de Animación y Multimedia"])
 
 
 #-------------------
