@@ -476,13 +476,13 @@ resumen_genero_target
 
 # Gráfico de proporciones
 
-
 resumen_genero_target <- datos_modelo %>%
   count(Gender, Target_bin) %>%
   group_by(Gender) %>%
   mutate(
     prop = n / sum(n),
-    etiqueta = percent(prop, accuracy = 0.1)
+    etiqueta = percent(prop, accuracy = 0.1),
+    Target_bin = factor(Target_bin, levels = c("No Abandono", "Abandono"))
   ) %>%
   ungroup()
 
@@ -519,7 +519,6 @@ ggplot(
     legend.position = "bottom",
     plot.title = element_text(face = "bold")
   )
-
 
 #Nuevas variables:
 
@@ -604,8 +603,11 @@ datos_prop <- datos_modelo %>%
   group_by(tipo_actividad, Target_bin) %>%
   summarise(n = n(), .groups = "drop") %>%
   group_by(tipo_actividad) %>%
-  mutate(prop = n / sum(n),
-         etiqueta = scales::percent(prop, accuracy = 0.1))
+  mutate(
+    prop = n / sum(n),
+    etiqueta = scales::percent(prop, accuracy = 0.1),
+    Target_bin = factor(Target_bin, levels = c("No Abandono", "Abandono"))
+  )
 
 # Gráfico
 ggplot(datos_prop,
@@ -614,7 +616,6 @@ ggplot(datos_prop,
            fill = Target_bin)) +
   geom_bar(stat = "identity") +
   
-  # Etiquetas dentro de la barra
   geom_text(aes(label = etiqueta),
             position = position_stack(vjust = 0.5),
             color = "black",
@@ -629,90 +630,15 @@ ggplot(datos_prop,
   
   labs(title = "Proporción de abandono según tipo de actividad académica",
        x = "Tipo de actividad",
-       y = "Proporción") +
+       y = "Proporción",
+       fill = "Situación final") +
   
   theme_minimal()
 
 
 
-
 #Análisis univariante numérico:
 
-
-
-#Análisis bivariante: variables numéricas vs Target
-
-#NOTAS POR SEMESTRE SEGÚN ABANDONO (voy a hacerlo excluyendo a las personas que no tienen actividad en alguno de 
-#los dos semestres o en ambos)
-
-# Convertir a formato largo
-df_long1 <- datos_modelo %>%
-  filter(tipo_actividad == "Con actividad") %>%
-  pivot_longer(
-    cols = c(Curricular.units.1st.sem.grade_10,
-             Curricular.units.2nd.sem.grade_10),
-    names_to = "Semestre",
-    values_to = "Nota"
-  ) %>%
-  mutate(
-    Semestre = dplyr::recode(Semestre,
-                      "Curricular.units.1st.sem.grade_10" = "1º Semestre",
-                      "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
-  )
-# Gráfico combinado
-ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    x = "Abandono",
-    y = "Nota",
-    fill = "Semestre",
-    title = "Notas por semestre según abandono"
-  ) +
-  theme_minimal(base_size = 14)
-
-
-#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
-
-df_long2 <- datos_modelo %>%
-  filter(tipo_actividad == "Con actividad") %>%   
-  pivot_longer(
-    cols = c(Porcentaje_aprobado_sem_1,
-             Porcentaje_aprobado_sem_2),
-    names_to = "Semestre",
-    values_to = "Porcentaje_evaluaciones_aprobadas"
-  ) %>%
-  mutate(
-    Semestre = dplyr::recode(Semestre,
-                             "Porcentaje_aprobado_sem_1" = "1º Semestre",
-                             "Porcentaje_aprobado_sem_2" = "2º Semestre")
-  )
-
-ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    x = "Abandono",
-    y = "Porcentaje evaluaciones aprobadas",
-    fill = "Semestre",
-    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
-  ) +
-  theme_minimal(base_size = 14)
-
-#Test de Mann - Whitney
-datos_activos <- datos_modelo %>% 
-  filter(tipo_actividad == "Con actividad")
-
-wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
-wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
-
-#Tamaño del efecto
-wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
-wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
 
 
 #Densidades de calificaciones
@@ -845,6 +771,82 @@ prop.table(table(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$C
 (0.3744109331+ 0.4071630537)/2
 ( 0.1625824694+ 0.1267672008)/2
 
+
+
+
+#Análisis bivariante: variables numéricas vs Target
+
+#NOTAS POR SEMESTRE SEGÚN ABANDONO (voy a hacerlo excluyendo a las personas que no tienen actividad en alguno de 
+#los dos semestres o en ambos)
+
+# Convertir a formato largo
+df_long1 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%
+  pivot_longer(
+    cols = c(Curricular.units.1st.sem.grade_10,
+             Curricular.units.2nd.sem.grade_10),
+    names_to = "Semestre",
+    values_to = "Nota"
+  ) %>%
+  mutate(
+    Semestre = dplyr::recode(Semestre,
+                      "Curricular.units.1st.sem.grade_10" = "1º Semestre",
+                      "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
+  )
+# Gráfico combinado
+ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Nota",
+    fill = "Semestre",
+    title = "Notas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
+
+df_long2 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%   
+  pivot_longer(
+    cols = c(Porcentaje_aprobado_sem_1,
+             Porcentaje_aprobado_sem_2),
+    names_to = "Semestre",
+    values_to = "Porcentaje_evaluaciones_aprobadas"
+  ) %>%
+  mutate(
+    Semestre = dplyr::recode(Semestre,
+                             "Porcentaje_aprobado_sem_1" = "1º Semestre",
+                             "Porcentaje_aprobado_sem_2" = "2º Semestre")
+  )
+
+ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Porcentaje evaluaciones aprobadas",
+    fill = "Semestre",
+    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+#Test de Mann - Whitney
+datos_activos <- datos_modelo %>% 
+  filter(tipo_actividad == "Con actividad")
+
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
+
+#Tamaño del efecto
+wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
 
 
 #Análisis bivariante: variabels categóricas vs Target
