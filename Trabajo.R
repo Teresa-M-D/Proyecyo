@@ -660,6 +660,116 @@ df_long1 <- datos_modelo %>%
                       "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
   )
 
+#Densidades de calificaciones
+datos_long <- datos_modelo %>%
+  pivot_longer(
+    cols = c(
+      Curricular.units.1st.sem.grade_10,
+      Curricular.units.2nd.sem.grade_10,
+      Previous.qualification.grade_10,
+      Admission.grade_10
+    ),
+    
+    names_to = "Variable",
+    values_to = "Valor"
+  ) %>%
+  
+  filter(
+    !(Variable == "Curricular.units.2nd.sem.grade_10" &
+        Valor == 0)
+  )
+
+ggplot(datos_long,
+       aes(
+         x = Valor,
+         color = Variable
+       )) +
+  
+  geom_density(linewidth = 1.2) +
+  
+  scale_color_discrete(
+    labels = c(
+      "Nota estudios previos",
+      "Nota media 2º semestre",
+      "Nota media 1º semestre",
+      "Nota de admisión"
+    )
+  ) +
+  
+  labs(
+    color = "Variable",
+    x = "Nota sobre 10",
+    y = "Densidad"
+  ) +
+  
+  theme_minimal(base_size = 15) +
+  
+  theme(
+    axis.title.x = element_text(size = 18),
+    axis.title.y = element_text(size = 18),
+    
+    axis.text.x = element_text(size = 15),
+    axis.text.y = element_text(size = 15),
+    
+    legend.title = element_text(size = 17),
+    legend.text = element_text(size = 15)
+  )
+
+#Papel probabilístico normal
+#curricular 1st sem grades
+qqnorm(
+  datos_recodificados$Curricular.units.1st.sem.grade_10,
+  main = "Papel probabilístico normal 1st Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.1st.sem.grade_10)
+grid()
+
+#curricular 2nd sem grades
+qqnorm(
+  datos_recodificados$Curricular.units.2nd.sem.grade_10,
+  main = "Papel probabilístico normal 2nd Sem. Grades",
+)
+qqline(datos_recodificados$Curricular.units.2nd.sem.grade_10)
+grid()
+
+#Faltas a evaluaciones
+datos_long <- datos_modelo %>%
+  pivot_longer(
+    cols = c(
+      Curricular.units.1st.sem..without.evaluations.,
+      Curricular.units.2nd.sem..without.evaluations.
+    ),
+    
+    names_to = "Variable",
+    values_to = "Valor"
+  )
+
+ggplot(
+  datos_long,
+  
+  aes(
+    x = factor(Valor),
+    fill = Variable
+  )
+) +
+  
+  geom_bar(position = "dodge") +
+  
+  scale_fill_discrete(
+    labels = c(
+      "Sin evaluación 1º semestre",
+      "Sin evaluación 2º semestre"
+    )
+  ) +
+  
+  labs(
+    fill = "Variable",
+    x = "Número de asignaturas sin evaluación",
+    y = "Frecuencia"
+  ) +
+  
+  theme_minimal(base_size = 16)
+
 # Gráfico combinado
 ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
