@@ -532,3 +532,4 @@ ggplot(df_long3, aes(x = Target_bin, y = Carga_academica_real, fill = Semestre))
   theme_minimal(base_size = 14)
 
 sum(datos_modelo$Age.at.enrollment == 70)
+porcentaje_
