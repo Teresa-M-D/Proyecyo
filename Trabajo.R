@@ -785,8 +785,10 @@ barplot(table(datos_modelo$Curricular.units.1st.sem..approved.),
         xlab = "Asignaturas aprobadas",
         ylab = "Frecuencia",
         col = "lightblue")
-
-
+prop.table(table(datos_modelo$Curricular.units.1st.sem..approved./datos_modelo$Curricular.units.1st.sem..enrolled.))
+prop.table(table(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..enrolled.))
+(0.3744109331+ 0.4071630537)/2
+( 0.1625824694+ 0.1267672008)/2
 # Gráfico combinado
 ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
