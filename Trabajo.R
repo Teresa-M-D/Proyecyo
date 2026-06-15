@@ -659,6 +659,61 @@ df_long1 <- datos_modelo %>%
                       "Curricular.units.1st.sem.grade_10" = "1º Semestre",
                       "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
   )
+# Gráfico combinado
+ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Nota",
+    fill = "Semestre",
+    title = "Notas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+
+#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
+
+df_long2 <- datos_modelo %>%
+  filter(tipo_actividad == "Con actividad") %>%   
+  pivot_longer(
+    cols = c(Porcentaje_aprobado_sem_1,
+             Porcentaje_aprobado_sem_2),
+    names_to = "Semestre",
+    values_to = "Porcentaje_evaluaciones_aprobadas"
+  ) %>%
+  mutate(
+    Semestre = dplyr::recode(Semestre,
+                             "Porcentaje_aprobado_sem_1" = "1º Semestre",
+                             "Porcentaje_aprobado_sem_2" = "2º Semestre")
+  )
+
+ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    x = "Abandono",
+    y = "Porcentaje evaluaciones aprobadas",
+    fill = "Semestre",
+    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
+  ) +
+  theme_minimal(base_size = 14)
+
+#Test de Mann - Whitney
+datos_activos <- datos_modelo %>% 
+  filter(tipo_actividad == "Con actividad")
+
+wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
+
+#Tamaño del efecto
+wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
+wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
+
 
 #Densidades de calificaciones
 datos_long <- datos_modelo %>%
@@ -789,62 +844,7 @@ prop.table(table(datos_modelo$Curricular.units.1st.sem..approved./datos_modelo$C
 prop.table(table(datos_modelo$Curricular.units.2nd.sem..approved./datos_modelo$Curricular.units.2nd.sem..enrolled.))
 (0.3744109331+ 0.4071630537)/2
 ( 0.1625824694+ 0.1267672008)/2
-# Gráfico combinado
-ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    x = "Abandono",
-    y = "Nota",
-    fill = "Semestre",
-    title = "Notas por semestre según abandono"
-  ) +
-  theme_minimal(base_size = 14)
 
-
-#PORCENTAJE EVALUACIONES APROBADAS POR SEMESTRE SEGUN ABANDONO
-
-df_long2 <- datos_modelo %>%
-  filter(tipo_actividad == "Con actividad") %>%   
-  pivot_longer(
-    cols = c(Porcentaje_aprobado_sem_1,
-             Porcentaje_aprobado_sem_2),
-    names_to = "Semestre",
-    values_to = "Porcentaje_evaluaciones_aprobadas"
-  ) %>%
-  mutate(
-    Semestre = dplyr::recode(Semestre,
-                      "Porcentaje_aprobado_sem_1" = "1º Semestre",
-                      "Porcentaje_aprobado_sem_2" = "2º Semestre")
-  )
-
-ggplot(df_long2, aes(x = Target_bin, y = Porcentaje_evaluaciones_aprobadas, fill = Semestre)) +
-  geom_boxplot(position = position_dodge(width = 0.8)) +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    x = "Abandono",
-    y = "Porcentaje evaluaciones aprobadas",
-    fill = "Semestre",
-    title = "Porcentaje evaluaciones aprobadas por semestre según abandono"
-  ) +
-  theme_minimal(base_size = 14)
-
-#Test de Mann - Whitney
-datos_activos <- datos_modelo %>% 
-  filter(tipo_actividad == "Con actividad")
-
-wilcox.test(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox.test(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox.test(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
-wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
-
-#Tamaño del efecto
-wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
-
-
-wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
-wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
-wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
 
 
 #Análisis bivariante: variabels categóricas vs Target
