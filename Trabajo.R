@@ -774,6 +774,19 @@ ggplot(
   
   theme_minimal(base_size = 16)
 
+sum(datos_modelo$Curricular.units.1st.sem..without.evaluations.[datos_modelo$Curricular.units.1st.sem..without.evaluations.!=0])
+sum(datos_modelo$Curricular.units.2nd.sem..without.evaluations.[datos_modelo$Curricular.units.2nd.sem..without.evaluations.!=0])
+sum(datos_modelo$Curricular.units.1st.sem..without.evaluations.!=0)
+sum(datos_modelo$Curricular.units.2nd.sem..without.evaluations.!=0)
+
+#Unidades curriculares aprobadas
+barplot(table(datos_modelo$Curricular.units.1st.sem..approved.),
+        main = "Número de asignaturas aprobadas",
+        xlab = "Asignaturas aprobadas",
+        ylab = "Frecuencia",
+        col = "lightblue")
+
+
 # Gráfico combinado
 ggplot(df_long1, aes(x = Target_bin, y = Nota, fill = Semestre)) +
   geom_boxplot(position = position_dodge(width = 0.8)) +
