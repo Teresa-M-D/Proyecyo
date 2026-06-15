@@ -1,8 +1,9 @@
 # Instalar paquetes solo si no están instalados
 paquetes <- c(
   "dplyr", "ggplot2", "DescTools", "clickR", "corrplot", "gridExtra",
-  "plotly", "scatterplot3d", "vcd", "lsr", "GGally", "psych", "scales", "sf", "rnaturalearth", "rnaturalearthdata", "car", "pROC", "caret"
+  "plotly", "scatterplot3d", "vcd", "lsr", "GGally", "psych", "scales", "sf", "rnaturalearth", "rnaturalearthdata", "car", "pROC", "caret", "tidyr", "rstatix"
 )
+
 
 #Librerías a usar:
 library(corrplot)
@@ -26,6 +27,10 @@ library(car)
 library(pROC)
 library(caret)
 library(dplyr)
+library(tidyr)
+library(rstatix)
+
+
 #CARGA DE DATOS:
 
 datos_sin_imputar <- read.csv("estudiantes.csv", header=TRUE, sep=";")
