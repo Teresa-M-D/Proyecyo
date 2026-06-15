@@ -1444,6 +1444,29 @@ table(datos_recodificados$Unemployment.rate)
 
 
 
+datos_modelo$course_abreviado<-dplyr::recode(
+  datos_modelo$Course,
+  "Agronomía" = "Agronomía",
+  "Diseño de Animación y Multimedia" = "Animación y Mult.",
+  "Diseño de Comunicación" = "Diseño Com.",
+  "Educación Básica" = "Ed. Básica",
+  "Enfermería" = "Enfermería",
+  "Enfermería Veterinaria" = "Vet.",
+  "Equinocultura" = "Equinocultura",
+  "Gestión" = "Gestión",
+  "Gestión (turno de tarde)" = "Gestión Tarde",
+  "Gestión de Publicidad y Marketing" = "Marketing",
+  "Higiene Bucodental" = "Higiene Bucodental",
+  "Ingeniería Informática" = "Informática",
+  "Periodismo y Comunicación" = "Periodismo",
+  "Tecnologías de Producción de Biocombustibles" = "Tec. Combustibles",
+  "Trabajo Social" = "Trabajo Social",
+  "Trabajo Social (turno de tarde)" = "Trab. Social T.",
+  "Turismo" = "Turismo"
+)
+
+mosaicplot(table( datos_modelo$course_abreviado,datos_modelo$Target), las=2, main="Abandono según Grado", cex.axis = 1.5)
+
 #####################
 #BIVARIANTE NUMÉRICO
 #####################
