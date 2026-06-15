@@ -821,6 +821,8 @@ wilcox.test(Porcentaje_aprobado_sem_2  ~ Target_bin, data = datos_activos)
 
 #Tamaño del efecto
 wilcox_effsize(Curricular.units.1st.sem.grade_10 ~ Target_bin, data = datos_activos)
+
+
 wilcox_effsize(Curricular.units.2nd.sem.grade_10 ~ Target_bin, data = datos_activos)
 wilcox_effsize(Porcentaje_aprobado_sem_1 ~ Target_bin, data = datos_activos)
 wilcox_effsize(Porcentaje_aprobado_sem_2 ~ Target_bin, data = datos_activos)
