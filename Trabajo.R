@@ -39,7 +39,7 @@ datos_ue_portugal <- datos_limpios %>%
     )
   ) %>%
   mutate(
-    pais = recode(
+    pais = dplyr::recode(
       pais,
       "European Union - 27 countries (from 2020)" = "Unión Europea"
     ),
@@ -250,7 +250,7 @@ fig
 
 datos_target <- datos_modelo %>%
   mutate(
-    Target = recode(
+    Target = dplyr::recode(
       Target,
       "Dropout" = "Abandono",
       "Graduate" = "Graduado",
@@ -655,7 +655,7 @@ df_long1 <- datos_modelo %>%
     values_to = "Nota"
   ) %>%
   mutate(
-    Semestre = recode(Semestre,
+    Semestre = dplyr::recode(Semestre,
                       "Curricular.units.1st.sem.grade_10" = "1º Semestre",
                       "Curricular.units.2nd.sem.grade_10" = "2º Semestre")
   )
@@ -715,7 +715,11 @@ ggplot(datos_long,
     legend.text = element_text(size = 15)
   )
 
+
+
+
 #Papel probabilístico normal
+
 #curricular 1st sem grades
 qqnorm(
   datos_recodificados$Curricular.units.1st.sem.grade_10,
@@ -794,7 +798,7 @@ df_long2 <- datos_modelo %>%
     values_to = "Porcentaje_evaluaciones_aprobadas"
   ) %>%
   mutate(
-    Semestre = recode(Semestre,
+    Semestre = dplyr::recode(Semestre,
                       "Porcentaje_aprobado_sem_1" = "1º Semestre",
                       "Porcentaje_aprobado_sem_2" = "2º Semestre")
   )
