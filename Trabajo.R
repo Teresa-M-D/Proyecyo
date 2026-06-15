@@ -523,8 +523,30 @@ ggplot(
 
 #Nuevas variables:
 
+#Carga académica real
+ggplot(datos_modelo, aes(x = Carga_academica_real)) +
+  geom_histogram(
+    aes(fill = Carga_academica_real %in% c(5, 6)),
+    binwidth = 1,
+    color = "grey40"
+  ) +
+  scale_fill_manual(
+    values = c("FALSE" = "#dfe8e6",
+               "TRUE" = "#ff7f50"),
+    guide = "none"
+  ) +
+  labs(
+    x = "Carga académica real",
+    y = "Frecuencia"
+  ) +
+  theme_bw()
 
+prop.table(table(datos_modelo$Carga_academica_real))
+prop.table(table(datos_modelo$Carga_academica_real_sem_2))
+(0.2669651272+0.4429783223+0.2841658812+0.4415645617)/2
 
+#Porcentaje de aprobados
+descriptive(datos_recodificados$Porcentaje_aprobado_sem_1[datos_recodificados$Course=="Diseño de Animación y Multimedia"])
 
 
 #-------------------
